@@ -1,325 +1,514 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Moon Night X — Admin Panel</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #050505; --surface: #111111; --surface2: #1a1a1a;
-      --border: #222222; --text: #ffffff; --muted: #888888;
-      --accent: #E02424; --accent-hover: #c01c1c;
-      --green: #22c55e; --yellow: #f59e0b; --blue: #3b82f6;
-    }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Moon Night X — Admin Panel</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050505;--surface:#111111;--surface2:#1a1a1a;--surface3:#222222;
+  --border:#2a2a2a;--text:#ffffff;--muted:#888888;--muted2:#555555;
+  --accent:#E02424;--accent2:#c01c1c;
+  --green:#22c55e;--yellow:#f59e0b;--blue:#3b82f6;--purple:#a855f7;--cyan:#06b6d4;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden}
+input,select,textarea,button{font-family:inherit}
 
-    /* LOGIN */
-    #login-screen {
-      display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; padding: 20px;
-    }
-    .login-box {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 40px; width: 100%; max-width: 400px;
-    }
-    .login-box h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
-    .login-box p { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
-    .login-box input {
-      width: 100%; padding: 12px 16px; background: var(--bg);
-      border: 1px solid var(--border); border-radius: 10px;
-      color: var(--text); font-size: 14px; margin-bottom: 12px; outline: none;
-    }
-    .login-box input:focus { border-color: var(--accent); }
-    .login-error { color: var(--accent); font-size: 12px; margin-bottom: 12px; display: none; }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#444}
 
-    /* LAYOUT */
-    #admin-panel { display: none; }
-    .header {
-      background: var(--surface); border-bottom: 1px solid var(--border);
-      padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 100;
-    }
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .logo { font-size: 18px; font-weight: 800; }
-    .logo span { color: var(--accent); }
-    .badge { background: var(--accent); color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
-    .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+/* ── LOGIN ── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:radial-gradient(ellipse at 50% 0%,#1a0505 0%,var(--bg) 70%)}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:44px;width:100%;max-width:420px;box-shadow:0 25px 80px rgba(224,36,36,0.08)}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.login-logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.login-logo h1{font-size:22px;font-weight:900;letter-spacing:-0.5px}
+.login-logo span{color:var(--accent)}
+.login-subtitle{color:var(--muted);font-size:13px;margin-bottom:28px}
+.login-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:block}
+.login-input{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;margin-bottom:14px;outline:none;transition:border .2s}
+.login-input:focus{border-color:var(--accent)}
+.login-error{color:var(--accent);font-size:12px;margin-bottom:12px;display:none;padding:10px 14px;background:#1a0505;border:1px solid #3a1010;border-radius:8px}
+.login-btn{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s}
+.login-btn:hover{background:var(--accent2)}
 
-    /* STATS */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
-    .stat-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 20px;
-    }
-    .stat-card .label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-    .stat-card .value { font-size: 28px; font-weight: 800; }
-    .stat-card .value.accent { color: var(--accent); }
-    .stat-card .value.green { color: var(--green); }
-    .stat-card .value.blue { color: var(--blue); }
-    .stat-card .value.yellow { color: var(--yellow); }
+/* ── APP SHELL ── */
+#app{display:none;height:100vh;overflow:hidden}
+.shell{display:flex;height:100vh}
 
-    /* TOOLBAR */
-    .toolbar {
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
-    }
-    .toolbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .search-box {
-      padding: 9px 14px; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text); font-size: 13px; outline: none; width: 240px;
-    }
-    .search-box:focus { border-color: var(--accent); }
-    select.filter-select {
-      padding: 9px 12px; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text); font-size: 13px; outline: none; cursor: pointer;
-    }
+/* ── SIDEBAR ── */
+.sidebar{width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
+.sidebar-header{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.sidebar-logo{font-size:15px;font-weight:900;letter-spacing:-.3px}
+.sidebar-logo span{color:var(--accent)}
+.sidebar-badge{display:inline-block;background:var(--accent);color:#fff;font-size:9px;font-weight:800;padding:1px 7px;border-radius:99px;margin-left:6px;letter-spacing:.05em}
+.sidebar-status{font-size:10px;color:var(--muted);margin-top:4px}
+.sidebar-nav{flex:1;padding:10px 0}
+.nav-section{padding:14px 18px 6px;font-size:10px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 18px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;border-left:3px solid transparent;user-select:none}
+.nav-item:hover{color:var(--text);background:var(--surface2)}
+.nav-item.active{color:var(--text);background:rgba(224,36,36,.1);border-left-color:var(--accent);font-weight:700}
+.nav-item .icon{font-size:15px;width:18px;text-align:center}
+.nav-item .count{margin-left:auto;background:var(--surface3);color:var(--muted);font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px}
+.nav-item.active .count{background:rgba(224,36,36,.2);color:var(--accent)}
+.sidebar-footer{padding:14px 18px;border-top:1px solid var(--border)}
+.sidebar-user{font-size:12px;color:var(--muted);margin-bottom:10px}
+.sidebar-user strong{color:var(--text);display:block}
 
-    /* BUTTONS */
-    .btn { padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
-    .btn:active { transform: scale(0.97); }
-    .btn-primary { background: var(--accent); color: white; }
-    .btn-primary:hover { background: var(--accent-hover); }
-    .btn-ghost { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
-    .btn-ghost:hover { color: var(--text); border-color: #444; }
-    .btn-danger { background: #2a0a0a; color: var(--accent); border: 1px solid #3a1010; }
-    .btn-danger:hover { background: #3a1010; }
-    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
-    .btn-green { background: #052a12; color: var(--green); border: 1px solid #0a4020; }
-    .btn-green:hover { background: #0a4020; }
+/* ── MAIN CONTENT ── */
+.main-content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:16px;font-weight:800}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.page{padding:24px;display:none;flex-direction:column;gap:20px}
+.page.active{display:flex}
 
-    /* TABLE */
-    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-    table { width: 100%; border-collapse: collapse; }
-    thead { background: var(--surface2); }
-    th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
-    td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: var(--surface2); }
-    .thumb { width: 48px; height: 64px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); }
-    .badge-cat { padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 700; background: #1a0a0a; color: var(--accent); border: 1px solid #3a1010; text-transform: uppercase; }
-    .badge-tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; background: var(--surface2); color: var(--muted); margin: 1px; }
-    .flag { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 999px; font-size: 10px; font-weight: 700; margin: 1px; }
-    .flag.featured { background: #1a0a2a; color: #a855f7; border: 1px solid #3a1a5a; }
-    .flag.trending { background: #0a1a2a; color: var(--blue); border: 1px solid #1a3a5a; }
-    .flag.popular { background: #0a2a0a; color: var(--green); border: 1px solid #1a5a1a; }
-    .flag.new { background: #2a1a00; color: var(--yellow); border: 1px solid #5a3a00; }
-    .actions { display: flex; gap: 6px; }
-    .empty-state { padding: 60px 20px; text-align: center; color: var(--muted); }
-    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
-    .loading-row td { text-align: center; padding: 40px; color: var(--muted); }
+/* ── CARDS & GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.06}
+.stat-card.red::before{background:var(--accent)}
+.stat-card.green::before{background:var(--green)}
+.stat-card.blue::before{background:var(--blue)}
+.stat-card.yellow::before{background:var(--yellow)}
+.stat-card.purple::before{background:var(--purple)}
+.stat-card .s-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.stat-card .s-value{font-size:30px;font-weight:900;line-height:1}
+.stat-card .s-value.red{color:var(--accent)}
+.stat-card .s-value.green{color:var(--green)}
+.stat-card .s-value.blue{color:var(--blue)}
+.stat-card .s-value.yellow{color:var(--yellow)}
+.stat-card .s-value.purple{color:var(--purple)}
+.stat-card .s-sub{font-size:11px;color:var(--muted);margin-top:4px}
 
-    /* MODAL */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200;
-      display: flex; align-items: center; justify-content: center; padding: 20px;
-    }
-    .modal {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; width: 100%; max-width: 700px;
-      max-height: 90vh; overflow-y: auto; padding: 28px;
-    }
-    .modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group.full { grid-column: 1 / -1; }
-    .form-group label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .form-group input, .form-group select, .form-group textarea {
-      padding: 10px 14px; background: var(--bg); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text); font-size: 13px; outline: none; width: 100%;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
-    .form-group textarea { resize: vertical; min-height: 80px; }
-    .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
-    .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
-    .checkbox-label input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px; }
-    .preview-img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); margin-top: 8px; background: var(--surface2); display: none; }
+/* ── CHARTS ── */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+.chart-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:100px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;transition:height .4s ease;min-height:3px}
+.bar-label{font-size:9px;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.bar-val{font-size:9px;font-weight:700;color:var(--text)}
+.donut-wrap{display:flex;align-items:center;gap:16px}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:6px}
+.donut-row{display:flex;align-items:center;gap:7px;font-size:11px}
+.donut-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
-    /* TOAST */
-    #toast {
-      position: fixed; bottom: 24px; right: 24px; z-index: 500;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 14px 20px; font-size: 13px; font-weight: 600;
-      display: flex; align-items: center; gap: 10px;
-      transform: translateY(80px); opacity: 0;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    }
-    #toast.show { transform: translateY(0); opacity: 1; }
-    #toast.success { border-color: var(--green); }
-    #toast.error { border-color: var(--accent); }
+/* ── TABLE ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.card-title{font-size:13px;font-weight:700}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+input.inp,select.inp{padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:12px;outline:none;transition:border .2s}
+input.inp:focus,select.inp:focus{border-color:var(--accent)}
+input.inp[type=search]{width:200px}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--surface2)}
+th{padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 14px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+tr.selected td{background:rgba(224,36,36,.04)}
+.thumb{width:44px;height:58px;object-fit:cover;border-radius:6px;border:1px solid var(--border);background:var(--surface2)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;white-space:nowrap}
+.tag.cat{background:#1a0505;color:var(--accent);border:1px solid #3a0f0f}
+.tag.featured{background:#1a0a2a;color:var(--purple);border:1px solid #3a1a5a}
+.tag.trending{background:#0a1225;color:var(--blue);border:1px solid #1a3060}
+.tag.popular{background:#051a08;color:var(--green);border:1px solid #0d4015}
+.tag.new{background:#1e1200;color:var(--yellow);border:1px solid #4a2f00}
+.tag.source-fb{background:#0a1a0a;color:var(--green);border:1px solid #1a4a1a}
+.actions-cell{display:flex;gap:5px;flex-wrap:wrap}
+.empty{padding:50px 20px;text-align:center;color:var(--muted)}
+.empty .em-icon{font-size:40px;margin-bottom:10px}
 
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-      .form-grid { grid-template-columns: 1fr; }
-      .main { padding: 16px; }
-      .search-box { width: 180px; }
-      th:nth-child(3), td:nth-child(3), th:nth-child(5), td:nth-child(5) { display: none; }
-    }
-  </style>
+/* ── BUTTONS ── */
+.btn{padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:#555}
+.btn-danger{background:#160404;color:var(--accent);border:1px solid #2a0808}
+.btn-danger:hover{background:#2a0808}
+.btn-green{background:#051808;color:var(--green);border:1px solid #0d4015}
+.btn-green:hover{background:#0d4015}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:7px}
+.btn-xs{padding:3px 8px;font-size:10px;border-radius:5px}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:740px;max-height:92vh;overflow-y:auto;padding:28px;box-shadow:0 40px 100px rgba(0,0,0,.6)}
+.modal h2{font-size:17px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fg label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.fg input,.fg select,.fg textarea{padding:10px 13px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none;width:100%;transition:border .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent)}
+.fg textarea{resize:vertical;min-height:76px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fgrid .full{grid-column:1/-1}
+.checks{display:flex;flex-wrap:wrap;gap:12px;padding:10px 0}
+.check-item{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.check-item input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border)}
+.prev-img{width:100%;height:110px;object-fit:cover;border-radius:8px;border:1px solid var(--border);margin-top:7px;background:var(--surface2);display:none}
+
+/* ── ACTIVITY LOG ── */
+.log-list{display:flex;flex-direction:column;gap:0}
+.log-item{display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);transition:background .15s}
+.log-item:last-child{border-bottom:none}
+.log-item:hover{background:var(--surface2)}
+.log-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.log-dot.add{background:var(--green)}
+.log-dot.edit{background:var(--blue)}
+.log-dot.del{background:var(--accent)}
+.log-dot.login{background:var(--yellow)}
+.log-dot.clear{background:var(--purple)}
+.log-content{flex:1;min-width:0}
+.log-msg{font-size:12px;font-weight:600;line-height:1.4}
+.log-time{font-size:10px;color:var(--muted);margin-top:2px;font-family:monospace}
+.log-meta{font-size:10px;color:var(--muted2);margin-top:2px}
+
+/* ── BULK BAR ── */
+.bulk-bar{position:sticky;bottom:0;background:var(--surface);border-top:2px solid var(--accent);padding:12px 20px;display:flex;align-items:center;gap:10px;transform:translateY(100%);transition:transform .25s;z-index:40}
+.bulk-bar.visible{transform:translateY(0)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px 18px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 12px 40px rgba(0,0,0,.5);min-width:240px}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.success{border-color:var(--green);color:var(--green)}
+#toast.error{border-color:var(--accent);color:var(--accent)}
+#toast.info{border-color:var(--blue);color:var(--blue)}
+
+/* ── MISC ── */
+.badge-live{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--green)}
+.badge-live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.section-title{font-size:13px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.divider{height:1px;background:var(--border);margin:4px 0}
+.progress-bar{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.img-preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:10px}
+.img-preview-grid img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:7px;border:1px solid var(--border)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){.sidebar{width:180px;min-width:180px}.chart-grid{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.fgrid .full{grid-column:1}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.sidebar{display:none}.stats-grid{grid-template-columns:repeat(2,1fr)}.chart-grid{grid-template-columns:1fr}th:nth-child(3),td:nth-child(3),th:nth-child(5),td:nth-child(5){display:none}}
+</style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
-    <h1>🔐 Admin Login</h1>
-    <p>Moon Night X — Admin Panel. Enter your credentials to continue.</p>
-    <input type="text" id="admin-user" placeholder="Username" />
-    <input type="password" id="admin-pass" placeholder="Password" onkeydown="if(event.key==='Enter') doLogin()" />
-    <div class="login-error" id="login-error">❌ Invalid credentials. Try again.</div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="doLogin()">Login to Admin →</button>
+    <div class="login-logo"><div class="dot"></div><h1>Moon <span>Night X</span></h1></div>
+    <p class="login-subtitle">Admin Control Panel — Restricted Access</p>
+    <label class="login-label">Username</label>
+    <input class="login-input" id="u" type="text" placeholder="admin" autocomplete="username"/>
+    <label class="login-label">Password</label>
+    <input class="login-input" id="p" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
+    <div class="login-error" id="lerr">❌ Invalid credentials. Try again.</div>
+    <button class="login-btn" onclick="login()">Login to Admin Panel →</button>
   </div>
 </div>
 
-<!-- ADMIN PANEL -->
-<div id="admin-panel">
+<!-- APP -->
+<div id="app">
+<div class="shell">
 
-  <!-- HEADER -->
-  <div class="header">
-    <div class="header-left">
-      <div class="logo">Moon <span>Night X</span></div>
-      <span class="badge">ADMIN</span>
-      <span id="firebase-status" style="font-size:11px;color:#888;">⏳ Connecting...</span>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">MNX <span>Admin</span><span class="sidebar-badge">PANEL</span></div>
+      <div class="sidebar-status" id="db-status">⏳ Connecting...</div>
     </div>
-    <div style="display:flex;gap:10px;align-items:center;">
-      <span id="header-count" style="font-size:12px;color:#888;"></span>
-      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item active" onclick="showPage('dashboard')"><span class="icon">📊</span> Dashboard</div>
+      <div class="nav-item" onclick="showPage('images')"><span class="icon">🖼️</span> Images <span class="count" id="nav-count">0</span></div>
+      <div class="nav-section">Manage</div>
+      <div class="nav-item" onclick="showPage('activity')"><span class="icon">📋</span> Activity Log <span class="count" id="nav-log-count">0</span></div>
+      <div class="nav-item" onclick="showPage('bulk')"><span class="icon">⚡</span> Bulk Actions</div>
+      <div class="nav-section">Tools</div>
+      <div class="nav-item" onclick="showPage('settings')"><span class="icon">⚙️</span> Settings</div>
+      <div class="nav-item" onclick="exportJSON()"><span class="icon">⬇️</span> Export JSON</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user"><strong id="admin-name">admin</strong>Logged in as Admin</div>
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="logout()">Logout</button>
     </div>
-  </div>
+  </aside>
 
-  <div class="main">
+  <!-- MAIN -->
+  <div class="main-content">
 
-    <!-- STATS -->
-    <div class="stats-grid">
-      <div class="stat-card"><div class="label">Total Images</div><div class="value accent" id="stat-total">—</div></div>
-      <div class="stat-card"><div class="label">Firebase Images</div><div class="value green" id="stat-firebase">—</div></div>
-      <div class="stat-card"><div class="label">Featured</div><div class="value blue" id="stat-featured">—</div></div>
-      <div class="stat-card"><div class="label">Trending</div><div class="value yellow" id="stat-trending">—</div></div>
-    </div>
-
-    <!-- TOOLBAR -->
-    <div class="toolbar">
-      <div class="toolbar-left">
-        <input class="search-box" type="text" id="search-input" placeholder="🔍 Search images..." oninput="renderTable()" />
-        <select class="filter-select" id="filter-cat" onchange="renderTable()">
-          <option value="">All Categories</option>
-          <option value="cyberpunk">Cyberpunk</option>
-          <option value="artistic">Artistic</option>
-          <option value="fitness">Fitness</option>
-          <option value="cosplay">Cosplay</option>
-          <option value="glamour">Glamour</option>
-          <option value="amateur">Amateur</option>
-          <option value="model">Model</option>
-          <option value="high-fashion">High Fashion</option>
-        </select>
-        <select class="filter-select" id="filter-flag" onchange="renderTable()">
-          <option value="">All Flags</option>
-          <option value="isFeatured">Featured</option>
-          <option value="isTrending">Trending</option>
-          <option value="isPopular">Popular</option>
-          <option value="isNew">New</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-ghost btn-sm" onclick="exportJSON()">⬇ Export JSON</button>
-        <button class="btn btn-primary" onclick="openAddModal()">+ Add Image</button>
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">📊 Dashboard</div>
+      <div class="topbar-right">
+        <span class="badge-live" id="live-badge">LIVE</span>
+        <span style="font-size:11px;color:var(--muted)" id="top-count"></span>
+        <button class="btn btn-primary btn-sm" onclick="openAdd()">+ Add Image</button>
       </div>
     </div>
 
-    <!-- TABLE -->
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Thumbnail</th>
-            <th>Title / Model</th>
-            <th>Category</th>
-            <th>Flags</th>
-            <th>Stats</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="images-tbody">
-          <tr class="loading-row"><td colspan="6">⏳ Loading images from Firebase...</td></tr>
-        </tbody>
-      </table>
+    <!-- ── DASHBOARD PAGE ── -->
+    <div class="page active" id="page-dashboard">
+
+      <div class="stats-grid">
+        <div class="stat-card red"><div class="s-label">Total Images</div><div class="s-value red" id="s-total">—</div><div class="s-sub">In Firebase DB</div></div>
+        <div class="stat-card green"><div class="s-label">Featured</div><div class="s-value green" id="s-featured">—</div><div class="s-sub">Pinned to hero</div></div>
+        <div class="stat-card blue"><div class="s-label">Trending</div><div class="s-value blue" id="s-trending">—</div><div class="s-sub">Hot right now</div></div>
+        <div class="stat-card yellow"><div class="s-label">Popular</div><div class="s-value yellow" id="s-popular">—</div><div class="s-sub">High engagement</div></div>
+        <div class="stat-card purple"><div class="s-label">New</div><div class="s-value purple" id="s-new">—</div><div class="s-sub">Recently added</div></div>
+        <div class="stat-card red"><div class="s-label">Total Views</div><div class="s-value red" id="s-views" style="font-size:22px">—</div><div class="s-sub">Across all images</div></div>
+      </div>
+
+      <div class="chart-grid">
+        <!-- Category breakdown -->
+        <div class="chart-card">
+          <div class="chart-title">📂 Images by Category</div>
+          <div class="bar-chart" id="cat-chart"></div>
+        </div>
+
+        <!-- Flag breakdown -->
+        <div class="chart-card">
+          <div class="chart-title">🏷️ Flag Distribution</div>
+          <div class="donut-wrap">
+            <canvas id="donut-canvas" width="110" height="110"></canvas>
+            <div class="donut-legend" id="donut-legend"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent activity preview -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🕒 Recent Activity</div>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('activity')">View All →</button>
+        </div>
+        <div id="dash-log-list"></div>
+      </div>
+
+      <!-- Recent images -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🆕 Latest Images Added</div>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('images')">View All →</button>
+        </div>
+        <div class="img-preview-grid" id="dash-recent" style="padding:16px"></div>
+      </div>
     </div>
 
-    <div style="margin-top:12px;font-size:12px;color:#555;text-align:right;" id="table-footer"></div>
-  </div>
-</div>
+    <!-- ── IMAGES PAGE ── -->
+    <div class="page" id="page-images">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🖼️ All Images</div>
+          <div class="toolbar">
+            <input class="inp" type="search" id="q" placeholder="🔍 Search..." oninput="renderTable()" style="width:180px"/>
+            <select class="inp" id="fcat" onchange="renderTable()">
+              <option value="">All Categories</option>
+              <option value="cyberpunk">Cyberpunk</option><option value="artistic">Artistic</option>
+              <option value="fitness">Fitness</option><option value="cosplay">Cosplay</option>
+              <option value="glamour">Glamour</option><option value="amateur">Amateur</option>
+              <option value="model">Model</option><option value="high-fashion">High Fashion</option>
+            </select>
+            <select class="inp" id="fflag" onchange="renderTable()">
+              <option value="">All Flags</option>
+              <option value="isFeatured">Featured</option><option value="isTrending">Trending</option>
+              <option value="isPopular">Popular</option><option value="isNew">New</option>
+            </select>
+            <select class="inp" id="fsort" onchange="renderTable()">
+              <option value="newest">Newest First</option><option value="oldest">Oldest First</option>
+              <option value="views">Most Views</option><option value="likes">Most Likes</option>
+              <option value="az">A–Z</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr>
+              <th><input type="checkbox" id="check-all" onchange="toggleAll(this.checked)" style="accent-color:var(--accent)"/></th>
+              <th>Thumb</th><th>Title / ID</th><th>Category</th><th>Flags</th>
+              <th>Stats</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div style="padding:10px 16px;font-size:11px;color:var(--muted);border-top:1px solid var(--border)" id="tfoot"></div>
+      </div>
 
-<!-- ADD / EDIT MODAL -->
-<div class="modal-overlay" id="modal" style="display:none;" onclick="if(event.target===this) closeModal()">
-  <div class="modal">
-    <h2 id="modal-title">➕ Add New Image</h2>
-    <div class="form-grid">
-      <div class="form-group"><label>Image ID *</label><input id="f-id" placeholder="velvet-001" /></div>
-      <div class="form-group"><label>Slug *</label><input id="f-slug" placeholder="lumina-neon-portrait" /></div>
-      <div class="form-group full"><label>Title *</label><input id="f-title" placeholder="Lumina Neon Cyberpunk Portrait" /></div>
-      <div class="form-group full"><label>Description</label><textarea id="f-desc" placeholder="Detailed description..."></textarea></div>
-      <div class="form-group">
-        <label>Category *</label>
-        <select id="f-category">
-          <option value="cyberpunk">Cyberpunk</option>
-          <option value="artistic">Artistic</option>
-          <option value="fitness">Fitness</option>
-          <option value="cosplay">Cosplay</option>
-          <option value="glamour">Glamour</option>
-          <option value="amateur">Amateur</option>
-          <option value="model">Model</option>
-          <option value="high-fashion">High Fashion</option>
-        </select>
+      <!-- Bulk bar -->
+      <div class="bulk-bar" id="bulk-bar">
+        <span style="font-size:12px;font-weight:700" id="sel-count">0 selected</span>
+        <button class="btn btn-green btn-sm" onclick="bulkFlag('isFeatured',true)">⭐ Set Featured</button>
+        <button class="btn btn-ghost btn-sm" onclick="bulkFlag('isFeatured',false)">✖ Unset Featured</button>
+        <button class="btn btn-ghost btn-sm" onclick="bulkFlag('isTrending',true)">🔥 Set Trending</button>
+        <button class="btn btn-danger btn-sm" onclick="bulkDelete()">🗑 Delete Selected</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearSel()">✕ Clear</button>
       </div>
-      <div class="form-group">
-        <label>Aspect Ratio</label>
-        <select id="f-aspect">
-          <option value="portrait">Portrait</option>
-          <option value="landscape">Landscape</option>
-          <option value="square">Square</option>
-        </select>
+    </div>
+
+    <!-- ── ACTIVITY LOG PAGE ── -->
+    <div class="page" id="page-activity">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 Activity Log</div>
+          <div class="toolbar">
+            <select class="inp" id="log-filter" onchange="renderLog()">
+              <option value="">All Actions</option>
+              <option value="add">Add</option><option value="edit">Edit</option>
+              <option value="del">Delete</option><option value="login">Login</option>
+            </select>
+            <button class="btn btn-danger btn-sm" onclick="clearLog()">🗑 Clear Log</button>
+          </div>
+        </div>
+        <div class="log-list" id="log-list"></div>
       </div>
-      <div class="form-group full">
-        <label>Thumbnail URL *</label>
-        <input id="f-thumb" placeholder="https://images.unsplash.com/..." oninput="previewImg('f-thumb','prev-thumb')" />
-        <img class="preview-img" id="prev-thumb" />
-      </div>
-      <div class="form-group full">
-        <label>High Res URL *</label>
-        <input id="f-highres" placeholder="https://images.unsplash.com/..." oninput="previewImg('f-highres','prev-highres')" />
-        <img class="preview-img" id="prev-highres" />
-      </div>
-      <div class="form-group full">
-        <label>Gallery Images (one URL per line)</label>
-        <textarea id="f-gallery" placeholder="https://...\nhttps://...\nhttps://..." style="min-height:100px;"></textarea>
-      </div>
-      <div class="form-group"><label>Model Name</label><input id="f-model" placeholder="Kira Vance" /></div>
-      <div class="form-group"><label>Resolution</label><input id="f-resolution" placeholder="3840 x 5120" /></div>
-      <div class="form-group"><label>Format</label>
-        <select id="f-format"><option>WebP</option><option>AVIF</option><option>JPEG</option></select>
-      </div>
-      <div class="form-group"><label>File Size</label><input id="f-filesize" placeholder="1.8 MB" /></div>
-      <div class="form-group"><label>Views</label><input id="f-views" type="number" placeholder="48290" /></div>
-      <div class="form-group"><label>Likes</label><input id="f-likes" type="number" placeholder="3412" /></div>
-      <div class="form-group"><label>Width (px)</label><input id="f-width" type="number" placeholder="2400" /></div>
-      <div class="form-group"><label>Height (px)</label><input id="f-height" type="number" placeholder="3200" /></div>
-      <div class="form-group"><label>Uploaded At</label><input id="f-uploaded" placeholder="2 hours ago" /></div>
-      <div class="form-group"><label>Tags (comma separated)</label><input id="f-tags" placeholder="cyberpunk, neon, model" /></div>
-      <div class="form-group full">
-        <label>Flags</label>
-        <div class="checkbox-group">
-          <label class="checkbox-label"><input type="checkbox" id="f-featured" /> ⭐ Featured</label>
-          <label class="checkbox-label"><input type="checkbox" id="f-trending" /> 🔥 Trending</label>
-          <label class="checkbox-label"><input type="checkbox" id="f-popular" /> ❤️ Popular</label>
-          <label class="checkbox-label"><input type="checkbox" id="f-new" /> ✨ New</label>
+    </div>
+
+    <!-- ── BULK ACTIONS PAGE ── -->
+    <div class="page" id="page-bulk">
+      <div class="card" style="padding:24px">
+        <div class="section-title">⚡ Bulk Operations</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:20px">Apply mass changes to your entire image database instantly.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">⭐ Set All Featured</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Mark every image as Featured</div>
+            <button class="btn btn-green btn-sm" onclick="massFlag('isFeatured',true)">Apply</button>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">🔥 Set All Trending</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Mark every image as Trending</div>
+            <button class="btn btn-ghost btn-sm" onclick="massFlag('isTrending',true)">Apply</button>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">✨ Set All New</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Mark every image as New</div>
+            <button class="btn btn-ghost btn-sm" onclick="massFlag('isNew',true)">Apply</button>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">🧹 Clear All Flags</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Remove all Featured/Trending/Popular/New</div>
+            <button class="btn btn-danger btn-sm" onclick="massFlag('all',false)">Clear All</button>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px">📂 Export JSON</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Download all images as JSON file</div>
+            <button class="btn btn-primary btn-sm" onclick="exportJSON()">Export</button>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">🗑 Delete ALL Images</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">⚠️ Permanently removes everything</div>
+            <button class="btn btn-danger btn-sm" onclick="deleteAll()">Delete All</button>
+          </div>
+        </div>
+
+        <!-- Import JSON -->
+        <div style="margin-top:24px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px">
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px">📤 Import JSON</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Paste a JSON array of image objects to batch-import into Firebase</div>
+          <textarea class="inp" id="import-json" style="width:100%;min-height:120px;font-family:monospace;font-size:11px" placeholder='[{"id":"img-001","title":"My Image",...}]'></textarea>
+          <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="importJSON()">Import to Firebase</button>
         </div>
       </div>
     </div>
-    <div class="modal-actions">
+
+    <!-- ── SETTINGS PAGE ── -->
+    <div class="page" id="page-settings">
+      <div class="card" style="padding:24px">
+        <div class="section-title">⚙️ Admin Settings</div>
+        <div style="display:grid;gap:16px;max-width:480px">
+          <div class="fg"><label>Admin Username</label><input class="inp" id="set-user" value="admin"/></div>
+          <div class="fg"><label>New Password</label><input class="inp" id="set-pass" type="password" placeholder="Leave blank to keep current"/></div>
+          <div class="fg"><label>Firebase DB URL</label><input class="inp" id="set-db" value="https://moon-night-x-default-rtdb.firebaseio.com" readonly style="color:var(--muted)"/></div>
+          <div class="fg"><label>Items Per Page</label>
+            <select class="inp" id="set-ipp">
+              <option value="20">20</option><option value="50" selected>50</option><option value="100">100</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" style="width:fit-content" onclick="saveSettings()">💾 Save Settings</button>
+        </div>
+
+        <div class="divider" style="margin:24px 0"></div>
+
+        <div class="section-title">🔧 Cache & Storage</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px">
+          LocalStorage cache used by main website for instant load.
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="checkCache()">📦 Check Cache Size</button>
+          <button class="btn btn-danger btn-sm" onclick="clearCache()">🗑 Clear Site Cache</button>
+        </div>
+        <div id="cache-info" style="font-size:11px;color:var(--muted);margin-top:10px"></div>
+      </div>
+    </div>
+
+  </div><!-- end main-content -->
+</div><!-- end shell -->
+</div><!-- end app -->
+
+<!-- ── ADD/EDIT MODAL ── -->
+<div class="overlay" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 id="modal-title">➕ Add New Image</h2>
+    <div class="fgrid">
+      <div class="fg"><label>Image ID *</label><input class="inp" id="f-id" placeholder="velvet-017"/></div>
+      <div class="fg"><label>Slug *</label><input class="inp" id="f-slug" placeholder="my-gallery-slug"/></div>
+      <div class="fg full"><label>Title *</label><input class="inp" id="f-title" placeholder="Beautiful Portrait Session"/></div>
+      <div class="fg full"><label>Description</label><textarea class="inp" id="f-desc" placeholder="Detailed description..."></textarea></div>
+      <div class="fg"><label>Category *</label>
+        <select class="inp" id="f-cat">
+          <option value="cyberpunk">Cyberpunk</option><option value="artistic">Artistic</option>
+          <option value="fitness">Fitness</option><option value="cosplay">Cosplay</option>
+          <option value="glamour">Glamour</option><option value="amateur">Amateur</option>
+          <option value="model">Model</option><option value="high-fashion">High Fashion</option>
+        </select>
+      </div>
+      <div class="fg"><label>Aspect Ratio</label>
+        <select class="inp" id="f-aspect"><option value="portrait">Portrait</option><option value="landscape">Landscape</option><option value="square">Square</option></select>
+      </div>
+      <div class="fg full">
+        <label>Thumbnail URL *</label>
+        <input class="inp" id="f-thumb" placeholder="https://..." oninput="prevImg('f-thumb','p-thumb')"/>
+        <img class="prev-img" id="p-thumb"/>
+      </div>
+      <div class="fg full">
+        <label>High Res URL *</label>
+        <input class="inp" id="f-hires" placeholder="https://..." oninput="prevImg('f-hires','p-hires')"/>
+        <img class="prev-img" id="p-hires"/>
+      </div>
+      <div class="fg full"><label>Gallery Images (one URL per line)</label><textarea class="inp" id="f-gallery" placeholder="https://...\nhttps://..." style="min-height:90px"></textarea></div>
+      <div class="fg"><label>Model Name</label><input class="inp" id="f-model" placeholder="Kira Vance"/></div>
+      <div class="fg"><label>Resolution</label><input class="inp" id="f-res" placeholder="3840 x 5120"/></div>
+      <div class="fg"><label>Format</label><select class="inp" id="f-fmt"><option>WebP</option><option>AVIF</option><option>JPEG</option></select></div>
+      <div class="fg"><label>File Size</label><input class="inp" id="f-size" placeholder="1.8 MB"/></div>
+      <div class="fg"><label>Views</label><input class="inp" id="f-views" type="number" placeholder="0"/></div>
+      <div class="fg"><label>Likes</label><input class="inp" id="f-likes" type="number" placeholder="0"/></div>
+      <div class="fg"><label>Width (px)</label><input class="inp" id="f-w" type="number" placeholder="2400"/></div>
+      <div class="fg"><label>Height (px)</label><input class="inp" id="f-h" type="number" placeholder="3200"/></div>
+      <div class="fg"><label>Uploaded At</label><input class="inp" id="f-up" placeholder="2 hours ago"/></div>
+      <div class="fg"><label>Tags (comma sep.)</label><input class="inp" id="f-tags" placeholder="neon, model, glamour"/></div>
+      <div class="fg full"><label>Flags</label>
+        <div class="checks">
+          <label class="check-item"><input type="checkbox" id="f-featured"/> ⭐ Featured</label>
+          <label class="check-item"><input type="checkbox" id="f-trending"/> 🔥 Trending</label>
+          <label class="check-item"><input type="checkbox" id="f-popular"/> ❤️ Popular</label>
+          <label class="check-item"><input type="checkbox" id="f-new"/> ✨ New</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" id="modal-save-btn" onclick="saveImage()">💾 Save to Firebase</button>
+      <button class="btn btn-primary" id="save-btn" onclick="saveImg()">💾 Save to Firebase</button>
     </div>
   </div>
 </div>
@@ -327,305 +516,533 @@
 <!-- TOAST -->
 <div id="toast"></div>
 
-<!-- FIREBASE SDK -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-  import { getDatabase, ref, onValue, set, remove, push } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+import { initializeApp }              from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import { getDatabase, ref, onValue, set, remove, update, off }
+                                       from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
-  // ── FIREBASE CONFIG ──
-  const firebaseConfig = {
-    apiKey: "AIzaSyACW8aFQmlaoaxNtE55m8Pck6H8BRlfEbs",
-    authDomain: "moon-night-x.firebaseapp.com",
-    databaseURL: "https://moon-night-x-default-rtdb.firebaseio.com",
-    projectId: "moon-night-x",
-    storageBucket: "moon-night-x.firebasestorage.app",
-    messagingSenderId: "779934381788",
-    appId: "1:779934381788:web:1426fa035171015634a619",
-    measurementId: "G-9B6R1VRP24"
-  };
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const FB = { apiKey:"AIzaSyACW8aFQmlaoaxNtE55m8Pck6H8BRlfEbs", authDomain:"moon-night-x.firebaseapp.com", databaseURL:"https://moon-night-x-default-rtdb.firebaseio.com", projectId:"moon-night-x", storageBucket:"moon-night-x.firebasestorage.app", messagingSenderId:"779934381788", appId:"1:779934381788:web:1426fa035171015634a619", measurementId:"G-9B6R1VRP24" };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+const app = initializeApp(FB);
+const db  = getDatabase(app);
 
-  // ── ADMIN CREDENTIALS ──
-  const ADMIN_USER = "admin";
-  const ADMIN_PASS = "moonnightx@2024";
+// ── STATE ────────────────────────────────────────────────────────────────────
+let images   = [];
+let editId   = null;
+let selected = new Set();
+let actLog   = JSON.parse(localStorage.getItem('mnx_admin_log') || '[]');
+let settings = JSON.parse(localStorage.getItem('mnx_admin_settings') || '{"user":"admin","pass":"moonnightx@2024"}');
+let currentPage = 'dashboard';
 
-  // ── STATE ──
-  let allImages = [];
-  let editingId = null;
+// ── EXPOSE GLOBALS ───────────────────────────────────────────────────────────
+Object.assign(window, {
+  login, logout, showPage, openAdd, openEdit, closeModal, saveImg,
+  deleteImg, renderTable, renderLog, toggleAll, toggleRow, clearSel,
+  bulkFlag, bulkDelete, massFlag, deleteAll, exportJSON, importJSON,
+  saveSettings, checkCache, clearCache, clearLog, prevImg,
+});
 
-  // ── LOGIN ──
-  window.doLogin = function() {
-    const u = document.getElementById('admin-user').value.trim();
-    const p = document.getElementById('admin-pass').value;
-    if (u === ADMIN_USER && p === ADMIN_PASS) {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('admin-panel').style.display = 'block';
-      initFirebase();
-    } else {
-      document.getElementById('login-error').style.display = 'block';
-    }
-  };
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+function login() {
+  const u = document.getElementById('u').value.trim();
+  const p = document.getElementById('p').value;
+  if (u === settings.user && p === settings.pass) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('admin-name').textContent = u;
+    logActivity('login', `Admin "${u}" logged in`, '👤');
+    initDB();
+  } else {
+    document.getElementById('lerr').style.display = 'block';
+  }
+}
 
-  window.doLogout = function() {
-    document.getElementById('admin-panel').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('admin-user').value = '';
-    document.getElementById('admin-pass').value = '';
-  };
+function logout() {
+  logActivity('login', 'Admin logged out', '🚪');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('p').value = '';
+}
 
-  // ── FIREBASE LISTENER ──
-  function initFirebase() {
-    const imagesRef = ref(db, 'images');
-    onValue(imagesRef, (snapshot) => {
-      document.getElementById('firebase-status').textContent = '🟢 Firebase Connected';
-      document.getElementById('firebase-status').style.color = '#22c55e';
+// ── FIREBASE ──────────────────────────────────────────────────────────────────
+function initDB() {
+  const imgRef = ref(db, 'images');
+  onValue(imgRef, snap => {
+    document.getElementById('db-status').innerHTML = '<span style="color:var(--green)">🟢 Connected</span>';
+    images = snap.exists() ? Object.values(snap.val()) : [];
+    updateAll();
+  }, err => {
+    document.getElementById('db-status').innerHTML = '<span style="color:var(--accent)">🔴 Error</span>';
+    console.error(err);
+  });
+}
 
-      if (snapshot.exists()) {
-        allImages = Object.values(snapshot.val());
-      } else {
-        allImages = [];
-      }
-      updateStats();
-      renderTable();
-    }, (err) => {
-      document.getElementById('firebase-status').textContent = '🔴 Firebase Error';
-      document.getElementById('firebase-status').style.color = '#E02424';
-      console.error(err);
-    });
+function updateAll() {
+  const n = images.length;
+  document.getElementById('nav-count').textContent = n;
+  document.getElementById('top-count').textContent = n + ' images';
+
+  // Stats
+  document.getElementById('s-total').textContent    = n;
+  document.getElementById('s-featured').textContent = images.filter(i=>i.isFeatured).length;
+  document.getElementById('s-trending').textContent = images.filter(i=>i.isTrending).length;
+  document.getElementById('s-popular').textContent  = images.filter(i=>i.isPopular).length;
+  document.getElementById('s-new').textContent      = images.filter(i=>i.isNew).length;
+  const totalViews = images.reduce((a,i)=>a+(i.views||0),0);
+  document.getElementById('s-views').textContent = totalViews.toLocaleString();
+
+  renderCatChart();
+  renderDonut();
+  renderDashLog();
+  renderRecentImages();
+  renderTable();
+}
+
+// ── CHARTS ───────────────────────────────────────────────────────────────────
+const CAT_COLORS = {cyberpunk:'#E02424',artistic:'#a855f7',fitness:'#22c55e',cosplay:'#f59e0b',glamour:'#ec4899',amateur:'#06b6d4',model:'#3b82f6','high-fashion':'#f97316'};
+
+function renderCatChart() {
+  const cats = {};
+  images.forEach(i=>{ cats[i.category]=(cats[i.category]||0)+1; });
+  const max = Math.max(...Object.values(cats),1);
+  const el = document.getElementById('cat-chart');
+  el.innerHTML = Object.entries(cats).map(([cat,cnt])=>`
+    <div class="bar-wrap">
+      <div class="bar-val">${cnt}</div>
+      <div class="bar" style="height:${Math.max((cnt/max)*90,3)}px;background:${CAT_COLORS[cat]||'#888'}"></div>
+      <div class="bar-label">${cat.slice(0,6)}</div>
+    </div>`).join('') || '<div style="color:var(--muted);font-size:12px;margin:auto">No data</div>';
+}
+
+function renderDonut() {
+  const flags = [
+    {label:'Featured', key:'isFeatured', color:'#a855f7'},
+    {label:'Trending',  key:'isTrending', color:'#3b82f6'},
+    {label:'Popular',   key:'isPopular',  color:'#22c55e'},
+    {label:'New',       key:'isNew',      color:'#f59e0b'},
+    {label:'None',      key:'none',       color:'#2a2a2a'},
+  ];
+  const counts = flags.map(f=>{
+    if(f.key==='none') return images.filter(i=>!i.isFeatured&&!i.isTrending&&!i.isPopular&&!i.isNew).length;
+    return images.filter(i=>i[f.key]).length;
+  });
+  const total = counts.reduce((a,b)=>a+b,0)||1;
+  const canvas = document.getElementById('donut-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,110,110);
+  let angle = -Math.PI/2;
+  counts.forEach((c,i)=>{
+    if(!c) return;
+    const slice = (c/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(55,55);
+    ctx.arc(55,55,50,angle,angle+slice);
+    ctx.closePath();ctx.fillStyle=flags[i].color;ctx.fill();
+    angle+=slice;
+  });
+  ctx.beginPath();ctx.arc(55,55,30,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(images.length,55,55);
+
+  document.getElementById('donut-legend').innerHTML = flags.map((f,i)=>`
+    <div class="donut-row"><div class="donut-dot" style="background:${f.color}"></div>
+    <span style="color:var(--muted)">${f.label}</span><span style="margin-left:auto;font-weight:700">${counts[i]}</span></div>`).join('');
+}
+
+function renderDashLog() {
+  const el = document.getElementById('dash-log-list');
+  const recent = [...actLog].slice(0,5);
+  el.innerHTML = recent.length ? recent.map(logHTML).join('') : '<div class="empty"><div class="em-icon">📋</div>No activity yet</div>';
+}
+
+function renderRecentImages() {
+  const el = document.getElementById('dash-recent');
+  const recent = [...images].slice(0,12);
+  el.innerHTML = recent.map(img=>`
+    <div title="${img.title}" onclick="openEdit('${img.id}')" style="cursor:pointer">
+      <img src="${img.thumbnailUrl||''}" alt="${img.title||''}" onerror="this.src=''" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:7px;border:1px solid var(--border)"/>
+    </div>`).join('') || '<div style="color:var(--muted);font-size:12px;padding:10px">No images yet</div>';
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────────────────
+window.renderTable = function() {
+  const q    = (document.getElementById('q')?.value||'').toLowerCase();
+  const fcat = document.getElementById('fcat')?.value||'';
+  const fflag= document.getElementById('fflag')?.value||'';
+  const fsort= document.getElementById('fsort')?.value||'newest';
+
+  let list = images.filter(img=>{
+    const mq = !q || [img.title,img.modelName,img.id,img.slug].some(s=>(s||'').toLowerCase().includes(q));
+    const mc = !fcat  || img.category===fcat;
+    const mf = !fflag || img[fflag];
+    return mq&&mc&&mf;
+  });
+
+  if(fsort==='views')  list.sort((a,b)=>(b.views||0)-(a.views||0));
+  else if(fsort==='likes') list.sort((a,b)=>(b.likes||0)-(a.likes||0));
+  else if(fsort==='az') list.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
+  else if(fsort==='oldest') {}
+  else list.reverse();
+
+  const tbody = document.getElementById('tbody');
+  document.getElementById('tfoot').textContent = `Showing ${list.length} of ${images.length} images`;
+
+  if(!list.length){
+    tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="em-icon">🖼️</div>No images found</div></td></tr>`;
+    return;
   }
 
-  // ── STATS ──
-  function updateStats() {
-    document.getElementById('stat-total').textContent = allImages.length;
-    document.getElementById('stat-firebase').textContent = allImages.length;
-    document.getElementById('stat-featured').textContent = allImages.filter(i => i.isFeatured).length;
-    document.getElementById('stat-trending').textContent = allImages.filter(i => i.isTrending).length;
-    document.getElementById('header-count').textContent = allImages.length + ' images in DB';
-  }
+  tbody.innerHTML = list.map(img=>{
+    const isSel = selected.has(img.id);
+    return `<tr class="${isSel?'selected':''}">
+      <td><input type="checkbox" ${isSel?'checked':''} onchange="toggleRow('${img.id}',this.checked)" style="accent-color:var(--accent)"/></td>
+      <td><img class="thumb" src="${img.thumbnailUrl||''}" alt="" onerror="this.src=''"/></td>
+      <td>
+        <div style="font-weight:700;font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${img.title||'—'}</div>
+        <div style="font-size:10px;color:var(--muted);font-family:monospace;margin-top:2px">${img.id||''}</div>
+        ${img.modelName?`<div style="font-size:10px;color:var(--muted2)">👤 ${img.modelName}</div>`:''}
+      </td>
+      <td><span class="tag cat">${img.category||'—'}</span></td>
+      <td>
+        ${img.isFeatured?'<span class="tag featured">⭐ Featured</span> ':''}
+        ${img.isTrending?'<span class="tag trending">🔥 Trending</span> ':''}
+        ${img.isPopular?'<span class="tag popular">❤️ Popular</span> ':''}
+        ${img.isNew?'<span class="tag new">✨ New</span>':''}
+      </td>
+      <td>
+        <div style="font-size:10px;color:var(--muted)">👁 ${(img.views||0).toLocaleString()}</div>
+        <div style="font-size:10px;color:var(--muted)">❤️ ${(img.likes||0).toLocaleString()}</div>
+        <div style="font-size:10px;color:var(--muted2);font-family:monospace">${img.uploadedAt||''}</div>
+      </td>
+      <td><div class="actions-cell">
+        <button class="btn btn-ghost btn-xs" onclick="openEdit('${img.id}')">✏️</button>
+        <button class="btn btn-danger btn-xs" onclick="deleteImg('${img.id}','${(img.title||'').replace(/'/g,"\\'")}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+};
 
-  // ── TABLE RENDER ──
-  window.renderTable = function() {
-    const q = document.getElementById('search-input').value.toLowerCase();
-    const cat = document.getElementById('filter-cat').value;
-    const flag = document.getElementById('filter-flag').value;
+// ── SELECTION ─────────────────────────────────────────────────────────────────
+window.toggleAll = function(checked) {
+  const list = getFiltered();
+  list.forEach(img=>checked?selected.add(img.id):selected.delete(img.id));
+  updateBulkBar();
+  renderTable();
+};
+window.toggleRow = function(id,checked) {
+  checked?selected.add(id):selected.delete(id);
+  updateBulkBar();
+};
+window.clearSel = function() {
+  selected.clear();
+  document.getElementById('check-all').checked=false;
+  updateBulkBar();
+  renderTable();
+};
+function updateBulkBar() {
+  const bar = document.getElementById('bulk-bar');
+  const n = selected.size;
+  document.getElementById('sel-count').textContent = n + ' selected';
+  bar.classList.toggle('visible', n>0);
+}
+function getFiltered() {
+  const q    = (document.getElementById('q')?.value||'').toLowerCase();
+  const fcat = document.getElementById('fcat')?.value||'';
+  const fflag= document.getElementById('fflag')?.value||'';
+  return images.filter(img=>{
+    const mq = !q || [img.title,img.modelName,img.id].some(s=>(s||'').toLowerCase().includes(q));
+    return mq && (!fcat||img.category===fcat) && (!fflag||img[fflag]);
+  });
+}
 
-    let filtered = allImages.filter(img => {
-      const matchQ = !q || img.title?.toLowerCase().includes(q) || img.modelName?.toLowerCase().includes(q) || img.id?.toLowerCase().includes(q);
-      const matchCat = !cat || img.category === cat;
-      const matchFlag = !flag || img[flag];
-      return matchQ && matchCat && matchFlag;
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+window.openAdd = function() {
+  editId=null;
+  document.getElementById('modal-title').textContent='➕ Add New Image';
+  document.getElementById('save-btn').textContent='💾 Save to Firebase';
+  clearForm();
+  document.getElementById('modal').style.display='flex';
+};
+window.openEdit = function(id) {
+  const img=images.find(i=>i.id===id);
+  if(!img) return;
+  editId=id;
+  document.getElementById('modal-title').textContent='✏️ Edit Image';
+  document.getElementById('save-btn').textContent='💾 Update Firebase';
+  document.getElementById('f-id').value    = img.id||'';
+  document.getElementById('f-slug').value  = img.slug||'';
+  document.getElementById('f-title').value = img.title||'';
+  document.getElementById('f-desc').value  = img.description||'';
+  document.getElementById('f-cat').value   = img.category||'cyberpunk';
+  document.getElementById('f-aspect').value= img.aspectRatio||'portrait';
+  document.getElementById('f-thumb').value = img.thumbnailUrl||'';
+  document.getElementById('f-hires').value = img.highResUrl||'';
+  document.getElementById('f-gallery').value=(img.galleryImages||[]).join('\n');
+  document.getElementById('f-model').value = img.modelName||'';
+  document.getElementById('f-res').value   = img.resolution||'';
+  document.getElementById('f-fmt').value   = img.format||'WebP';
+  document.getElementById('f-size').value  = img.fileSize||'';
+  document.getElementById('f-views').value = img.views||'';
+  document.getElementById('f-likes').value = img.likes||'';
+  document.getElementById('f-w').value     = img.width||'';
+  document.getElementById('f-h').value     = img.height||'';
+  document.getElementById('f-up').value    = img.uploadedAt||'';
+  document.getElementById('f-tags').value  = (img.tags||[]).join(', ');
+  document.getElementById('f-featured').checked=!!img.isFeatured;
+  document.getElementById('f-trending').checked=!!img.isTrending;
+  document.getElementById('f-popular').checked=!!img.isPopular;
+  document.getElementById('f-new').checked=!!img.isNew;
+  if(img.thumbnailUrl) prevImg('f-thumb','p-thumb');
+  if(img.highResUrl)   prevImg('f-hires','p-hires');
+  document.getElementById('modal').style.display='flex';
+};
+window.closeModal=function(){ document.getElementById('modal').style.display='none'; editId=null; };
+function clearForm() {
+  ['f-id','f-slug','f-title','f-desc','f-thumb','f-hires','f-gallery','f-model','f-res','f-size','f-views','f-likes','f-w','f-h','f-up','f-tags'].forEach(id=>{ document.getElementById(id).value=''; });
+  document.getElementById('f-cat').value='cyberpunk';
+  document.getElementById('f-aspect').value='portrait';
+  document.getElementById('f-fmt').value='WebP';
+  ['f-featured','f-trending','f-popular','f-new'].forEach(id=>{ document.getElementById(id).checked=false; });
+  document.getElementById('p-thumb').style.display='none';
+  document.getElementById('p-hires').style.display='none';
+}
+
+// ── SAVE IMAGE ────────────────────────────────────────────────────────────────
+window.saveImg = async function() {
+  const id    = document.getElementById('f-id').value.trim();
+  const title = document.getElementById('f-title').value.trim();
+  const thumb = document.getElementById('f-thumb').value.trim();
+  const hires = document.getElementById('f-hires').value.trim();
+  const slug  = document.getElementById('f-slug').value.trim();
+  if(!id||!title||!thumb||!hires||!slug){ toast('❌ ID, Slug, Title, Thumbnail & HighRes required!','error'); return; }
+
+  const gallery = document.getElementById('f-gallery').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
+  const tags    = document.getElementById('f-tags').value.split(',').map(s=>s.trim()).filter(Boolean);
+
+  const data = {
+    id,slug,title,
+    description: document.getElementById('f-desc').value.trim(),
+    category:    document.getElementById('f-cat').value,
+    aspectRatio: document.getElementById('f-aspect').value,
+    thumbnailUrl:thumb, highResUrl:hires, galleryImages:gallery,
+    modelName:   document.getElementById('f-model').value.trim(),
+    resolution:  document.getElementById('f-res').value.trim(),
+    format:      document.getElementById('f-fmt').value,
+    fileSize:    document.getElementById('f-size').value.trim(),
+    views:  parseInt(document.getElementById('f-views').value)||0,
+    likes:  parseInt(document.getElementById('f-likes').value)||0,
+    width:  parseInt(document.getElementById('f-w').value)||0,
+    height: parseInt(document.getElementById('f-h').value)||0,
+    uploadedAt: document.getElementById('f-up').value.trim()||'Just now',
+    tags,
+    isFeatured: document.getElementById('f-featured').checked,
+    isTrending: document.getElementById('f-trending').checked,
+    isPopular:  document.getElementById('f-popular').checked,
+    isNew:      document.getElementById('f-new').checked,
+  };
+
+  const btn=document.getElementById('save-btn');
+  btn.textContent='⏳ Saving...'; btn.disabled=true;
+  try {
+    await set(ref(db,'images/'+id),data);
+    const action = editId ? 'edit' : 'add';
+    logActivity(action, `${editId?'Updated':'Added'} image: "${title}"`, editId?'✏️':'➕');
+    toast(`✅ Image ${editId?'updated':'saved'} successfully!`,'success');
+    closeModal();
+  } catch(e) {
+    toast('❌ Firebase error: '+e.message,'error');
+  } finally { btn.textContent='💾 Save to Firebase'; btn.disabled=false; }
+};
+
+// ── DELETE ────────────────────────────────────────────────────────────────────
+window.deleteImg = async function(id,title) {
+  if(!confirm(`Delete "${title}"?\nThis is permanent.`)) return;
+  try {
+    await remove(ref(db,'images/'+id));
+    logActivity('del',`Deleted image: "${title}"`, '🗑️');
+    toast('🗑️ Image deleted','success');
+    selected.delete(id);
+    updateBulkBar();
+  } catch(e){ toast('❌ '+e.message,'error'); }
+};
+
+// ── BULK ACTIONS ───────────────────────────────────────────────────────────────
+window.bulkFlag = async function(flag,val) {
+  if(!selected.size){ toast('No images selected','info'); return; }
+  const updates={};
+  selected.forEach(id=>{ updates[`images/${id}/${flag}`]=val; });
+  try {
+    await update(ref(db),updates);
+    logActivity('edit',`Bulk flag "${flag}"=${val} on ${selected.size} images`,'⚡');
+    toast(`✅ Updated ${selected.size} images`,'success');
+    clearSel();
+  } catch(e){ toast('❌ '+e.message,'error'); }
+};
+
+window.bulkDelete = async function() {
+  if(!selected.size){ toast('No images selected','info'); return; }
+  if(!confirm(`Delete ${selected.size} selected images permanently?`)) return;
+  try {
+    await Promise.all([...selected].map(id=>remove(ref(db,'images/'+id))));
+    logActivity('del',`Bulk deleted ${selected.size} images`,'🗑️');
+    toast(`🗑️ Deleted ${selected.size} images`,'success');
+    clearSel();
+  } catch(e){ toast('❌ '+e.message,'error'); }
+};
+
+window.massFlag = async function(flag,val) {
+  if(!images.length){ toast('No images in database','info'); return; }
+  if(flag==='all'){
+    if(!confirm('Clear ALL flags from ALL images?')) return;
+    const updates={};
+    images.forEach(img=>{
+      updates[`images/${img.id}/isFeatured`]=false;
+      updates[`images/${img.id}/isTrending`]=false;
+      updates[`images/${img.id}/isPopular`]=false;
+      updates[`images/${img.id}/isNew`]=false;
     });
-
-    const tbody = document.getElementById('images-tbody');
-    document.getElementById('table-footer').textContent = `Showing ${filtered.length} of ${allImages.length} images`;
-
-    if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">🖼️</div><div>No images found</div></div></td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = filtered.map(img => `
-      <tr>
-        <td><img class="thumb" src="${img.thumbnailUrl || ''}" alt="${img.title || ''}" onerror="this.src=''" /></td>
-        <td>
-          <div style="font-weight:700;font-size:13px;margin-bottom:3px;">${img.title || '—'}</div>
-          <div style="font-size:11px;color:#888;">${img.modelName ? '👤 ' + img.modelName : ''}</div>
-          <div style="font-size:10px;color:#555;margin-top:2px;font-family:monospace;">${img.id}</div>
-        </td>
-        <td><span class="badge-cat">${img.category || '—'}</span></td>
-        <td>
-          ${img.isFeatured ? '<span class="flag featured">⭐ Featured</span>' : ''}
-          ${img.isTrending ? '<span class="flag trending">🔥 Trending</span>' : ''}
-          ${img.isPopular ? '<span class="flag popular">❤️ Popular</span>' : ''}
-          ${img.isNew ? '<span class="flag new">✨ New</span>' : ''}
-        </td>
-        <td>
-          <div style="font-size:11px;color:#888;">👁 ${(img.views||0).toLocaleString()}</div>
-          <div style="font-size:11px;color:#888;">❤️ ${(img.likes||0).toLocaleString()}</div>
-          <div style="font-size:10px;color:#555;margin-top:2px;">${img.uploadedAt || ''}</div>
-        </td>
-        <td>
-          <div class="actions">
-            <button class="btn btn-ghost btn-sm" onclick="openEditModal('${img.id}')">✏️ Edit</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteImage('${img.id}', '${(img.title||'').replace(/'/g,"\\'")}')">🗑</button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-  };
-
-  // ── MODAL OPEN (ADD) ──
-  window.openAddModal = function() {
-    editingId = null;
-    document.getElementById('modal-title').textContent = '➕ Add New Image';
-    document.getElementById('modal-save-btn').textContent = '💾 Save to Firebase';
-    clearForm();
-    document.getElementById('modal').style.display = 'flex';
-  };
-
-  // ── MODAL OPEN (EDIT) ──
-  window.openEditModal = function(id) {
-    const img = allImages.find(i => i.id === id);
-    if (!img) return;
-    editingId = id;
-    document.getElementById('modal-title').textContent = '✏️ Edit Image';
-    document.getElementById('modal-save-btn').textContent = '💾 Update Firebase';
-
-    document.getElementById('f-id').value = img.id || '';
-    document.getElementById('f-slug').value = img.slug || '';
-    document.getElementById('f-title').value = img.title || '';
-    document.getElementById('f-desc').value = img.description || '';
-    document.getElementById('f-category').value = img.category || 'cyberpunk';
-    document.getElementById('f-aspect').value = img.aspectRatio || 'portrait';
-    document.getElementById('f-thumb').value = img.thumbnailUrl || '';
-    document.getElementById('f-highres').value = img.highResUrl || '';
-    document.getElementById('f-gallery').value = (img.galleryImages || []).join('\n');
-    document.getElementById('f-model').value = img.modelName || '';
-    document.getElementById('f-resolution').value = img.resolution || '';
-    document.getElementById('f-format').value = img.format || 'WebP';
-    document.getElementById('f-filesize').value = img.fileSize || '';
-    document.getElementById('f-views').value = img.views || '';
-    document.getElementById('f-likes').value = img.likes || '';
-    document.getElementById('f-width').value = img.width || '';
-    document.getElementById('f-height').value = img.height || '';
-    document.getElementById('f-uploaded').value = img.uploadedAt || '';
-    document.getElementById('f-tags').value = (img.tags || []).join(', ');
-    document.getElementById('f-featured').checked = !!img.isFeatured;
-    document.getElementById('f-trending').checked = !!img.isTrending;
-    document.getElementById('f-popular').checked = !!img.isPopular;
-    document.getElementById('f-new').checked = !!img.isNew;
-
-    // Preview
-    if (img.thumbnailUrl) { previewImg('f-thumb','prev-thumb'); }
-    if (img.highResUrl) { previewImg('f-highres','prev-highres'); }
-
-    document.getElementById('modal').style.display = 'flex';
-  };
-
-  window.closeModal = function() {
-    document.getElementById('modal').style.display = 'none';
-    editingId = null;
-  };
-
-  function clearForm() {
-    ['f-id','f-slug','f-title','f-desc','f-thumb','f-highres','f-gallery','f-model','f-resolution','f-filesize','f-views','f-likes','f-width','f-height','f-uploaded','f-tags'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
-    document.getElementById('f-category').value = 'cyberpunk';
-    document.getElementById('f-aspect').value = 'portrait';
-    document.getElementById('f-format').value = 'WebP';
-    ['f-featured','f-trending','f-popular','f-new'].forEach(id => {
-      document.getElementById(id).checked = false;
-    });
-    document.getElementById('prev-thumb').style.display = 'none';
-    document.getElementById('prev-highres').style.display = 'none';
+    await update(ref(db),updates);
+    logActivity('edit','Cleared all flags from all images','🧹');
+    toast('✅ All flags cleared','success');
+    return;
   }
+  if(!confirm(`Set "${flag}"=${val} on ALL ${images.length} images?`)) return;
+  const updates={};
+  images.forEach(img=>{ updates[`images/${img.id}/${flag}`]=val; });
+  await update(ref(db),updates);
+  logActivity('edit',`Mass set "${flag}"=${val} on ${images.length} images`,'⚡');
+  toast(`✅ Updated ${images.length} images`,'success');
+};
 
-  // ── SAVE IMAGE ──
-  window.saveImage = async function() {
-    const id = document.getElementById('f-id').value.trim();
-    const title = document.getElementById('f-title').value.trim();
-    const thumb = document.getElementById('f-thumb').value.trim();
-    const highres = document.getElementById('f-highres').value.trim();
-    const slug = document.getElementById('f-slug').value.trim();
+window.deleteAll = async function() {
+  if(!confirm(`DELETE ALL ${images.length} images from Firebase?\nThis CANNOT be undone!`)) return;
+  if(!confirm('Are you absolutely sure?')) return;
+  try {
+    await remove(ref(db,'images'));
+    logActivity('del',`Deleted ALL ${images.length} images`,'💥');
+    toast('💥 All images deleted','success');
+  } catch(e){ toast('❌ '+e.message,'error'); }
+};
 
-    if (!id || !title || !thumb || !highres || !slug) {
-      showToast('❌ ID, Slug, Title, Thumbnail & HighRes URL required!', 'error');
-      return;
-    }
+// ── EXPORT / IMPORT ────────────────────────────────────────────────────────────
+window.exportJSON = function() {
+  const blob=new Blob([JSON.stringify(images,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='moon-night-x-images.json'; a.click();
+  logActivity('add','Exported JSON backup','⬇️');
+  toast('✅ JSON exported!','success');
+};
 
-    const galleryRaw = document.getElementById('f-gallery').value.trim();
-    const galleryImages = galleryRaw ? galleryRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
-    const tagsRaw = document.getElementById('f-tags').value.trim();
-    const tags = tagsRaw ? tagsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+window.importJSON = async function() {
+  const raw = document.getElementById('import-json').value.trim();
+  if(!raw){ toast('Paste JSON first','info'); return; }
+  try {
+    const arr = JSON.parse(raw);
+    if(!Array.isArray(arr)) throw new Error('Must be a JSON array');
+    if(!confirm(`Import ${arr.length} images to Firebase?`)) return;
+    const updates={};
+    arr.forEach(img=>{ if(img.id) updates[`images/${img.id}`]=img; });
+    await update(ref(db),updates);
+    logActivity('add',`Imported ${arr.length} images via JSON`,'📤');
+    toast(`✅ Imported ${arr.length} images!`,'success');
+    document.getElementById('import-json').value='';
+  } catch(e){ toast('❌ Invalid JSON: '+e.message,'error'); }
+};
 
-    const imageData = {
-      id,
-      slug,
-      title,
-      description: document.getElementById('f-desc').value.trim(),
-      category: document.getElementById('f-category').value,
-      aspectRatio: document.getElementById('f-aspect').value,
-      thumbnailUrl: thumb,
-      highResUrl: highres,
-      galleryImages,
-      modelName: document.getElementById('f-model').value.trim(),
-      resolution: document.getElementById('f-resolution').value.trim(),
-      format: document.getElementById('f-format').value,
-      fileSize: document.getElementById('f-filesize').value.trim(),
-      views: parseInt(document.getElementById('f-views').value) || 0,
-      likes: parseInt(document.getElementById('f-likes').value) || 0,
-      width: parseInt(document.getElementById('f-width').value) || 0,
-      height: parseInt(document.getElementById('f-height').value) || 0,
-      uploadedAt: document.getElementById('f-uploaded').value.trim() || 'Just now',
-      tags,
-      isFeatured: document.getElementById('f-featured').checked,
-      isTrending: document.getElementById('f-trending').checked,
-      isPopular: document.getElementById('f-popular').checked,
-      isNew: document.getElementById('f-new').checked,
-    };
+// ── ACTIVITY LOG ───────────────────────────────────────────────────────────────
+function logActivity(type,msg,icon='📝') {
+  actLog.unshift({ type, msg, icon, time: new Date().toISOString() });
+  if(actLog.length>200) actLog=actLog.slice(0,200);
+  localStorage.setItem('mnx_admin_log',JSON.stringify(actLog));
+  document.getElementById('nav-log-count').textContent=actLog.length;
+  renderLog();
+  renderDashLog();
+}
+function logHTML(entry) {
+  const d=new Date(entry.time);
+  const timeStr=d.toLocaleDateString()+' '+d.toLocaleTimeString();
+  return `<div class="log-item">
+    <div class="log-dot ${entry.type}"></div>
+    <div class="log-content">
+      <div class="log-msg">${entry.icon||''} ${entry.msg}</div>
+      <div class="log-time">${timeStr}</div>
+    </div>
+  </div>`;
+}
+window.renderLog = function() {
+  const f=document.getElementById('log-filter')?.value||'';
+  const filtered=f?actLog.filter(e=>e.type===f):actLog;
+  document.getElementById('nav-log-count').textContent=actLog.length;
+  const el=document.getElementById('log-list');
+  el.innerHTML=filtered.length?filtered.map(logHTML).join(''):'<div class="empty"><div class="em-icon">📋</div>No activity logged yet</div>';
+};
+window.clearLog = function() {
+  if(!confirm('Clear all activity logs?')) return;
+  actLog=[];
+  localStorage.setItem('mnx_admin_log','[]');
+  logActivity('clear','Log cleared','🗑️');
+  toast('Log cleared','success');
+};
 
-    try {
-      const btn = document.getElementById('modal-save-btn');
-      btn.textContent = '⏳ Saving...';
-      btn.disabled = true;
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+window.saveSettings = function() {
+  const u=document.getElementById('set-user').value.trim();
+  const p=document.getElementById('set-pass').value.trim();
+  if(u) settings.user=u;
+  if(p) settings.pass=p;
+  localStorage.setItem('mnx_admin_settings',JSON.stringify(settings));
+  toast('✅ Settings saved','success');
+};
+window.checkCache = function() {
+  const keys=['mnx_images_cache','mnx_images_ts'];
+  let info='';
+  keys.forEach(k=>{
+    const v=localStorage.getItem(k);
+    if(v) info+=`${k}: ${(v.length/1024).toFixed(1)} KB\n`;
+  });
+  document.getElementById('cache-info').textContent = info || 'No cache found';
+};
+window.clearCache = function() {
+  localStorage.removeItem('mnx_images_cache');
+  localStorage.removeItem('mnx_images_ts');
+  toast('✅ Site cache cleared','success');
+  document.getElementById('cache-info').textContent='Cache cleared!';
+};
 
-      await set(ref(db, 'images/' + id), imageData);
-      showToast('✅ Image saved to Firebase!', 'success');
-      closeModal();
-    } catch(err) {
-      console.error(err);
-      showToast('❌ Firebase error: ' + err.message, 'error');
-      document.getElementById('modal-save-btn').textContent = '💾 Save to Firebase';
-      document.getElementById('modal-save-btn').disabled = false;
-    }
-  };
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+window.showPage = function(name) {
+  currentPage=name;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pg=document.getElementById('page-'+name);
+  if(pg) pg.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')?.includes("'"+name+"'")) n.classList.add('active');
+  });
+  const titles={dashboard:'📊 Dashboard',images:'🖼️ Images',activity:'📋 Activity Log',bulk:'⚡ Bulk Actions',settings:'⚙️ Settings'};
+  document.getElementById('page-title').textContent=titles[name]||name;
+  if(name==='activity') renderLog();
+};
 
-  // ── DELETE IMAGE ──
-  window.deleteImage = async function(id, title) {
-    if (!confirm(`Delete "${title}"?\nThis will remove it from Firebase permanently.`)) return;
-    try {
-      await remove(ref(db, 'images/' + id));
-      showToast('🗑️ Image deleted from Firebase', 'success');
-    } catch(err) {
-      showToast('❌ Delete failed: ' + err.message, 'error');
-    }
-  };
+// ── PREVIEW ────────────────────────────────────────────────────────────────────
+window.prevImg = function(inId,prevId) {
+  const url=document.getElementById(inId).value.trim();
+  const img=document.getElementById(prevId);
+  if(url){ img.src=url; img.style.display='block'; img.onerror=()=>{img.style.display='none'}; }
+  else img.style.display='none';
+};
 
-  // ── PREVIEW ──
-  window.previewImg = function(inputId, previewId) {
-    const url = document.getElementById(inputId).value.trim();
-    const img = document.getElementById(previewId);
-    if (url) {
-      img.src = url;
-      img.style.display = 'block';
-      img.onerror = () => { img.style.display = 'none'; };
-    } else {
-      img.style.display = 'none';
-    }
-  };
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg,type='success') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show '+type;
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>{ t.className=''; },3000);
+}
 
-  // ── EXPORT JSON ──
-  window.exportJSON = function() {
-    const json = JSON.stringify(allImages, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'moon-night-x-images.json';
-    a.click();
-    showToast('✅ JSON exported!', 'success');
-  };
-
-  // ── TOAST ──
-  function showToast(msg, type='success') {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'show ' + type;
-    clearTimeout(window._toastTimer);
-    window._toastTimer = setTimeout(() => { t.className = ''; }, 3000);
-  }
+// ── INIT ─────────────────────────────────────────────────────────────────────
+document.getElementById('nav-log-count').textContent=actLog.length;
+renderLog();
 </script>
 </body>
 </html>

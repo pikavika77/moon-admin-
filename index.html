@@ -208,8 +208,8 @@ tr.selected td{background:rgba(224,36,36,.04)}
   <div class="login-box">
     <div class="login-logo"><div class="dot"></div><h1>Moon <span>Night X</span></h1></div>
     <p class="login-subtitle">Admin Control Panel — Restricted Access</p>
-    <label class="login-label">Username</label>
-    <input class="login-input" id="u" type="text" placeholder="admin" autocomplete="username"/>
+    <label class="login-label">Email Address</label>
+    <input class="login-input" id="u" type="email" placeholder="aryakaran836@gmail.com" autocomplete="email"/>
     <label class="login-label">Password</label>
     <input class="login-input" id="p" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
     <div class="login-error" id="lerr">❌ Invalid credentials. Try again.</div>
@@ -518,6 +518,7 @@ tr.selected td{background:rgba(224,36,36,.04)}
 
 <script type="module">
 import { initializeApp }              from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getDatabase, ref, onValue, set, remove, update, off }
                                        from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
@@ -525,7 +526,9 @@ import { getDatabase, ref, onValue, set, remove, update, off }
 const FB = { apiKey:"AIzaSyACW8aFQmlaoaxNtE55m8Pck6H8BRlfEbs", authDomain:"moon-night-x.firebaseapp.com", databaseURL:"https://moon-night-x-default-rtdb.firebaseio.com", projectId:"moon-night-x", storageBucket:"moon-night-x.firebasestorage.app", messagingSenderId:"779934381788", appId:"1:779934381788:web:1426fa035171015634a619", measurementId:"G-9B6R1VRP24" };
 
 const app = initializeApp(FB);
-const db  = getDatabase(app);
+const db   = getDatabase(app);
+const auth = getAuth(app);
+const ALLOWED_EMAIL = "aryakaran836@gmail.com";
 
 // ── STATE ────────────────────────────────────────────────────────────────────
 let images   = [];
@@ -544,26 +547,65 @@ Object.assign(window, {
 });
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
-function login() {
-  const u = document.getElementById('u').value.trim();
-  const p = document.getElementById('p').value;
-  if (u === settings.user && p === settings.pass) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('admin-name').textContent = u;
-    logActivity('login', `Admin "${u}" logged in`, '👤');
-    initDB();
-  } else {
-    document.getElementById('lerr').style.display = 'block';
+async function login() {
+  const email = document.getElementById('u').value.trim();
+  const pass  = document.getElementById('p').value;
+  const errEl = document.getElementById('lerr');
+  const btn   = document.querySelector('.login-btn');
+
+  if (!email || !pass) { errEl.textContent = '❌ Email aur password dono fill karo.'; errEl.style.display = 'block'; return; }
+
+  // Only allow specific email
+  if (email.toLowerCase() !== ALLOWED_EMAIL) {
+    errEl.textContent = '❌ Access denied. Unauthorized email.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.textContent = '⏳ Logging in...';
+  btn.disabled = true;
+  errEl.style.display = 'none';
+
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    // onAuthStateChanged handles the rest
+  } catch(e) {
+    let msg = '❌ Login failed. Check credentials.';
+    if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') msg = '❌ Wrong password. Try again.';
+    else if (e.code === 'auth/user-not-found') msg = '❌ No account found for this email.';
+    else if (e.code === 'auth/too-many-requests') msg = '❌ Too many attempts. Try later.';
+    else if (e.code === 'auth/network-request-failed') msg = '❌ Network error. Check connection.';
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+    btn.textContent = 'Login to Admin Panel →';
+    btn.disabled = false;
   }
 }
 
-function logout() {
+async function logout() {
   logActivity('login', 'Admin logged out', '🚪');
+  await signOut(auth);
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('p').value = '';
+  document.getElementById('u').value = '';
 }
+
+// ── AUTH STATE LISTENER ───────────────────────────────────────────────────────
+onAuthStateChanged(auth, (user) => {
+  if (user && user.email.toLowerCase() === ALLOWED_EMAIL) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('admin-name').textContent = user.email;
+    document.querySelector('.login-btn').textContent = 'Login to Admin Panel →';
+    document.querySelector('.login-btn').disabled = false;
+    logActivity('login', `Signed in as ${user.email}`, '👤');
+    initDB();
+  } else if (user) {
+    // Logged in but wrong email — sign out immediately
+    signOut(auth);
+  }
+});
 
 // ── FIREBASE ──────────────────────────────────────────────────────────────────
 function initDB() {

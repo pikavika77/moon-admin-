@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moon Night X — Admin Panel</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #050505; --surface: #111111; --surface2: #1a1a1a;
+      --border: #222222; --text: #ffffff; --muted: #888888;
+      --accent: #E02424; --accent-hover: #c01c1c;
+      --green: #22c55e; --yellow: #f59e0b; --blue: #3b82f6;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+
+    /* LOGIN */
+    #login-screen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .login-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 40px; width: 100%; max-width: 400px;
+    }
+    .login-box h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+    .login-box p { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+    .login-box input {
+      width: 100%; padding: 12px 16px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-size: 14px; margin-bottom: 12px; outline: none;
+    }
+    .login-box input:focus { border-color: var(--accent); }
+    .login-error { color: var(--accent); font-size: 12px; margin-bottom: 12px; display: none; }
+
+    /* LAYOUT */
+    #admin-panel { display: none; }
+    .header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo { font-size: 18px; font-weight: 800; }
+    .logo span { color: var(--accent); }
+    .badge { background: var(--accent); color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+    .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .stat-card .label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .stat-card .value { font-size: 28px; font-weight: 800; }
+    .stat-card .value.accent { color: var(--accent); }
+    .stat-card .value.green { color: var(--green); }
+    .stat-card .value.blue { color: var(--blue); }
+    .stat-card .value.yellow { color: var(--yellow); }
+
+    /* TOOLBAR */
+    .toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+    }
+    .toolbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .search-box {
+      padding: 9px 14px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 13px; outline: none; width: 240px;
+    }
+    .search-box:focus { border-color: var(--accent); }
+    select.filter-select {
+      padding: 9px 12px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 13px; outline: none; cursor: pointer;
+    }
+
+    /* BUTTONS */
+    .btn { padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-ghost { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); border-color: #444; }
+    .btn-danger { background: #2a0a0a; color: var(--accent); border: 1px solid #3a1010; }
+    .btn-danger:hover { background: #3a1010; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+    .btn-green { background: #052a12; color: var(--green); border: 1px solid #0a4020; }
+    .btn-green:hover { background: #0a4020; }
+
+    /* TABLE */
+    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--surface2); }
+    th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
+    td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+    .thumb { width: 48px; height: 64px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); }
+    .badge-cat { padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 700; background: #1a0a0a; color: var(--accent); border: 1px solid #3a1010; text-transform: uppercase; }
+    .badge-tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; background: var(--surface2); color: var(--muted); margin: 1px; }
+    .flag { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 999px; font-size: 10px; font-weight: 700; margin: 1px; }
+    .flag.featured { background: #1a0a2a; color: #a855f7; border: 1px solid #3a1a5a; }
+    .flag.trending { background: #0a1a2a; color: var(--blue); border: 1px solid #1a3a5a; }
+    .flag.popular { background: #0a2a0a; color: var(--green); border: 1px solid #1a5a1a; }
+    .flag.new { background: #2a1a00; color: var(--yellow); border: 1px solid #5a3a00; }
+    .actions { display: flex; gap: 6px; }
+    .empty-state { padding: 60px 20px; text-align: center; color: var(--muted); }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    .loading-row td { text-align: center; padding: 40px; color: var(--muted); }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; width: 100%; max-width: 700px;
+      max-height: 90vh; overflow-y: auto; padding: 28px;
+    }
+    .modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 10px 14px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 13px; outline: none; width: 100%;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+    .checkbox-label input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px; }
+    .preview-img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); margin-top: 8px; background: var(--surface2); display: none; }
+
+    /* TOAST */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 500;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 20px; font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; gap: 10px;
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.success { border-color: var(--green); }
+    #toast.error { border-color: var(--accent); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .main { padding: 16px; }
+      .search-box { width: 180px; }
+      th:nth-child(3), td:nth-child(3), th:nth-child(5), td:nth-child(5) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <h1>🔐 Admin Login</h1>
+    <p>Moon Night X — Admin Panel. Enter your credentials to continue.</p>
+    <input type="text" id="admin-user" placeholder="Username" />
+    <input type="password" id="admin-pass" placeholder="Password" onkeydown="if(event.key==='Enter') doLogin()" />
+    <div class="login-error" id="login-error">❌ Invalid credentials. Try again.</div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="doLogin()">Login to Admin →</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">Moon <span>Night X</span></div>
+      <span class="badge">ADMIN</span>
+      <span id="firebase-status" style="font-size:11px;color:#888;">⏳ Connecting...</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span id="header-count" style="font-size:12px;color:#888;"></span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="label">Total Images</div><div class="value accent" id="stat-total">—</div></div>
+      <div class="stat-card"><div class="label">Firebase Images</div><div class="value green" id="stat-firebase">—</div></div>
+      <div class="stat-card"><div class="label">Featured</div><div class="value blue" id="stat-featured">—</div></div>
+      <div class="stat-card"><div class="label">Trending</div><div class="value yellow" id="stat-trending">—</div></div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <input class="search-box" type="text" id="search-input" placeholder="🔍 Search images..." oninput="renderTable()" />
+        <select class="filter-select" id="filter-cat" onchange="renderTable()">
+          <option value="">All Categories</option>
+          <option value="cyberpunk">Cyberpunk</option>
+          <option value="artistic">Artistic</option>
+          <option value="fitness">Fitness</option>
+          <option value="cosplay">Cosplay</option>
+          <option value="glamour">Glamour</option>
+          <option value="amateur">Amateur</option>
+          <option value="model">Model</option>
+          <option value="high-fashion">High Fashion</option>
+        </select>
+        <select class="filter-select" id="filter-flag" onchange="renderTable()">
+          <option value="">All Flags</option>
+          <option value="isFeatured">Featured</option>
+          <option value="isTrending">Trending</option>
+          <option value="isPopular">Popular</option>
+          <option value="isNew">New</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="exportJSON()">⬇ Export JSON</button>
+        <button class="btn btn-primary" onclick="openAddModal()">+ Add Image</button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Thumbnail</th>
+            <th>Title / Model</th>
+            <th>Category</th>
+            <th>Flags</th>
+            <th>Stats</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="images-tbody">
+          <tr class="loading-row"><td colspan="6">⏳ Loading images from Firebase...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:12px;font-size:12px;color:#555;text-align:right;" id="table-footer"></div>
+  </div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal-overlay" id="modal" style="display:none;" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <h2 id="modal-title">➕ Add New Image</h2>
+    <div class="form-grid">
+      <div class="form-group"><label>Image ID *</label><input id="f-id" placeholder="velvet-001" /></div>
+      <div class="form-group"><label>Slug *</label><input id="f-slug" placeholder="lumina-neon-portrait" /></div>
+      <div class="form-group full"><label>Title *</label><input id="f-title" placeholder="Lumina Neon Cyberpunk Portrait" /></div>
+      <div class="form-group full"><label>Description</label><textarea id="f-desc" placeholder="Detailed description..."></textarea></div>
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="f-category">
+          <option value="cyberpunk">Cyberpunk</option>
+          <option value="artistic">Artistic</option>
+          <option value="fitness">Fitness</option>
+          <option value="cosplay">Cosplay</option>
+          <option value="glamour">Glamour</option>
+          <option value="amateur">Amateur</option>
+          <option value="model">Model</option>
+          <option value="high-fashion">High Fashion</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Aspect Ratio</label>
+        <select id="f-aspect">
+          <option value="portrait">Portrait</option>
+          <option value="landscape">Landscape</option>
+          <option value="square">Square</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Thumbnail URL *</label>
+        <input id="f-thumb" placeholder="https://images.unsplash.com/..." oninput="previewImg('f-thumb','prev-thumb')" />
+        <img class="preview-img" id="prev-thumb" />
+      </div>
+      <div class="form-group full">
+        <label>High Res URL *</label>
+        <input id="f-highres" placeholder="https://images.unsplash.com/..." oninput="previewImg('f-highres','prev-highres')" />
+        <img class="preview-img" id="prev-highres" />
+      </div>
+      <div class="form-group full">
+        <label>Gallery Images (one URL per line)</label>
+        <textarea id="f-gallery" placeholder="https://...\nhttps://...\nhttps://..." style="min-height:100px;"></textarea>
+      </div>
+      <div class="form-group"><label>Model Name</label><input id="f-model" placeholder="Kira Vance" /></div>
+      <div class="form-group"><label>Resolution</label><input id="f-resolution" placeholder="3840 x 5120" /></div>
+      <div class="form-group"><label>Format</label>
+        <select id="f-format"><option>WebP</option><option>AVIF</option><option>JPEG</option></select>
+      </div>
+      <div class="form-group"><label>File Size</label><input id="f-filesize" placeholder="1.8 MB" /></div>
+      <div class="form-group"><label>Views</label><input id="f-views" type="number" placeholder="48290" /></div>
+      <div class="form-group"><label>Likes</label><input id="f-likes" type="number" placeholder="3412" /></div>
+      <div class="form-group"><label>Width (px)</label><input id="f-width" type="number" placeholder="2400" /></div>
+      <div class="form-group"><label>Height (px)</label><input id="f-height" type="number" placeholder="3200" /></div>
+      <div class="form-group"><label>Uploaded At</label><input id="f-uploaded" placeholder="2 hours ago" /></div>
+      <div class="form-group"><label>Tags (comma separated)</label><input id="f-tags" placeholder="cyberpunk, neon, model" /></div>
+      <div class="form-group full">
+        <label>Flags</label>
+        <div class="checkbox-group">
+          <label class="checkbox-label"><input type="checkbox" id="f-featured" /> ⭐ Featured</label>
+          <label class="checkbox-label"><input type="checkbox" id="f-trending" /> 🔥 Trending</label>
+          <label class="checkbox-label"><input type="checkbox" id="f-popular" /> ❤️ Popular</label>
+          <label class="checkbox-label"><input type="checkbox" id="f-new" /> ✨ New</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-save-btn" onclick="saveImage()">💾 Save to Firebase</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+  import { getDatabase, ref, onValue, set, remove, push } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+  // ── FIREBASE CONFIG ──
+  const firebaseConfig = {
+    apiKey: "AIzaSyACW8aFQmlaoaxNtE55m8Pck6H8BRlfEbs",
+    authDomain: "moon-night-x.firebaseapp.com",
+    databaseURL: "https://moon-night-x-default-rtdb.firebaseio.com",
+    projectId: "moon-night-x",
+    storageBucket: "moon-night-x.firebasestorage.app",
+    messagingSenderId: "779934381788",
+    appId: "1:779934381788:web:1426fa035171015634a619",
+    measurementId: "G-9B6R1VRP24"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // ── ADMIN CREDENTIALS ──
+  const ADMIN_USER = "admin";
+  const ADMIN_PASS = "moonnightx@2024";
+
+  // ── STATE ──
+  let allImages = [];
+  let editingId = null;
+
+  // ── LOGIN ──
+  window.doLogin = function() {
+    const u = document.getElementById('admin-user').value.trim();
+    const p = document.getElementById('admin-pass').value;
+    if (u === ADMIN_USER && p === ADMIN_PASS) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+      initFirebase();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  };
+
+  window.doLogout = function() {
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-user').value = '';
+    document.getElementById('admin-pass').value = '';
+  };
+
+  // ── FIREBASE LISTENER ──
+  function initFirebase() {
+    const imagesRef = ref(db, 'images');
+    onValue(imagesRef, (snapshot) => {
+      document.getElementById('firebase-status').textContent = '🟢 Firebase Connected';
+      document.getElementById('firebase-status').style.color = '#22c55e';
+
+      if (snapshot.exists()) {
+        allImages = Object.values(snapshot.val());
+      } else {
+        allImages = [];
+      }
+      updateStats();
+      renderTable();
+    }, (err) => {
+      document.getElementById('firebase-status').textContent = '🔴 Firebase Error';
+      document.getElementById('firebase-status').style.color = '#E02424';
+      console.error(err);
+    });
+  }
+
+  // ── STATS ──
+  function updateStats() {
+    document.getElementById('stat-total').textContent = allImages.length;
+    document.getElementById('stat-firebase').textContent = allImages.length;
+    document.getElementById('stat-featured').textContent = allImages.filter(i => i.isFeatured).length;
+    document.getElementById('stat-trending').textContent = allImages.filter(i => i.isTrending).length;
+    document.getElementById('header-count').textContent = allImages.length + ' images in DB';
+  }
+
+  // ── TABLE RENDER ──
+  window.renderTable = function() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    const cat = document.getElementById('filter-cat').value;
+    const flag = document.getElementById('filter-flag').value;
+
+    let filtered = allImages.filter(img => {
+      const matchQ = !q || img.title?.toLowerCase().includes(q) || img.modelName?.toLowerCase().includes(q) || img.id?.toLowerCase().includes(q);
+      const matchCat = !cat || img.category === cat;
+      const matchFlag = !flag || img[flag];
+      return matchQ && matchCat && matchFlag;
+    });
+
+    const tbody = document.getElementById('images-tbody');
+    document.getElementById('table-footer').textContent = `Showing ${filtered.length} of ${allImages.length} images`;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">🖼️</div><div>No images found</div></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(img => `
+      <tr>
+        <td><img class="thumb" src="${img.thumbnailUrl || ''}" alt="${img.title || ''}" onerror="this.src=''" /></td>
+        <td>
+          <div style="font-weight:700;font-size:13px;margin-bottom:3px;">${img.title || '—'}</div>
+          <div style="font-size:11px;color:#888;">${img.modelName ? '👤 ' + img.modelName : ''}</div>
+          <div style="font-size:10px;color:#555;margin-top:2px;font-family:monospace;">${img.id}</div>
+        </td>
+        <td><span class="badge-cat">${img.category || '—'}</span></td>
+        <td>
+          ${img.isFeatured ? '<span class="flag featured">⭐ Featured</span>' : ''}
+          ${img.isTrending ? '<span class="flag trending">🔥 Trending</span>' : ''}
+          ${img.isPopular ? '<span class="flag popular">❤️ Popular</span>' : ''}
+          ${img.isNew ? '<span class="flag new">✨ New</span>' : ''}
+        </td>
+        <td>
+          <div style="font-size:11px;color:#888;">👁 ${(img.views||0).toLocaleString()}</div>
+          <div style="font-size:11px;color:#888;">❤️ ${(img.likes||0).toLocaleString()}</div>
+          <div style="font-size:10px;color:#555;margin-top:2px;">${img.uploadedAt || ''}</div>
+        </td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-ghost btn-sm" onclick="openEditModal('${img.id}')">✏️ Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteImage('${img.id}', '${(img.title||'').replace(/'/g,"\\'")}')">🗑</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  };
+
+  // ── MODAL OPEN (ADD) ──
+  window.openAddModal = function() {
+    editingId = null;
+    document.getElementById('modal-title').textContent = '➕ Add New Image';
+    document.getElementById('modal-save-btn').textContent = '💾 Save to Firebase';
+    clearForm();
+    document.getElementById('modal').style.display = 'flex';
+  };
+
+  // ── MODAL OPEN (EDIT) ──
+  window.openEditModal = function(id) {
+    const img = allImages.find(i => i.id === id);
+    if (!img) return;
+    editingId = id;
+    document.getElementById('modal-title').textContent = '✏️ Edit Image';
+    document.getElementById('modal-save-btn').textContent = '💾 Update Firebase';
+
+    document.getElementById('f-id').value = img.id || '';
+    document.getElementById('f-slug').value = img.slug || '';
+    document.getElementById('f-title').value = img.title || '';
+    document.getElementById('f-desc').value = img.description || '';
+    document.getElementById('f-category').value = img.category || 'cyberpunk';
+    document.getElementById('f-aspect').value = img.aspectRatio || 'portrait';
+    document.getElementById('f-thumb').value = img.thumbnailUrl || '';
+    document.getElementById('f-highres').value = img.highResUrl || '';
+    document.getElementById('f-gallery').value = (img.galleryImages || []).join('\n');
+    document.getElementById('f-model').value = img.modelName || '';
+    document.getElementById('f-resolution').value = img.resolution || '';
+    document.getElementById('f-format').value = img.format || 'WebP';
+    document.getElementById('f-filesize').value = img.fileSize || '';
+    document.getElementById('f-views').value = img.views || '';
+    document.getElementById('f-likes').value = img.likes || '';
+    document.getElementById('f-width').value = img.width || '';
+    document.getElementById('f-height').value = img.height || '';
+    document.getElementById('f-uploaded').value = img.uploadedAt || '';
+    document.getElementById('f-tags').value = (img.tags || []).join(', ');
+    document.getElementById('f-featured').checked = !!img.isFeatured;
+    document.getElementById('f-trending').checked = !!img.isTrending;
+    document.getElementById('f-popular').checked = !!img.isPopular;
+    document.getElementById('f-new').checked = !!img.isNew;
+
+    // Preview
+    if (img.thumbnailUrl) { previewImg('f-thumb','prev-thumb'); }
+    if (img.highResUrl) { previewImg('f-highres','prev-highres'); }
+
+    document.getElementById('modal').style.display = 'flex';
+  };
+
+  window.closeModal = function() {
+    document.getElementById('modal').style.display = 'none';
+    editingId = null;
+  };
+
+  function clearForm() {
+    ['f-id','f-slug','f-title','f-desc','f-thumb','f-highres','f-gallery','f-model','f-resolution','f-filesize','f-views','f-likes','f-width','f-height','f-uploaded','f-tags'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('f-category').value = 'cyberpunk';
+    document.getElementById('f-aspect').value = 'portrait';
+    document.getElementById('f-format').value = 'WebP';
+    ['f-featured','f-trending','f-popular','f-new'].forEach(id => {
+      document.getElementById(id).checked = false;
+    });
+    document.getElementById('prev-thumb').style.display = 'none';
+    document.getElementById('prev-highres').style.display = 'none';
+  }
+
+  // ── SAVE IMAGE ──
+  window.saveImage = async function() {
+    const id = document.getElementById('f-id').value.trim();
+    const title = document.getElementById('f-title').value.trim();
+    const thumb = document.getElementById('f-thumb').value.trim();
+    const highres = document.getElementById('f-highres').value.trim();
+    const slug = document.getElementById('f-slug').value.trim();
+
+    if (!id || !title || !thumb || !highres || !slug) {
+      showToast('❌ ID, Slug, Title, Thumbnail & HighRes URL required!', 'error');
+      return;
+    }
+
+    const galleryRaw = document.getElementById('f-gallery').value.trim();
+    const galleryImages = galleryRaw ? galleryRaw.split('\n').map(s => s.trim()).filter(Boolean) : [];
+    const tagsRaw = document.getElementById('f-tags').value.trim();
+    const tags = tagsRaw ? tagsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+    const imageData = {
+      id,
+      slug,
+      title,
+      description: document.getElementById('f-desc').value.trim(),
+      category: document.getElementById('f-category').value,
+      aspectRatio: document.getElementById('f-aspect').value,
+      thumbnailUrl: thumb,
+      highResUrl: highres,
+      galleryImages,
+      modelName: document.getElementById('f-model').value.trim(),
+      resolution: document.getElementById('f-resolution').value.trim(),
+      format: document.getElementById('f-format').value,
+      fileSize: document.getElementById('f-filesize').value.trim(),
+      views: parseInt(document.getElementById('f-views').value) || 0,
+      likes: parseInt(document.getElementById('f-likes').value) || 0,
+      width: parseInt(document.getElementById('f-width').value) || 0,
+      height: parseInt(document.getElementById('f-height').value) || 0,
+      uploadedAt: document.getElementById('f-uploaded').value.trim() || 'Just now',
+      tags,
+      isFeatured: document.getElementById('f-featured').checked,
+      isTrending: document.getElementById('f-trending').checked,
+      isPopular: document.getElementById('f-popular').checked,
+      isNew: document.getElementById('f-new').checked,
+    };
+
+    try {
+      const btn = document.getElementById('modal-save-btn');
+      btn.textContent = '⏳ Saving...';
+      btn.disabled = true;
+
+      await set(ref(db, 'images/' + id), imageData);
+      showToast('✅ Image saved to Firebase!', 'success');
+      closeModal();
+    } catch(err) {
+      console.error(err);
+      showToast('❌ Firebase error: ' + err.message, 'error');
+      document.getElementById('modal-save-btn').textContent = '💾 Save to Firebase';
+      document.getElementById('modal-save-btn').disabled = false;
+    }
+  };
+
+  // ── DELETE IMAGE ──
+  window.deleteImage = async function(id, title) {
+    if (!confirm(`Delete "${title}"?\nThis will remove it from Firebase permanently.`)) return;
+    try {
+      await remove(ref(db, 'images/' + id));
+      showToast('🗑️ Image deleted from Firebase', 'success');
+    } catch(err) {
+      showToast('❌ Delete failed: ' + err.message, 'error');
+    }
+  };
+
+  // ── PREVIEW ──
+  window.previewImg = function(inputId, previewId) {
+    const url = document.getElementById(inputId).value.trim();
+    const img = document.getElementById(previewId);
+    if (url) {
+      img.src = url;
+      img.style.display = 'block';
+      img.onerror = () => { img.style.display = 'none'; };
+    } else {
+      img.style.display = 'none';
+    }
+  };
+
+  // ── EXPORT JSON ──
+  window.exportJSON = function() {
+    const json = JSON.stringify(allImages, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'moon-night-x-images.json';
+    a.click();
+    showToast('✅ JSON exported!', 'success');
+  };
+
+  // ── TOAST ──
+  function showToast(msg, type='success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => { t.className = ''; }, 3000);
+  }
+</script>
+</body>
+</html>

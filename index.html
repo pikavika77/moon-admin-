@@ -36,6 +36,9 @@ input,select,textarea,button{font-family:inherit}
 .login-error{color:var(--accent);font-size:12px;margin-bottom:12px;display:none;padding:10px 14px;background:#1a0505;border:1px solid #3a1010;border-radius:8px}
 .login-btn{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s}
 .login-btn:hover{background:var(--accent2)}
+.google-btn{width:100%;padding:13px;background:#fff;color:#333;border:1.5px solid #ddd;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px}
+.google-btn:hover{background:#f5f5f5;border-color:#bbb;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.google-btn:active{transform:scale(.98)}
 
 /* ── APP SHELL ── */
 #app{display:none;height:100vh;overflow:hidden}
@@ -208,12 +211,21 @@ tr.selected td{background:rgba(224,36,36,.04)}
   <div class="login-box">
     <div class="login-logo"><div class="dot"></div><h1>Moon <span>Night X</span></h1></div>
     <p class="login-subtitle">Admin Control Panel — Restricted Access</p>
+    <button class="google-btn" onclick="loginGoogle()" id="google-btn">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Continue with Google
+    </button>
+    <div style="display:flex;align-items:center;gap:10px;margin:16px 0">
+      <div style="flex:1;height:1px;background:#2a2a2a"></div>
+      <span style="font-size:11px;color:#555">or email login</span>
+      <div style="flex:1;height:1px;background:#2a2a2a"></div>
+    </div>
     <label class="login-label">Email Address</label>
     <input class="login-input" id="u" type="email" placeholder="aryakaran836@gmail.com" autocomplete="email"/>
     <label class="login-label">Password</label>
     <input class="login-input" id="p" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
     <div class="login-error" id="lerr">❌ Invalid credentials. Try again.</div>
-    <button class="login-btn" onclick="login()">Login to Admin Panel →</button>
+    <button class="login-btn" onclick="login()">Login with Email →</button>
   </div>
 </div>
 
@@ -232,6 +244,7 @@ tr.selected td{background:rgba(224,36,36,.04)}
       <div class="nav-item active" onclick="showPage('dashboard')"><span class="icon">📊</span> Dashboard</div>
       <div class="nav-item" onclick="showPage('images')"><span class="icon">🖼️</span> Images <span class="count" id="nav-count">0</span></div>
       <div class="nav-section">Manage</div>
+      <div class="nav-item" onclick="showPage('categories')"><span class="icon">📂</span> Categories <span class="count" id="nav-cat-count">0</span></div>
       <div class="nav-item" onclick="showPage('activity')"><span class="icon">📋</span> Activity Log <span class="count" id="nav-log-count">0</span></div>
       <div class="nav-item" onclick="showPage('bulk')"><span class="icon">⚡</span> Bulk Actions</div>
       <div class="nav-section">Tools</div>
@@ -352,6 +365,32 @@ tr.selected td{background:rgba(224,36,36,.04)}
         <button class="btn btn-ghost btn-sm" onclick="bulkFlag('isTrending',true)">🔥 Set Trending</button>
         <button class="btn btn-danger btn-sm" onclick="bulkDelete()">🗑 Delete Selected</button>
         <button class="btn btn-ghost btn-sm" onclick="clearSel()">✕ Clear</button>
+      </div>
+    </div>
+
+    <!-- ── CATEGORIES PAGE ── -->
+    <div class="page" id="page-categories">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📂 Manage Categories</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddCat()">+ Add Category</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr>
+              <th>ID / Slug</th><th>Name</th><th>Description</th><th>Image Count</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="cat-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" style="padding:18px 20px">
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          <strong style="color:var(--text)">ℹ️ How it works:</strong><br>
+          • Category <strong>ID</strong> — images ke <code style="background:var(--surface2);padding:1px 5px;border-radius:4px">category</code> field se match hona chahiye<br>
+          • Category yahan add karo → website pe automatically dikh jaayegi<br>
+          • Delete karne se images delete nahi hongi, sirf category pill hategi
+        </div>
       </div>
     </div>
 
@@ -513,12 +552,27 @@ tr.selected td{background:rgba(224,36,36,.04)}
   </div>
 </div>
 
+<!-- CATEGORY MODAL -->
+<div class="overlay" id="cat-modal" style="display:none" onclick="if(event.target===this)closeAddCat()">
+  <div class="modal" style="max-width:480px">
+    <h2 id="cat-modal-title">📂 Add Category</h2>
+    <div class="fg"><label>Category ID * (slug, no spaces)</label><input class="inp" id="cf-id" placeholder="e.g. cyberpunk, high-fashion"/></div>
+    <div class="fg"><label>Display Name *</label><input class="inp" id="cf-name" placeholder="e.g. Cyberpunk"/></div>
+    <div class="fg"><label>Description</label><textarea class="inp" id="cf-desc" placeholder="Short description..."></textarea></div>
+    <div class="fg"><label>Featured Image URL</label><input class="inp" id="cf-img" placeholder="https://..." oninput="prevImg('cf-img','cf-prev')"/><img class="prev-img" id="cf-prev"/></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAddCat()">Cancel</button>
+      <button class="btn btn-primary" id="cat-save-btn" onclick="saveCat()">💾 Save Category</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
 <script type="module">
 import { initializeApp }              from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getDatabase, ref, onValue, set, remove, update, off }
                                        from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
@@ -529,6 +583,8 @@ const app = initializeApp(FB);
 const db   = getDatabase(app);
 const auth = getAuth(app);
 const ALLOWED_EMAIL = "aryakaran836@gmail.com";
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ login_hint: ALLOWED_EMAIL });
 
 // ── STATE ────────────────────────────────────────────────────────────────────
 let images   = [];
@@ -540,10 +596,11 @@ let currentPage = 'dashboard';
 
 // ── EXPOSE GLOBALS ───────────────────────────────────────────────────────────
 Object.assign(window, {
-  login, logout, showPage, openAdd, openEdit, closeModal, saveImg,
+  login, loginGoogle, logout, showPage, openAdd, openEdit, closeModal, saveImg,
   deleteImg, renderTable, renderLog, toggleAll, toggleRow, clearSel,
   bulkFlag, bulkDelete, massFlag, deleteAll, exportJSON, importJSON,
   saveSettings, checkCache, clearCache, clearLog, prevImg,
+  openAddCat, closeAddCat, saveCat, deleteCat,
 });
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
@@ -601,6 +658,7 @@ onAuthStateChanged(auth, (user) => {
     document.querySelector('.login-btn').disabled = false;
     logActivity('login', `Signed in as ${user.email}`, '👤');
     initDB();
+    initCategories();
   } else if (user) {
     // Logged in but wrong email — sign out immediately
     signOut(auth);
@@ -1061,9 +1119,10 @@ window.showPage = function(name) {
   document.querySelectorAll('.nav-item').forEach(n=>{
     if(n.getAttribute('onclick')?.includes("'"+name+"'")) n.classList.add('active');
   });
-  const titles={dashboard:'📊 Dashboard',images:'🖼️ Images',activity:'📋 Activity Log',bulk:'⚡ Bulk Actions',settings:'⚙️ Settings'};
+  const titles={dashboard:'📊 Dashboard',images:'🖼️ Images',categories:'📂 Categories',activity:'📋 Activity Log',bulk:'⚡ Bulk Actions',settings:'⚙️ Settings'};
   document.getElementById('page-title').textContent=titles[name]||name;
   if(name==='activity') renderLog();
+  if(name==='categories') renderCatTable();
 };
 
 // ── PREVIEW ────────────────────────────────────────────────────────────────────
@@ -1081,6 +1140,107 @@ function toast(msg,type='success') {
   clearTimeout(window._tt);
   window._tt=setTimeout(()=>{ t.className=''; },3000);
 }
+
+// ── CATEGORIES ───────────────────────────────────────────────────────────────
+let allCategories = [];
+let editCatId = null;
+
+function initCategories() {
+  const catRef = ref(db, 'categories');
+  onValue(catRef, snap => {
+    allCategories = snap.exists() ? Object.values(snap.val()) : [];
+    document.getElementById('nav-cat-count').textContent = allCategories.length;
+    renderCatTable();
+  });
+}
+
+function renderCatTable() {
+  const tbody = document.getElementById('cat-tbody');
+  if (!tbody) return;
+  if (!allCategories.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty"><div class="em-icon">📂</div>No categories yet. Add one!</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = allCategories.map(cat => {
+    const imgCount = images.filter(i => i.category === cat.id).length;
+    return `<tr>
+      <td><code style="font-family:monospace;font-size:11px;background:var(--surface2);padding:2px 7px;border-radius:5px">${cat.id}</code></td>
+      <td style="font-weight:700">${cat.name}</td>
+      <td style="font-size:11px;color:var(--muted);max-width:200px">${cat.description||'—'}</td>
+      <td><span class="tag cat">${imgCount} images</span></td>
+      <td><div class="actions-cell">
+        <button class="btn btn-ghost btn-xs" onclick="openEditCat('${cat.id}')">✏️ Edit</button>
+        <button class="btn btn-danger btn-xs" onclick="deleteCat('${cat.id}','${(cat.name||'').replace(/'/g,"\\'")}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+window.openAddCat = function() {
+  editCatId = null;
+  document.getElementById('cat-modal-title').textContent = '📂 Add Category';
+  document.getElementById('cat-save-btn').textContent = '💾 Save Category';
+  document.getElementById('cf-id').value = '';
+  document.getElementById('cf-name').value = '';
+  document.getElementById('cf-desc').value = '';
+  document.getElementById('cf-img').value = '';
+  document.getElementById('cf-prev').style.display = 'none';
+  document.getElementById('cf-id').disabled = false;
+  document.getElementById('cat-modal').style.display = 'flex';
+};
+
+window.openEditCat = function(id) {
+  const cat = allCategories.find(c => c.id === id);
+  if (!cat) return;
+  editCatId = id;
+  document.getElementById('cat-modal-title').textContent = '✏️ Edit Category';
+  document.getElementById('cat-save-btn').textContent = '💾 Update Category';
+  document.getElementById('cf-id').value = cat.id;
+  document.getElementById('cf-name').value = cat.name||''
+  document.getElementById('cf-desc').value = cat.description||'';
+  document.getElementById('cf-img').value = cat.featuredImageUrl||'';
+  document.getElementById('cf-id').disabled = true;
+  if (cat.featuredImageUrl) prevImg('cf-img','cf-prev');
+  document.getElementById('cat-modal').style.display = 'flex';
+};
+
+window.closeAddCat = function() {
+  document.getElementById('cat-modal').style.display = 'none';
+  editCatId = null;
+};
+
+window.saveCat = async function() {
+  const id   = document.getElementById('cf-id').value.trim().toLowerCase().replace(/\s+/g,'-');
+  const name = document.getElementById('cf-name').value.trim();
+  if (!id || !name) { toast('❌ ID aur Name required!','error'); return; }
+
+  const data = {
+    id, name,
+    description:     document.getElementById('cf-desc').value.trim(),
+    featuredImageUrl:document.getElementById('cf-img').value.trim(),
+    iconName: 'Grid', slug: id, tags: [], count: 0
+  };
+
+  const btn = document.getElementById('cat-save-btn');
+  btn.textContent = '⏳ Saving...'; btn.disabled = true;
+  try {
+    await set(ref(db, 'categories/' + id), data);
+    logActivity('add', `${editCatId?'Updated':'Added'} category: "${name}"`, '📂');
+    toast(`✅ Category "${name}" ${editCatId?'updated':'saved'}!`, 'success');
+    closeAddCat();
+  } catch(e) {
+    toast('❌ ' + e.message, 'error');
+  } finally { btn.textContent='💾 Save Category'; btn.disabled=false; }
+};
+
+window.deleteCat = async function(id, name) {
+  if (!confirm(`Delete category "${name}"?\nImages will NOT be deleted.`)) return;
+  try {
+    await remove(ref(db, 'categories/' + id));
+    logActivity('del', `Deleted category: "${name}"`, '📂');
+    toast(`🗑️ Category deleted`, 'success');
+  } catch(e) { toast('❌ ' + e.message, 'error'); }
+};
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 document.getElementById('nav-log-count').textContent=actLog.length;

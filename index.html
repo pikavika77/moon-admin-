@@ -3,505 +3,474 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Moon Night X — Admin Panel</title>
+<title>Moon Night X — Admin</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#050505;--surface:#111111;--surface2:#1a1a1a;--surface3:#222222;
-  --border:#2a2a2a;--text:#ffffff;--muted:#888888;--muted2:#555555;
-  --accent:#E02424;--accent2:#c01c1c;
-  --green:#22c55e;--yellow:#f59e0b;--blue:#3b82f6;--purple:#a855f7;--cyan:#06b6d4;
+  --bg:#050505;--s1:#111111;--s2:#1a1a1a;--s3:#222222;
+  --br:#2a2a2a;--tx:#fff;--mu:#888;--mu2:#555;
+  --red:#E02424;--red2:#c01c1c;
+  --grn:#22c55e;--ylw:#f59e0b;--blu:#3b82f6;--pur:#a855f7;
 }
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 input,select,textarea,button{font-family:inherit}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--s1)}
+::-webkit-scrollbar-thumb{background:var(--br);border-radius:3px}
 
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--surface)}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:#444}
+/* ══ LOGIN ══════════════════════════════════════════════════════════ */
+#login-wrap{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 0%,#1a0505,var(--bg) 70%);z-index:999
+}
+.login-box{
+  background:var(--s1);border:1px solid var(--br);border-radius:20px;
+  padding:44px 40px;width:100%;max-width:400px;
+  box-shadow:0 25px 80px rgba(224,36,36,.08)
+}
+.login-logo{font-size:22px;font-weight:900;margin-bottom:4px}
+.login-logo span{color:var(--red)}
+.login-sub{color:var(--mu);font-size:13px;margin-bottom:28px}
+.g-btn{
+  width:100%;padding:15px;background:#fff;color:#333;
+  border:1.5px solid #ddd;border-radius:12px;font-size:15px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;
+  transition:all .2s
+}
+.g-btn:hover{background:#f5f5f5;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.g-btn:active{transform:scale(.98)}
+.g-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.l-err{
+  margin-top:14px;padding:12px 14px;background:#1a0505;
+  border:1px solid #3a1010;border-radius:10px;
+  font-size:12px;color:var(--red);display:none;line-height:1.5
+}
+.l-info{
+  margin-bottom:18px;padding:10px 14px;background:var(--s2);
+  border:1px solid var(--br);border-radius:10px;
+  font-size:11px;color:var(--mu);text-align:center
+}
 
-/* ── LOGIN ── */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:radial-gradient(ellipse at 50% 0%,#1a0505 0%,var(--bg) 70%)}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:44px;width:100%;max-width:420px;box-shadow:0 25px 80px rgba(224,36,36,0.08)}
-.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.login-logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
-.login-logo h1{font-size:22px;font-weight:900;letter-spacing:-0.5px}
-.login-logo span{color:var(--accent)}
-.login-subtitle{color:var(--muted);font-size:13px;margin-bottom:28px}
-.login-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:block}
-.login-input{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;margin-bottom:14px;outline:none;transition:border .2s}
-.login-input:focus{border-color:var(--accent)}
-.login-error{color:var(--accent);font-size:12px;margin-bottom:12px;display:none;padding:10px 14px;background:#1a0505;border:1px solid #3a1010;border-radius:8px}
-.google-btn{width:100%;padding:15px;background:#fff;color:#333;border:1.5px solid #ddd;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:12px;margin-top:8px}
-.google-btn:hover{background:#f5f5f5;border-color:#bbb;box-shadow:0 4px 16px rgba(0,0,0,.2)}
-.google-btn:active{transform:scale(.98)}
-.google-btn:disabled{opacity:.6;cursor:not-allowed}
-.login-info{font-size:12px;color:#666;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:10px 14px;margin-bottom:16px;text-align:center}
-
-/* ── APP SHELL ── */
-#app{display:none;height:100vh;overflow:hidden}
-.shell{display:flex;height:100vh}
-
-/* ── SIDEBAR ── */
-.sidebar{width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
-.sidebar-header{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
-.sidebar-logo{font-size:15px;font-weight:900;letter-spacing:-.3px}
-.sidebar-logo span{color:var(--accent)}
-.sidebar-badge{display:inline-block;background:var(--accent);color:#fff;font-size:9px;font-weight:800;padding:1px 7px;border-radius:99px;margin-left:6px;letter-spacing:.05em}
-.sidebar-status{font-size:10px;color:var(--muted);margin-top:4px}
-.sidebar-nav{flex:1;padding:10px 0}
-.nav-section{padding:14px 18px 6px;font-size:10px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 18px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;border-left:3px solid transparent;user-select:none}
-.nav-item:hover{color:var(--text);background:var(--surface2)}
-.nav-item.active{color:var(--text);background:rgba(224,36,36,.1);border-left-color:var(--accent);font-weight:700}
-.nav-item .icon{font-size:15px;width:18px;text-align:center}
-.nav-item .count{margin-left:auto;background:var(--surface3);color:var(--muted);font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px}
-.nav-item.active .count{background:rgba(224,36,36,.2);color:var(--accent)}
-.sidebar-footer{padding:14px 18px;border-top:1px solid var(--border)}
-.sidebar-user{font-size:12px;color:var(--muted);margin-bottom:10px}
-.sidebar-user strong{color:var(--text);display:block}
-
-/* ── MAIN CONTENT ── */
-.main-content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-.topbar-title{font-size:16px;font-weight:800}
+/* ══ APP SHELL ══════════════════════════════════════════════════════ */
+#app-wrap{display:none;height:100vh;overflow:hidden;flex-direction:column}
+.topbar{
+  background:var(--s1);border-bottom:1px solid var(--br);
+  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0
+}
+.topbar-logo{font-size:15px;font-weight:900}
+.topbar-logo span{color:var(--red)}
 .topbar-right{display:flex;align-items:center;gap:10px}
-.page{padding:24px;display:none;flex-direction:column;gap:20px}
-.page.active{display:flex}
+.body-wrap{display:flex;flex:1;overflow:hidden}
 
-/* ── CARDS & GRID ── */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden}
-.stat-card::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.06}
-.stat-card.red::before{background:var(--accent)}
-.stat-card.green::before{background:var(--green)}
-.stat-card.blue::before{background:var(--blue)}
-.stat-card.yellow::before{background:var(--yellow)}
-.stat-card.purple::before{background:var(--purple)}
-.stat-card .s-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-.stat-card .s-value{font-size:30px;font-weight:900;line-height:1}
-.stat-card .s-value.red{color:var(--accent)}
-.stat-card .s-value.green{color:var(--green)}
-.stat-card .s-value.blue{color:var(--blue)}
-.stat-card .s-value.yellow{color:var(--yellow)}
-.stat-card .s-value.purple{color:var(--purple)}
-.stat-card .s-sub{font-size:11px;color:var(--muted);margin-top:4px}
+/* ══ SIDEBAR ══════════════════════════════════════════════════════ */
+.sidebar{
+  width:210px;min-width:210px;background:var(--s1);
+  border-right:1px solid var(--br);overflow-y:auto;display:flex;flex-direction:column
+}
+.sb-section{padding:16px 16px 6px;font-size:10px;font-weight:800;color:var(--mu2);text-transform:uppercase;letter-spacing:.08em}
+.sb-item{
+  display:flex;align-items:center;gap:9px;padding:9px 16px;
+  font-size:13px;font-weight:500;color:var(--mu);cursor:pointer;
+  transition:all .15s;border-left:3px solid transparent;user-select:none
+}
+.sb-item:hover{color:var(--tx);background:var(--s2)}
+.sb-item.active{color:var(--tx);background:rgba(224,36,36,.08);border-left-color:var(--red);font-weight:700}
+.sb-item .ic{font-size:15px;width:18px;text-align:center}
+.sb-badge{margin-left:auto;background:var(--s3);color:var(--mu);font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;min-width:20px;text-align:center}
+.sb-item.active .sb-badge{background:rgba(224,36,36,.2);color:var(--red)}
+.sb-footer{padding:14px 16px;border-top:1px solid var(--br);margin-top:auto}
+.sb-user{font-size:11px;color:var(--mu);margin-bottom:10px}
+.sb-user strong{color:var(--tx);display:block;font-size:12px;margin-bottom:2px}
 
-/* ── CHARTS ── */
-.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
-.chart-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px}
-.bar-chart{display:flex;align-items:flex-end;gap:6px;height:100px}
-.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-.bar{width:100%;border-radius:4px 4px 0 0;transition:height .4s ease;min-height:3px}
-.bar-label{font-size:9px;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.bar-val{font-size:9px;font-weight:700;color:var(--text)}
-.donut-wrap{display:flex;align-items:center;gap:16px}
-.donut-legend{flex:1;display:flex;flex-direction:column;gap:6px}
-.donut-row{display:flex;align-items:center;gap:7px;font-size:11px}
-.donut-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* ══ MAIN CONTENT ══════════════════════════════════════════════════ */
+.main{flex:1;overflow-y:auto;padding:20px}
+.page{display:none;flex-direction:column;gap:18px}
+.page.on{display:flex}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px}
+.page-title{font-size:16px;font-weight:800}
+.status-dot{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700}
+.status-dot::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
+.status-dot.live{color:var(--grn);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
 
-/* ── TABLE ── */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
-.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+/* ══ CARDS ══════════════════════════════════════════════════════════ */
+.card{background:var(--s1);border:1px solid var(--br);border-radius:14px;overflow:hidden}
+.card-hdr{padding:14px 18px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .card-title{font-size:13px;font-weight:700}
-.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-input.inp,select.inp{padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:12px;outline:none;transition:border .2s}
-input.inp:focus,select.inp:focus{border-color:var(--accent)}
-input.inp[type=search]{width:200px}
-table{width:100%;border-collapse:collapse}
-thead tr{background:var(--surface2)}
-th{padding:10px 14px;text-align:left;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:10px 14px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.02)}
-tr.selected td{background:rgba(224,36,36,.04)}
-.thumb{width:44px;height:58px;object-fit:cover;border-radius:6px;border:1px solid var(--border);background:var(--surface2)}
-.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;white-space:nowrap}
-.tag.cat{background:#1a0505;color:var(--accent);border:1px solid #3a0f0f}
-.tag.featured{background:#1a0a2a;color:var(--purple);border:1px solid #3a1a5a}
-.tag.trending{background:#0a1225;color:var(--blue);border:1px solid #1a3060}
-.tag.popular{background:#051a08;color:var(--green);border:1px solid #0d4015}
-.tag.new{background:#1e1200;color:var(--yellow);border:1px solid #4a2f00}
-.tag.source-fb{background:#0a1a0a;color:var(--green);border:1px solid #1a4a1a}
-.actions-cell{display:flex;gap:5px;flex-wrap:wrap}
-.empty{padding:50px 20px;text-align:center;color:var(--muted)}
-.empty .em-icon{font-size:40px;margin-bottom:10px}
+.card-body{padding:18px}
 
-/* ── BUTTONS ── */
+/* ══ STATS ══════════════════════════════════════════════════════════ */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.stat{background:var(--s1);border:1px solid var(--br);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
+.stat::after{content:'';position:absolute;top:-15px;right:-15px;width:70px;height:70px;border-radius:50%;opacity:.07}
+.stat.r::after{background:var(--red)} .stat.g::after{background:var(--grn)}
+.stat.b::after{background:var(--blu)} .stat.y::after{background:var(--ylw)}
+.stat.p::after{background:var(--pur)}
+.stat-lbl{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.stat-val{font-size:28px;font-weight:900}
+.r .stat-val{color:var(--red)} .g .stat-val{color:var(--grn)}
+.b .stat-val{color:var(--blu)} .y .stat-val{color:var(--ylw)} .p .stat-val{color:var(--pur)}
+.stat-sub{font-size:11px;color:var(--mu);margin-top:3px}
+
+/* ══ CHARTS ══════════════════════════════════════════════════════════ */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chart-card{background:var(--s1);border:1px solid var(--br);border-radius:14px;padding:18px}
+.chart-lbl{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:90px}
+.b-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.b-bar{width:100%;border-radius:3px 3px 0 0;min-height:3px;transition:height .4s}
+.b-val{font-size:9px;font-weight:700}
+.b-lbl{font-size:9px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
+.donut-wrap{display:flex;align-items:center;gap:14px}
+.donut-leg{flex:1;display:flex;flex-direction:column;gap:6px}
+.leg-row{display:flex;align-items:center;gap:7px;font-size:11px}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ══ TABLE ══════════════════════════════════════════════════════════ */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--s2)}
+th{padding:9px 13px;text-align:left;font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--br);white-space:nowrap}
+td{padding:10px 13px;font-size:12px;border-bottom:1px solid var(--br);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.015)}
+tr.sel td{background:rgba(224,36,36,.04)}
+.thumb{width:42px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--br)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;white-space:nowrap;margin:1px}
+.tag.cat{background:#1a0505;color:var(--red);border:1px solid #3a0f0f}
+.tag.ft{background:#1a0a2a;color:var(--pur);border:1px solid #3a1a5a}
+.tag.tr{background:#0a1225;color:var(--blu);border:1px solid #1a3060}
+.tag.pp{background:#051a08;color:var(--grn);border:1px solid #0d4015}
+.tag.nw{background:#1e1200;color:var(--ylw);border:1px solid #4a2f00}
+.act-row{display:flex;gap:5px}
+.tbl-foot{padding:9px 14px;font-size:11px;color:var(--mu);border-top:1px solid var(--br)}
+
+/* ══ BULK BAR ══════════════════════════════════════════════════════ */
+.bulk-bar{
+  position:sticky;bottom:0;background:var(--s1);border-top:2px solid var(--red);
+  padding:10px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  transform:translateY(100%);transition:transform .25s;z-index:40
+}
+.bulk-bar.on{transform:translateY(0)}
+
+/* ══ ACTIVITY LOG ══════════════════════════════════════════════════ */
+.log-wrap{display:flex;flex-direction:column}
+.log-item{display:flex;align-items:flex-start;gap:11px;padding:11px 18px;border-bottom:1px solid var(--br)}
+.log-item:last-child{border-bottom:none}
+.log-item:hover{background:var(--s2)}
+.log-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.log-dot.add{background:var(--grn)} .log-dot.edit{background:var(--blu)}
+.log-dot.del{background:var(--red)} .log-dot.login{background:var(--ylw)}
+.log-msg{font-size:12px;font-weight:600}
+.log-time{font-size:10px;color:var(--mu);font-family:monospace;margin-top:2px}
+
+/* ══ BUTTONS ══════════════════════════════════════════════════════ */
 .btn{padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .btn:active{transform:scale(.97)}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:var(--accent2)}
-.btn-ghost{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
-.btn-ghost:hover{color:var(--text);border-color:#555}
-.btn-danger{background:#160404;color:var(--accent);border:1px solid #2a0808}
-.btn-danger:hover{background:#2a0808}
-.btn-green{background:#051808;color:var(--green);border:1px solid #0d4015}
-.btn-green:hover{background:#0d4015}
+.btn-p{background:var(--red);color:#fff} .btn-p:hover{background:var(--red2)}
+.btn-g{background:var(--s2);color:var(--mu);border:1px solid var(--br)} .btn-g:hover{color:var(--tx);border-color:#555}
+.btn-d{background:#160404;color:var(--red);border:1px solid #2a0808} .btn-d:hover{background:#2a0808}
+.btn-grn{background:#051808;color:var(--grn);border:1px solid #0d4015} .btn-grn:hover{background:#0d4015}
 .btn-sm{padding:5px 10px;font-size:11px;border-radius:7px}
 .btn-xs{padding:3px 8px;font-size:10px;border-radius:5px}
 
-/* ── MODAL ── */
+/* ══ MODAL ══════════════════════════════════════════════════════════ */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:740px;max-height:92vh;overflow-y:auto;padding:28px;box-shadow:0 40px 100px rgba(0,0,0,.6)}
-.modal h2{font-size:17px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px}
-.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
-.fg label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.fg input,.fg select,.fg textarea{padding:10px 13px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none;width:100%;transition:border .2s}
-.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent)}
-.fg textarea{resize:vertical;min-height:76px}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.fgrid .full{grid-column:1/-1}
-.checks{display:flex;flex-wrap:wrap;gap:12px;padding:10px 0}
-.check-item{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
-.check-item input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px}
-.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border)}
-.prev-img{width:100%;height:110px;object-fit:cover;border-radius:8px;border:1px solid var(--border);margin-top:7px;background:var(--surface2);display:none}
+.modal{background:var(--s1);border:1px solid var(--br);border-radius:18px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto;padding:28px}
+.modal h2{font-size:16px;font-weight:800;margin-bottom:18px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.fg label{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em}
+.fg input,.fg select,.fg textarea{padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:13px;outline:none;width:100%;transition:border .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--red)}
+.fg textarea{resize:vertical;min-height:70px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.full{grid-column:1/-1}
+.checks{display:flex;flex-wrap:wrap;gap:12px;padding:8px 0}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.chk input[type=checkbox]{accent-color:var(--red);width:14px;height:14px}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--br)}
+.prev-img{width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--br);margin-top:6px;background:var(--s2);display:none}
+.empty{padding:48px 20px;text-align:center;color:var(--mu)}
+.empty-ic{font-size:36px;margin-bottom:10px}
 
-/* ── ACTIVITY LOG ── */
-.log-list{display:flex;flex-direction:column;gap:0}
-.log-item{display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);transition:background .15s}
-.log-item:last-child{border-bottom:none}
-.log-item:hover{background:var(--surface2)}
-.log-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
-.log-dot.add{background:var(--green)}
-.log-dot.edit{background:var(--blue)}
-.log-dot.del{background:var(--accent)}
-.log-dot.login{background:var(--yellow)}
-.log-dot.clear{background:var(--purple)}
-.log-content{flex:1;min-width:0}
-.log-msg{font-size:12px;font-weight:600;line-height:1.4}
-.log-time{font-size:10px;color:var(--muted);margin-top:2px;font-family:monospace}
-.log-meta{font-size:10px;color:var(--muted2);margin-top:2px}
+/* ══ TOOLBAR ══════════════════════════════════════════════════════ */
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.inp{padding:8px 12px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;transition:border .2s}
+.inp:focus{border-color:var(--red)}
+.inp[type=search]{width:180px}
 
-/* ── BULK BAR ── */
-.bulk-bar{position:sticky;bottom:0;background:var(--surface);border-top:2px solid var(--accent);padding:12px 20px;display:flex;align-items:center;gap:10px;transform:translateY(100%);transition:transform .25s;z-index:40}
-.bulk-bar.visible{transform:translateY(0)}
+/* ══ TOAST ══════════════════════════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:22px;right:22px;z-index:999;
+  background:var(--s1);border:1px solid var(--br);border-radius:12px;
+  padding:12px 18px;font-size:13px;font-weight:600;
+  transform:translateY(80px);opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 12px 40px rgba(0,0,0,.5);min-width:220px
+}
+#toast.on{transform:translateY(0);opacity:1}
+#toast.ok{border-color:var(--grn);color:var(--grn)}
+#toast.err{border-color:var(--red);color:var(--red)}
+#toast.inf{border-color:var(--blu);color:var(--blu)}
 
-/* ── TOAST ── */
-#toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px 18px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 12px 40px rgba(0,0,0,.5);min-width:240px}
-#toast.show{transform:translateY(0);opacity:1}
-#toast.success{border-color:var(--green);color:var(--green)}
-#toast.error{border-color:var(--accent);color:var(--accent)}
-#toast.info{border-color:var(--blue);color:var(--blue)}
-
-/* ── MISC ── */
-.badge-live{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--green)}
-.badge-live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.section-title{font-size:13px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px}
-.divider{height:1px;background:var(--border);margin:4px 0}
-.progress-bar{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;margin-top:6px}
-.progress-fill{height:100%;border-radius:3px;transition:width .4s ease}
-.img-preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:10px}
-.img-preview-grid img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:7px;border:1px solid var(--border)}
-
-/* ── RESPONSIVE ── */
-@media(max-width:900px){.sidebar{width:180px;min-width:180px}.chart-grid{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.fgrid .full{grid-column:1}.stats-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:640px){.sidebar{display:none}.stats-grid{grid-template-columns:repeat(2,1fr)}.chart-grid{grid-template-columns:1fr}th:nth-child(3),td:nth-child(3),th:nth-child(5),td:nth-child(5){display:none}}
+/* ══ RESPONSIVE ══════════════════════════════════════════════════ */
+@media(max-width:800px){.sidebar{display:none}.charts-row{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.full{grid-column:1}.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.stats-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-screen">
+<!-- ══ LOGIN ══════════════════════════════════════════════════════════ -->
+<div id="login-wrap">
   <div class="login-box">
-    <div class="login-logo"><div class="dot"></div><h1>Moon <span>Night X</span></h1></div>
-    <p class="login-subtitle">Admin Control Panel — Restricted Access</p>
-    <div class="login-info">🔒 Only <strong>aryakaran836@gmail.com</strong> can access this panel</div>
-    <div id="domain-notice" style="display:none;font-size:11px;background:#1a0d00;border:1px solid #4a2800;border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.7;color:#f59e0b">
-      <strong>⚠️ If login doesn't work, add your domain in Firebase:</strong><br>
-      Firebase Console → Authentication → Settings → Authorized domains → Add:<br>
-      <code id="current-domain" style="background:#2a1800;padding:2px 6px;border-radius:4px;font-family:monospace"></code>
-    </div>
-    <button class="google-btn" id="google-btn">
-      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+    <div class="login-logo">Moon <span>Night X</span></div>
+    <p class="login-sub">Admin Control Panel — Restricted Access</p>
+    <div class="l-info">🔒 Only <strong>aryakaran836@gmail.com</strong> can access this panel</div>
+    <button class="g-btn" id="g-btn">
+      <svg width="20" height="20" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
       Continue with Google
     </button>
-    <div class="login-error" id="lerr"></div>
+    <div class="l-err" id="l-err"></div>
   </div>
 </div>
 
-<!-- APP -->
-<div id="app">
-<div class="shell">
+<!-- ══ APP ═════════════════════════════════════════════════════════════ -->
+<div id="app-wrap" style="display:none;height:100vh;display:none;flex-direction:column">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo">MNX <span>Admin</span><span class="sidebar-badge">PANEL</span></div>
-      <div class="sidebar-status" id="db-status">⏳ Connecting...</div>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-logo">Moon <span>Night X</span> <span style="background:var(--red);color:#fff;font-size:9px;padding:2px 7px;border-radius:99px;margin-left:4px;font-weight:800">ADMIN</span></div>
+    <div class="topbar-right">
+      <span class="status-dot live" id="db-status">Connecting</span>
+      <span style="font-size:11px;color:var(--mu)" id="top-count"></span>
+      <button class="btn btn-p btn-sm" id="btn-add-img">+ Add Image</button>
+      <button class="btn btn-g btn-sm" id="btn-logout">Logout</button>
     </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">Main</div>
-      <div class="nav-item active" onclick="showPage('dashboard')"><span class="icon">📊</span> Dashboard</div>
-      <div class="nav-item" onclick="showPage('images')"><span class="icon">🖼️</span> Images <span class="count" id="nav-count">0</span></div>
-      <div class="nav-section">Manage</div>
-      <div class="nav-item" onclick="showPage('categories')"><span class="icon">📂</span> Categories <span class="count" id="nav-cat-count">0</span></div>
-      <div class="nav-item" onclick="showPage('activity')"><span class="icon">📋</span> Activity Log <span class="count" id="nav-log-count">0</span></div>
-      <div class="nav-item" onclick="showPage('bulk')"><span class="icon">⚡</span> Bulk Actions</div>
-      <div class="nav-section">Tools</div>
-      <div class="nav-item" onclick="showPage('settings')"><span class="icon">⚙️</span> Settings</div>
-      <div class="nav-item" onclick="exportJSON()"><span class="icon">⬇️</span> Export JSON</div>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="sidebar-user"><strong id="admin-name">admin</strong>Logged in as Admin</div>
-      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="logout()">Logout</button>
-    </div>
-  </aside>
+  </div>
 
-  <!-- MAIN -->
-  <div class="main-content">
-
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div class="topbar-title" id="page-title">📊 Dashboard</div>
-      <div class="topbar-right">
-        <span class="badge-live" id="live-badge">LIVE</span>
-        <span style="font-size:11px;color:var(--muted)" id="top-count"></span>
-        <button class="btn btn-primary btn-sm" onclick="openAdd()">+ Add Image</button>
+  <div class="body-wrap">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sb-section">Main</div>
+      <div class="sb-item active" data-page="dashboard"><span class="ic">📊</span>Dashboard</div>
+      <div class="sb-item" data-page="images"><span class="ic">🖼️</span>Images<span class="sb-badge" id="nb-img">0</span></div>
+      <div class="sb-section">Manage</div>
+      <div class="sb-item" data-page="categories"><span class="ic">📂</span>Categories<span class="sb-badge" id="nb-cat">0</span></div>
+      <div class="sb-item" data-page="activity"><span class="ic">📋</span>Activity<span class="sb-badge" id="nb-log">0</span></div>
+      <div class="sb-section">Tools</div>
+      <div class="sb-item" data-page="bulk"><span class="ic">⚡</span>Bulk Actions</div>
+      <div class="sb-item" data-page="settings"><span class="ic">⚙️</span>Settings</div>
+      <div class="sb-footer">
+        <div class="sb-user"><strong id="admin-email">—</strong>Logged in as Admin</div>
+        <button class="btn btn-g btn-sm" id="btn-logout2" style="width:100%;justify-content:center">Sign Out</button>
       </div>
-    </div>
+    </aside>
 
-    <!-- ── DASHBOARD PAGE ── -->
-    <div class="page active" id="page-dashboard">
+    <!-- Main -->
+    <div class="main">
 
-      <div class="stats-grid">
-        <div class="stat-card red"><div class="s-label">Total Images</div><div class="s-value red" id="s-total">—</div><div class="s-sub">In Firebase DB</div></div>
-        <div class="stat-card green"><div class="s-label">Featured</div><div class="s-value green" id="s-featured">—</div><div class="s-sub">Pinned to hero</div></div>
-        <div class="stat-card blue"><div class="s-label">Trending</div><div class="s-value blue" id="s-trending">—</div><div class="s-sub">Hot right now</div></div>
-        <div class="stat-card yellow"><div class="s-label">Popular</div><div class="s-value yellow" id="s-popular">—</div><div class="s-sub">High engagement</div></div>
-        <div class="stat-card purple"><div class="s-label">New</div><div class="s-value purple" id="s-new">—</div><div class="s-sub">Recently added</div></div>
-        <div class="stat-card red"><div class="s-label">Total Views</div><div class="s-value red" id="s-views" style="font-size:22px">—</div><div class="s-sub">Across all images</div></div>
-      </div>
-
-      <div class="chart-grid">
-        <!-- Category breakdown -->
-        <div class="chart-card">
-          <div class="chart-title">📂 Images by Category</div>
-          <div class="bar-chart" id="cat-chart"></div>
+      <!-- ── DASHBOARD ── -->
+      <div class="page on" id="page-dashboard">
+        <div class="page-hdr"><div class="page-title">📊 Dashboard</div></div>
+        <div class="stats-row">
+          <div class="stat r"><div class="stat-lbl">Total Images</div><div class="stat-val" id="s-total">—</div><div class="stat-sub">In Firebase</div></div>
+          <div class="stat g"><div class="stat-lbl">Featured</div><div class="stat-val" id="s-ft">—</div><div class="stat-sub">On hero</div></div>
+          <div class="stat b"><div class="stat-lbl">Trending</div><div class="stat-val" id="s-tr">—</div><div class="stat-sub">Hot now</div></div>
+          <div class="stat y"><div class="stat-lbl">Popular</div><div class="stat-val" id="s-pp">—</div><div class="stat-sub">High likes</div></div>
+          <div class="stat p"><div class="stat-lbl">New</div><div class="stat-val" id="s-nw">—</div><div class="stat-sub">Recently added</div></div>
+          <div class="stat r"><div class="stat-lbl">Total Views</div><div class="stat-val" id="s-views" style="font-size:20px">—</div><div class="stat-sub">All images</div></div>
         </div>
+        <div class="charts-row">
+          <div class="chart-card"><div class="chart-lbl">📂 By Category</div><div class="bar-chart" id="cat-chart"></div></div>
+          <div class="chart-card"><div class="chart-lbl">🏷️ Flag Split</div><div class="donut-wrap"><canvas id="donut" width="100" height="100"></canvas><div class="donut-leg" id="donut-leg"></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">🕒 Recent Activity</div><button class="btn btn-g btn-sm" data-goto="activity">View All →</button></div>
+          <div id="dash-log"></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">🆕 Latest Images</div><button class="btn btn-g btn-sm" data-goto="images">View All →</button></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;padding:16px" id="dash-imgs"></div>
+        </div>
+      </div>
 
-        <!-- Flag breakdown -->
-        <div class="chart-card">
-          <div class="chart-title">🏷️ Flag Distribution</div>
-          <div class="donut-wrap">
-            <canvas id="donut-canvas" width="110" height="110"></canvas>
-            <div class="donut-legend" id="donut-legend"></div>
+      <!-- ── IMAGES ── -->
+      <div class="page" id="page-images">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">🖼️ All Images</div>
+            <div class="toolbar">
+              <input class="inp" type="search" id="q-img" placeholder="🔍 Search..." style="width:170px"/>
+              <select class="inp" id="f-cat"><option value="">All Categories</option></select>
+              <select class="inp" id="f-flag">
+                <option value="">All Flags</option>
+                <option value="isFeatured">Featured</option>
+                <option value="isTrending">Trending</option>
+                <option value="isPopular">Popular</option>
+                <option value="isNew">New</option>
+              </select>
+              <select class="inp" id="f-sort">
+                <option value="def">Default</option>
+                <option value="views">Most Views</option>
+                <option value="likes">Most Likes</option>
+                <option value="az">A–Z</option>
+              </select>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr>
+                <th><input type="checkbox" id="chk-all" style="accent-color:var(--red)"/></th>
+                <th>Thumb</th><th>Title / ID</th><th>Category</th>
+                <th>Flags</th><th>Stats</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="img-tbody"></tbody>
+            </table>
+          </div>
+          <div class="tbl-foot" id="img-foot"></div>
+        </div>
+        <div class="bulk-bar" id="bulk-bar">
+          <span style="font-size:12px;font-weight:700" id="sel-count">0 selected</span>
+          <button class="btn btn-grn btn-sm" id="bb-ft">⭐ Set Featured</button>
+          <button class="btn btn-g btn-sm" id="bb-uft">✖ Unset Featured</button>
+          <button class="btn btn-g btn-sm" id="bb-tr">🔥 Set Trending</button>
+          <button class="btn btn-d btn-sm" id="bb-del">🗑 Delete</button>
+          <button class="btn btn-g btn-sm" id="bb-clr">✕ Clear</button>
+        </div>
+      </div>
+
+      <!-- ── CATEGORIES ── -->
+      <div class="page" id="page-categories">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">📂 Manage Categories</div>
+            <button class="btn btn-p btn-sm" id="btn-add-cat">+ Add Category</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Name</th><th>Description</th><th>Images</th><th>Actions</th></tr></thead>
+              <tbody id="cat-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body" style="font-size:12px;color:var(--mu);line-height:1.8">
+            <strong style="color:var(--tx)">ℹ️ How it works:</strong><br>
+            • Category <strong>ID</strong> must match images' <code style="background:var(--s2);padding:1px 5px;border-radius:4px">category</code> field exactly<br>
+            • Add a category here → it appears on the main website instantly<br>
+            • Deleting a category does NOT delete its images
           </div>
         </div>
       </div>
 
-      <!-- Recent activity preview -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🕒 Recent Activity</div>
-          <button class="btn btn-ghost btn-sm" onclick="showPage('activity')">View All →</button>
+      <!-- ── ACTIVITY ── -->
+      <div class="page" id="page-activity">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">📋 Activity Log</div>
+            <div class="toolbar">
+              <select class="inp" id="log-filter">
+                <option value="">All</option>
+                <option value="add">Add</option>
+                <option value="edit">Edit</option>
+                <option value="del">Delete</option>
+                <option value="login">Login</option>
+              </select>
+              <button class="btn btn-d btn-sm" id="btn-clr-log">🗑 Clear Log</button>
+            </div>
+          </div>
+          <div class="log-wrap" id="log-list"></div>
         </div>
-        <div id="dash-log-list"></div>
       </div>
 
-      <!-- Recent images -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🆕 Latest Images Added</div>
-          <button class="btn btn-ghost btn-sm" onclick="showPage('images')">View All →</button>
-        </div>
-        <div class="img-preview-grid" id="dash-recent" style="padding:16px"></div>
-      </div>
-    </div>
-
-    <!-- ── IMAGES PAGE ── -->
-    <div class="page" id="page-images">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🖼️ All Images</div>
-          <div class="toolbar">
-            <input class="inp" type="search" id="q" placeholder="🔍 Search..." oninput="renderTable()" style="width:180px"/>
-            <select class="inp" id="fcat" onchange="renderTable()">
-              <option value="">All Categories</option>
-              <option value="cyberpunk">Cyberpunk</option><option value="artistic">Artistic</option>
-              <option value="fitness">Fitness</option><option value="cosplay">Cosplay</option>
-              <option value="glamour">Glamour</option><option value="amateur">Amateur</option>
-              <option value="model">Model</option><option value="high-fashion">High Fashion</option>
-            </select>
-            <select class="inp" id="fflag" onchange="renderTable()">
-              <option value="">All Flags</option>
-              <option value="isFeatured">Featured</option><option value="isTrending">Trending</option>
-              <option value="isPopular">Popular</option><option value="isNew">New</option>
-            </select>
-            <select class="inp" id="fsort" onchange="renderTable()">
-              <option value="newest">Newest First</option><option value="oldest">Oldest First</option>
-              <option value="views">Most Views</option><option value="likes">Most Likes</option>
-              <option value="az">A–Z</option>
-            </select>
+      <!-- ── BULK ── -->
+      <div class="page" id="page-bulk">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">⚡ Bulk Operations</div></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:16px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:5px">⭐ All Featured</div>
+                <div style="font-size:11px;color:var(--mu);margin-bottom:12px">Mark every image as Featured</div>
+                <button class="btn btn-grn btn-sm bulk-op" data-flag="isFeatured" data-val="true">Apply</button>
+              </div>
+              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:16px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:5px">🔥 All Trending</div>
+                <div style="font-size:11px;color:var(--mu);margin-bottom:12px">Mark every image as Trending</div>
+                <button class="btn btn-g btn-sm bulk-op" data-flag="isTrending" data-val="true">Apply</button>
+              </div>
+              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:16px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:5px">✨ All New</div>
+                <div style="font-size:11px;color:var(--mu);margin-bottom:12px">Mark every image as New</div>
+                <button class="btn btn-g btn-sm bulk-op" data-flag="isNew" data-val="true">Apply</button>
+              </div>
+              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:16px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:5px;color:var(--red)">🧹 Clear All Flags</div>
+                <div style="font-size:11px;color:var(--mu);margin-bottom:12px">Remove all flags from all images</div>
+                <button class="btn btn-d btn-sm" id="bulk-clear-flags">Clear</button>
+              </div>
+              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:16px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:5px">⬇️ Export JSON</div>
+                <div style="font-size:11px;color:var(--mu);margin-bottom:12px">Download all images as JSON</div>
+                <button class="btn btn-p btn-sm" id="bulk-export">Export</button>
+              </div>
+              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:16px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:5px;color:var(--red)">💥 Delete ALL</div>
+                <div style="font-size:11px;color:var(--mu);margin-bottom:12px">⚠️ Removes everything permanently</div>
+                <button class="btn btn-d btn-sm" id="bulk-del-all">Delete All</button>
+              </div>
+            </div>
+            <div style="margin-top:20px;background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:18px">
+              <div style="font-size:13px;font-weight:700;margin-bottom:8px">📤 Import JSON</div>
+              <div style="font-size:11px;color:var(--mu);margin-bottom:10px">Paste a JSON array of image objects</div>
+              <textarea class="inp" id="import-json" style="width:100%;min-height:110px;font-family:monospace;font-size:11px" placeholder='[{"id":"img-001","title":"My Image",...}]'></textarea>
+              <button class="btn btn-p btn-sm" id="bulk-import" style="margin-top:10px">Import to Firebase</button>
+            </div>
           </div>
         </div>
-        <div style="overflow-x:auto">
-          <table>
-            <thead><tr>
-              <th><input type="checkbox" id="check-all" onchange="toggleAll(this.checked)" style="accent-color:var(--accent)"/></th>
-              <th>Thumb</th><th>Title / ID</th><th>Category</th><th>Flags</th>
-              <th>Stats</th><th>Actions</th>
-            </tr></thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-        <div style="padding:10px 16px;font-size:11px;color:var(--muted);border-top:1px solid var(--border)" id="tfoot"></div>
       </div>
 
-      <!-- Bulk bar -->
-      <div class="bulk-bar" id="bulk-bar">
-        <span style="font-size:12px;font-weight:700" id="sel-count">0 selected</span>
-        <button class="btn btn-green btn-sm" onclick="bulkFlag('isFeatured',true)">⭐ Set Featured</button>
-        <button class="btn btn-ghost btn-sm" onclick="bulkFlag('isFeatured',false)">✖ Unset Featured</button>
-        <button class="btn btn-ghost btn-sm" onclick="bulkFlag('isTrending',true)">🔥 Set Trending</button>
-        <button class="btn btn-danger btn-sm" onclick="bulkDelete()">🗑 Delete Selected</button>
-        <button class="btn btn-ghost btn-sm" onclick="clearSel()">✕ Clear</button>
-      </div>
-    </div>
-
-    <!-- ── CATEGORIES PAGE ── -->
-    <div class="page" id="page-categories">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">📂 Manage Categories</div>
-          <button class="btn btn-primary btn-sm" onclick="openAddCat()">+ Add Category</button>
-        </div>
-        <div style="overflow-x:auto">
-          <table>
-            <thead><tr>
-              <th>ID / Slug</th><th>Name</th><th>Description</th><th>Image Count</th><th>Actions</th>
-            </tr></thead>
-            <tbody id="cat-tbody"></tbody>
-          </table>
+      <!-- ── SETTINGS ── -->
+      <div class="page" id="page-settings">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">⚙️ Settings</div></div>
+          <div class="card-body" style="max-width:460px;display:flex;flex-direction:column;gap:14px">
+            <div class="fg"><label>Firebase DB URL</label><input class="inp" value="https://moon-night-x-default-rtdb.firebaseio.com" readonly style="color:var(--mu)"/></div>
+            <div class="fg"><label>Signed in as</label><input class="inp" id="set-email" readonly style="color:var(--mu)"/></div>
+            <div style="height:1px;background:var(--br)"></div>
+            <div style="font-size:13px;font-weight:700">🗄️ Site Cache</div>
+            <div style="font-size:12px;color:var(--mu)">LocalStorage cache used by main website for instant load.</div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-g btn-sm" id="btn-check-cache">📦 Check Cache</button>
+              <button class="btn btn-d btn-sm" id="btn-clear-cache">🗑 Clear Cache</button>
+            </div>
+            <div id="cache-info" style="font-size:11px;color:var(--mu)"></div>
+          </div>
         </div>
       </div>
-      <div class="card" style="padding:18px 20px">
-        <div style="font-size:12px;color:var(--muted);line-height:1.7">
-          <strong style="color:var(--text)">ℹ️ How it works:</strong><br>
-          • Category <strong>ID</strong> — images ke <code style="background:var(--surface2);padding:1px 5px;border-radius:4px">category</code> field se match hona chahiye<br>
-          • Category yahan add karo → website pe automatically dikh jaayegi<br>
-          • Delete karne se images delete nahi hongi, sirf category pill hategi
-        </div>
-      </div>
-    </div>
 
-    <!-- ── ACTIVITY LOG PAGE ── -->
-    <div class="page" id="page-activity">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">📋 Activity Log</div>
-          <div class="toolbar">
-            <select class="inp" id="log-filter" onchange="renderLog()">
-              <option value="">All Actions</option>
-              <option value="add">Add</option><option value="edit">Edit</option>
-              <option value="del">Delete</option><option value="login">Login</option>
-            </select>
-            <button class="btn btn-danger btn-sm" onclick="clearLog()">🗑 Clear Log</button>
-          </div>
-        </div>
-        <div class="log-list" id="log-list"></div>
-      </div>
-    </div>
+    </div><!-- /main -->
+  </div><!-- /body-wrap -->
+</div><!-- /app-wrap -->
 
-    <!-- ── BULK ACTIONS PAGE ── -->
-    <div class="page" id="page-bulk">
-      <div class="card" style="padding:24px">
-        <div class="section-title">⚡ Bulk Operations</div>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:20px">Apply mass changes to your entire image database instantly.</p>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px">⭐ Set All Featured</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Mark every image as Featured</div>
-            <button class="btn btn-green btn-sm" onclick="massFlag('isFeatured',true)">Apply</button>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px">🔥 Set All Trending</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Mark every image as Trending</div>
-            <button class="btn btn-ghost btn-sm" onclick="massFlag('isTrending',true)">Apply</button>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px">✨ Set All New</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Mark every image as New</div>
-            <button class="btn btn-ghost btn-sm" onclick="massFlag('isNew',true)">Apply</button>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px">🧹 Clear All Flags</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Remove all Featured/Trending/Popular/New</div>
-            <button class="btn btn-danger btn-sm" onclick="massFlag('all',false)">Clear All</button>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px">📂 Export JSON</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Download all images as JSON file</div>
-            <button class="btn btn-primary btn-sm" onclick="exportJSON()">Export</button>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">🗑 Delete ALL Images</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">⚠️ Permanently removes everything</div>
-            <button class="btn btn-danger btn-sm" onclick="deleteAll()">Delete All</button>
-          </div>
-        </div>
-
-        <!-- Import JSON -->
-        <div style="margin-top:24px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px">
-          <div style="font-size:13px;font-weight:700;margin-bottom:8px">📤 Import JSON</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Paste a JSON array of image objects to batch-import into Firebase</div>
-          <textarea class="inp" id="import-json" style="width:100%;min-height:120px;font-family:monospace;font-size:11px" placeholder='[{"id":"img-001","title":"My Image",...}]'></textarea>
-          <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="importJSON()">Import to Firebase</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── SETTINGS PAGE ── -->
-    <div class="page" id="page-settings">
-      <div class="card" style="padding:24px">
-        <div class="section-title">⚙️ Admin Settings</div>
-        <div style="display:grid;gap:16px;max-width:480px">
-          <div class="fg"><label>Admin Username</label><input class="inp" id="set-user" value="admin"/></div>
-          <div class="fg"><label>New Password</label><input class="inp" id="set-pass" type="password" placeholder="Leave blank to keep current"/></div>
-          <div class="fg"><label>Firebase DB URL</label><input class="inp" id="set-db" value="https://moon-night-x-default-rtdb.firebaseio.com" readonly style="color:var(--muted)"/></div>
-          <div class="fg"><label>Items Per Page</label>
-            <select class="inp" id="set-ipp">
-              <option value="20">20</option><option value="50" selected>50</option><option value="100">100</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" style="width:fit-content" onclick="saveSettings()">💾 Save Settings</button>
-        </div>
-
-        <div class="divider" style="margin:24px 0"></div>
-
-        <div class="section-title">🔧 Cache & Storage</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:14px">
-          LocalStorage cache used by main website for instant load.
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-ghost btn-sm" onclick="checkCache()">📦 Check Cache Size</button>
-          <button class="btn btn-danger btn-sm" onclick="clearCache()">🗑 Clear Site Cache</button>
-        </div>
-        <div id="cache-info" style="font-size:11px;color:var(--muted);margin-top:10px"></div>
-      </div>
-    </div>
-
-  </div><!-- end main-content -->
-</div><!-- end shell -->
-</div><!-- end app -->
-
-<!-- ── ADD/EDIT MODAL ── -->
-<div class="overlay" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
+<!-- ══ IMAGE MODAL ════════════════════════════════════════════════════ -->
+<div class="overlay" id="img-modal" style="display:none">
   <div class="modal">
-    <h2 id="modal-title">➕ Add New Image</h2>
+    <h2 id="img-modal-title">➕ Add Image</h2>
     <div class="fgrid">
-      <div class="fg"><label>Image ID *</label><input class="inp" id="f-id" placeholder="velvet-017"/></div>
-      <div class="fg"><label>Slug *</label><input class="inp" id="f-slug" placeholder="my-gallery-slug"/></div>
-      <div class="fg full"><label>Title *</label><input class="inp" id="f-title" placeholder="Beautiful Portrait Session"/></div>
-      <div class="fg full"><label>Description</label><textarea class="inp" id="f-desc" placeholder="Detailed description..."></textarea></div>
+      <div class="fg"><label>Image ID *</label><input class="inp" id="m-id" placeholder="velvet-001"/></div>
+      <div class="fg"><label>Slug *</label><input class="inp" id="m-slug" placeholder="my-gallery-slug"/></div>
+      <div class="fg full"><label>Title *</label><input class="inp" id="m-title" placeholder="Beautiful Portrait"/></div>
+      <div class="fg full"><label>Description</label><textarea class="inp" id="m-desc"></textarea></div>
       <div class="fg"><label>Category *</label>
-        <select class="inp" id="f-cat">
+        <select class="inp" id="m-cat">
           <option value="cyberpunk">Cyberpunk</option><option value="artistic">Artistic</option>
           <option value="fitness">Fitness</option><option value="cosplay">Cosplay</option>
           <option value="glamour">Glamour</option><option value="amateur">Amateur</option>
@@ -509,56 +478,48 @@ tr.selected td{background:rgba(224,36,36,.04)}
         </select>
       </div>
       <div class="fg"><label>Aspect Ratio</label>
-        <select class="inp" id="f-aspect"><option value="portrait">Portrait</option><option value="landscape">Landscape</option><option value="square">Square</option></select>
+        <select class="inp" id="m-aspect"><option value="portrait">Portrait</option><option value="landscape">Landscape</option><option value="square">Square</option></select>
       </div>
-      <div class="fg full">
-        <label>Thumbnail URL *</label>
-        <input class="inp" id="f-thumb" placeholder="https://..." oninput="prevImg('f-thumb','p-thumb')"/>
-        <img class="prev-img" id="p-thumb"/>
-      </div>
-      <div class="fg full">
-        <label>High Res URL *</label>
-        <input class="inp" id="f-hires" placeholder="https://..." oninput="prevImg('f-hires','p-hires')"/>
-        <img class="prev-img" id="p-hires"/>
-      </div>
-      <div class="fg full"><label>Gallery Images (one URL per line)</label><textarea class="inp" id="f-gallery" placeholder="https://...\nhttps://..." style="min-height:90px"></textarea></div>
-      <div class="fg"><label>Model Name</label><input class="inp" id="f-model" placeholder="Kira Vance"/></div>
-      <div class="fg"><label>Resolution</label><input class="inp" id="f-res" placeholder="3840 x 5120"/></div>
-      <div class="fg"><label>Format</label><select class="inp" id="f-fmt"><option>WebP</option><option>AVIF</option><option>JPEG</option></select></div>
-      <div class="fg"><label>File Size</label><input class="inp" id="f-size" placeholder="1.8 MB"/></div>
-      <div class="fg"><label>Views</label><input class="inp" id="f-views" type="number" placeholder="0"/></div>
-      <div class="fg"><label>Likes</label><input class="inp" id="f-likes" type="number" placeholder="0"/></div>
-      <div class="fg"><label>Width (px)</label><input class="inp" id="f-w" type="number" placeholder="2400"/></div>
-      <div class="fg"><label>Height (px)</label><input class="inp" id="f-h" type="number" placeholder="3200"/></div>
-      <div class="fg"><label>Uploaded At</label><input class="inp" id="f-up" placeholder="2 hours ago"/></div>
-      <div class="fg"><label>Tags (comma sep.)</label><input class="inp" id="f-tags" placeholder="neon, model, glamour"/></div>
+      <div class="fg full"><label>Thumbnail URL *</label><input class="inp" id="m-thumb" placeholder="https://..."/><img class="prev-img" id="p-thumb"/></div>
+      <div class="fg full"><label>High Res URL *</label><input class="inp" id="m-hires" placeholder="https://..."/><img class="prev-img" id="p-hires"/></div>
+      <div class="fg full"><label>Gallery Images (one URL per line)</label><textarea class="inp" id="m-gallery" style="min-height:80px"></textarea></div>
+      <div class="fg"><label>Model Name</label><input class="inp" id="m-model"/></div>
+      <div class="fg"><label>Resolution</label><input class="inp" id="m-res" placeholder="3840x5120"/></div>
+      <div class="fg"><label>Format</label><select class="inp" id="m-fmt"><option>WebP</option><option>AVIF</option><option>JPEG</option></select></div>
+      <div class="fg"><label>File Size</label><input class="inp" id="m-size" placeholder="1.8 MB"/></div>
+      <div class="fg"><label>Views</label><input class="inp" id="m-views" type="number" value="0"/></div>
+      <div class="fg"><label>Likes</label><input class="inp" id="m-likes" type="number" value="0"/></div>
+      <div class="fg"><label>Width px</label><input class="inp" id="m-w" type="number"/></div>
+      <div class="fg"><label>Height px</label><input class="inp" id="m-h" type="number"/></div>
+      <div class="fg"><label>Uploaded At</label><input class="inp" id="m-up" placeholder="Just now"/></div>
+      <div class="fg"><label>Tags (comma sep)</label><input class="inp" id="m-tags" placeholder="neon, model"/></div>
       <div class="fg full"><label>Flags</label>
         <div class="checks">
-          <label class="check-item"><input type="checkbox" id="f-featured"/> ⭐ Featured</label>
-          <label class="check-item"><input type="checkbox" id="f-trending"/> 🔥 Trending</label>
-          <label class="check-item"><input type="checkbox" id="f-popular"/> ❤️ Popular</label>
-          <label class="check-item"><input type="checkbox" id="f-new"/> ✨ New</label>
+          <label class="chk"><input type="checkbox" id="m-ft"/> ⭐ Featured</label>
+          <label class="chk"><input type="checkbox" id="m-tr"/> 🔥 Trending</label>
+          <label class="chk"><input type="checkbox" id="m-pp"/> ❤️ Popular</label>
+          <label class="chk"><input type="checkbox" id="m-nw"/> ✨ New</label>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" id="save-btn" onclick="saveImg()">💾 Save to Firebase</button>
+    <div class="modal-foot">
+      <button class="btn btn-g" id="img-modal-cancel">Cancel</button>
+      <button class="btn btn-p" id="img-modal-save">💾 Save to Firebase</button>
     </div>
   </div>
 </div>
 
-<!-- CATEGORY MODAL -->
-<div class="overlay" id="cat-modal" style="display:none" onclick="if(event.target===this)closeAddCat()">
-  <div class="modal" style="max-width:480px">
+<!-- ══ CATEGORY MODAL ═════════════════════════════════════════════════ -->
+<div class="overlay" id="cat-modal" style="display:none">
+  <div class="modal" style="max-width:460px">
     <h2 id="cat-modal-title">📂 Add Category</h2>
-    <div class="fg"><label>Category ID * (slug, no spaces)</label><input class="inp" id="cf-id" placeholder="e.g. cyberpunk, high-fashion"/></div>
-    <div class="fg"><label>Display Name *</label><input class="inp" id="cf-name" placeholder="e.g. Cyberpunk"/></div>
-    <div class="fg"><label>Description</label><textarea class="inp" id="cf-desc" placeholder="Short description..."></textarea></div>
-    <div class="fg"><label>Featured Image URL</label><input class="inp" id="cf-img" placeholder="https://..." oninput="prevImg('cf-img','cf-prev')"/><img class="prev-img" id="cf-prev"/></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeAddCat()">Cancel</button>
-      <button class="btn btn-primary" id="cat-save-btn" onclick="saveCat()">💾 Save Category</button>
+    <div class="fg"><label>Category ID * (no spaces)</label><input class="inp" id="c-id" placeholder="e.g. cyberpunk"/></div>
+    <div class="fg"><label>Display Name *</label><input class="inp" id="c-name" placeholder="e.g. Cyberpunk"/></div>
+    <div class="fg"><label>Description</label><textarea class="inp" id="c-desc"></textarea></div>
+    <div class="fg"><label>Featured Image URL</label><input class="inp" id="c-img" placeholder="https://..."/><img class="prev-img" id="p-cimg"/></div>
+    <div class="modal-foot">
+      <button class="btn btn-g" id="cat-modal-cancel">Cancel</button>
+      <button class="btn btn-p" id="cat-modal-save">💾 Save Category</button>
     </div>
   </div>
 </div>
@@ -566,784 +527,679 @@ tr.selected td{background:rgba(224,36,36,.04)}
 <!-- TOAST -->
 <div id="toast"></div>
 
+<!-- ══ FIREBASE SDK ════════════════════════════════════════════════════ -->
 <script type="module">
-import { initializeApp }              from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
+                           from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getDatabase, ref, onValue, set, remove, update, off }
-                                       from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+                           from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
-// ── CONFIG ──────────────────────────────────────────────────────────────────
-const FB = { apiKey:"AIzaSyACW8aFQmlaoaxNtE55m8Pck6H8BRlfEbs", authDomain:"moon-night-x.firebaseapp.com", databaseURL:"https://moon-night-x-default-rtdb.firebaseio.com", projectId:"moon-night-x", storageBucket:"moon-night-x.firebasestorage.app", messagingSenderId:"779934381788", appId:"1:779934381788:web:1426fa035171015634a619", measurementId:"G-9B6R1VRP24" };
+// ── CONFIG ────────────────────────────────────────────────────────────
+const FB_CONFIG = {
+  apiKey:            "AIzaSyACW8aFQmlaoaxNtE55m8Pck6H8BRlfEbs",
+  authDomain:        "moon-night-x.firebaseapp.com",
+  databaseURL:       "https://moon-night-x-default-rtdb.firebaseio.com",
+  projectId:         "moon-night-x",
+  storageBucket:     "moon-night-x.firebasestorage.app",
+  messagingSenderId: "779934381788",
+  appId:             "1:779934381788:web:1426fa035171015634a619",
+};
+const ALLOWED = "aryakaran836@gmail.com";
 
-const app = initializeApp(FB);
-const db   = getDatabase(app);
-const auth = getAuth(app);
-const ALLOWED_EMAIL = "aryakaran836@gmail.com";
-const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ login_hint: ALLOWED_EMAIL });
+const fbApp  = initializeApp(FB_CONFIG);
+const auth   = getAuth(fbApp);
+const db     = getDatabase(fbApp);
+const gProv  = new GoogleAuthProvider();
+gProv.setCustomParameters({ login_hint: ALLOWED });
 
-// ── STATE ────────────────────────────────────────────────────────────────────
+// ── STATE ─────────────────────────────────────────────────────────────
 let images   = [];
-let editId   = null;
+let cats     = [];
 let selected = new Set();
-let actLog   = JSON.parse(localStorage.getItem('mnx_admin_log') || '[]');
-let settings = JSON.parse(localStorage.getItem('mnx_admin_settings') || '{"user":"admin","pass":"moonnightx@2024"}');
-let currentPage = 'dashboard';
-let isAuthenticating = false;
+let editImgId  = null;
+let editCatId  = null;
+let actLog   = JSON.parse(localStorage.getItem('mnx_log') || '[]');
 
-// ── EXPOSE GLOBALS ───────────────────────────────────────────────────────────
-Object.assign(window, {
-  loginGoogle, logout, showPage, openAdd, openEdit, closeModal, saveImg,
-  deleteImg, renderTable, renderLog, toggleAll, toggleRow, clearSel,
-  bulkFlag, bulkDelete, massFlag, deleteAll, exportJSON, importJSON,
-  saveSettings, checkCache, clearCache, clearLog, prevImg,
-  openAddCat, closeAddCat, saveCat, deleteCat,
+// ── TOAST ─────────────────────────────────────────────────────────────
+function toast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'on ' + type;
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.className = '', 3000);
+}
+
+// ── ACTIVITY LOG ──────────────────────────────────────────────────────
+function addLog(type, msg) {
+  actLog.unshift({ type, msg, t: new Date().toISOString() });
+  if (actLog.length > 200) actLog = actLog.slice(0, 200);
+  localStorage.setItem('mnx_log', JSON.stringify(actLog));
+  document.getElementById('nb-log').textContent = actLog.length;
+  renderLog();
+  renderDashLog();
+}
+
+function renderLog() {
+  const f  = document.getElementById('log-filter')?.value || '';
+  const el = document.getElementById('log-list');
+  const filtered = f ? actLog.filter(e => e.type === f) : actLog;
+  el.innerHTML = filtered.length ? filtered.map(e => {
+    const d = new Date(e.t);
+    return `<div class="log-item">
+      <div class="log-dot ${e.type}"></div>
+      <div><div class="log-msg">${e.msg}</div>
+      <div class="log-time">${d.toLocaleDateString()} ${d.toLocaleTimeString()}</div></div>
+    </div>`;
+  }).join('') : '<div class="empty"><div class="empty-ic">📋</div>No logs</div>';
+}
+
+function renderDashLog() {
+  document.getElementById('dash-log').innerHTML = actLog.slice(0, 5).map(e => {
+    const d = new Date(e.t);
+    return `<div class="log-item">
+      <div class="log-dot ${e.type}"></div>
+      <div><div class="log-msg">${e.msg}</div>
+      <div class="log-time">${d.toLocaleDateString()} ${d.toLocaleTimeString()}</div></div>
+    </div>`;
+  }).join('') || '<div class="empty"><div class="empty-ic">📋</div>No activity yet</div>';
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  const pg = document.getElementById('page-' + name);
+  if (pg) pg.classList.add('on');
+  document.querySelectorAll(`.sb-item[data-page="${name}"]`).forEach(i => i.classList.add('active'));
+  if (name === 'activity') renderLog();
+  if (name === 'categories') renderCatTable();
+}
+
+document.querySelectorAll('.sb-item[data-page]').forEach(el => {
+  el.addEventListener('click', () => showPage(el.dataset.page));
+});
+document.querySelectorAll('[data-goto]').forEach(el => {
+  el.addEventListener('click', () => showPage(el.dataset.goto));
 });
 
-// ── LOGIN ─────────────────────────────────────────────────────────────────────
-const GOOGLE_SVG = `<svg width="20" height="20" viewBox="0 0 48 48">
+// ── AUTH ──────────────────────────────────────────────────────────────
+const gBtn  = document.getElementById('g-btn');
+const lErr  = document.getElementById('l-err');
+
+const G_SVG = `<svg width="20" height="20" viewBox="0 0 48 48">
   <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/>
   <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
   <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
   <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
 </svg> Continue with Google`;
 
-function handleAuthError(e) {
-  console.error('Google Sign-In Error:', e.code, e.message);
-  const errEl = document.getElementById('lerr');
-  const btn   = document.getElementById('google-btn');
-  if (!errEl || !btn) return;
-
-  let msg = '❌ ' + (e.message || 'Unknown error');
-
-  if (e.code === 'auth/popup-closed-by-user')
-    msg = '❌ Popup closed. Please try again.';
-  else if (e.code === 'auth/popup-blocked')
-    msg = '❌ Popup blocked! Allow popups for this site in browser settings, or wait for fallback redirect.';
-  else if (e.code === 'auth/cancelled-popup-request')
-    msg = '❌ Request cancelled. Try again.';
-  else if (e.code === 'auth/network-request-failed')
-    msg = '❌ Network error. Check your internet connection.';
-  else if (e.code === 'auth/unauthorized-domain')
-    msg = '❌ Domain not authorized! Go to Firebase Console → Authentication → Settings → Authorized domains → Add: ' + location.hostname;
-  else if (e.code === 'auth/operation-not-allowed')
-    msg = '❌ Google sign-in not enabled in Firebase Console.';
-  else if (e.code === 'auth/invalid-api-key')
-    msg = '❌ Invalid Firebase API key.';
-
-  errEl.textContent   = msg;
-  errEl.style.display = 'block';
-  btn.innerHTML = GOOGLE_SVG;
-  btn.disabled  = false;
+function resetGBtn() {
+  gBtn.innerHTML = G_SVG;
+  gBtn.disabled  = false;
 }
 
-// Check redirect result on page load
-getRedirectResult(auth)
-  .then(async (result) => {
-    if (result && result.user) {
-      const email = result.user.email.toLowerCase();
-      if (email !== ALLOWED_EMAIL) {
-        await signOut(auth);
-        const errEl = document.getElementById('lerr');
-        if (errEl) {
-          errEl.innerHTML = `❌ Access denied.<br><small>Only <b>${ALLOWED_EMAIL}</b> is authorized.</small>`;
-          errEl.style.display = 'block';
-        }
-      }
-    }
-  })
-  .catch((e) => {
-    handleAuthError(e);
-  });
-
-async function loginGoogle() {
-  if (isAuthenticating) return;
-  isAuthenticating = true;
-
-  const errEl = document.getElementById('lerr');
-  const btn   = document.getElementById('google-btn');
-
-  btn.innerHTML = '⏳ Please wait...';
-  btn.disabled  = true;
-  errEl.style.display = 'none';
-  errEl.textContent   = '';
+gBtn.addEventListener('click', async () => {
+  gBtn.innerHTML = '⏳ Opening Google...';
+  gBtn.disabled  = true;
+  lErr.style.display = 'none';
+  lErr.textContent   = '';
 
   try {
-    const result = await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, gProv);
     const email  = result.user.email.toLowerCase();
-
-    if (email !== ALLOWED_EMAIL) {
+    if (email !== ALLOWED) {
       await signOut(auth);
-      errEl.innerHTML = `❌ Access denied.<br><small>Only <b>${ALLOWED_EMAIL}</b> is authorized.</small>`;
-      errEl.style.display = 'block';
-      btn.innerHTML = GOOGLE_SVG;
-      btn.disabled  = false;
+      lErr.innerHTML = `❌ Access denied.<br><small>Only <b>${ALLOWED}</b> allowed.</small>`;
+      lErr.style.display = 'block';
+      resetGBtn();
     }
-    // If email matches — onAuthStateChanged handles the rest
-
   } catch(e) {
-    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
-      console.log('Popup failed, falling back to redirect...', e);
-      if (errEl) {
-        errEl.textContent = '⏳ Popup blocked/closed. Redirecting to Google Sign-In...';
-        errEl.style.display = 'block';
-      }
-      try {
-        await signInWithRedirect(auth, googleProvider);
-      } catch (redirectErr) {
-        handleAuthError(redirectErr);
-      }
-    } else {
-      handleAuthError(e);
-    }
-  } finally {
-    isAuthenticating = false;
-  }
-}
-
-async function logout() {
-  logActivity('login', 'Admin logged out', '🚪');
-  await signOut(auth);
-  document.getElementById('app').style.display          = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-}
-
-// ── AUTH STATE LISTENER ───────────────────────────────────────────────────────
-onAuthStateChanged(auth, (user) => {
-  const btn = document.getElementById('google-btn');
-  if (user && user.email.toLowerCase() === ALLOWED_EMAIL) {
-    // Valid admin logged in
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display          = 'block';
-    document.getElementById('admin-name').textContent     = user.email;
-    if (btn) { btn.innerHTML = GOOGLE_SVG; btn.disabled = false; }
-    logActivity('login', `Signed in as ${user.email}`, '👤');
-    initDB();
-    initCategories();
-  } else if (user) {
-    // Wrong Google account logged in — kick out
-    signOut(auth);
-    const errEl = document.getElementById('lerr');
-    if(errEl) {
-      errEl.innerHTML = `❌ Access denied. Only <b>${ALLOWED_EMAIL}</b> can log in.`;
-      errEl.style.display = 'block';
-    }
-    if (btn) { btn.innerHTML = GOOGLE_SVG; btn.disabled = false; }
-  } else {
-    // Not logged in — show login screen
-    if (btn) { btn.innerHTML = GOOGLE_SVG; btn.disabled = false; }
+    console.error('Auth error:', e.code, e.message);
+    const msgs = {
+      'auth/popup-closed-by-user':   '❌ Popup was closed. Please try again.',
+      'auth/popup-blocked':          '❌ Popup blocked! Allow popups for this site then retry.',
+      'auth/cancelled-popup-request':'❌ Cancelled. Try again.',
+      'auth/network-request-failed': '❌ Network error. Check connection.',
+      'auth/unauthorized-domain':    `❌ Domain not authorized in Firebase Console. Add "${location.hostname}" to Authentication → Settings → Authorized domains.`,
+      'auth/operation-not-allowed':  '❌ Google sign-in not enabled in Firebase Console.',
+    };
+    lErr.textContent = msgs[e.code] || ('❌ ' + (e.code || e.message));
+    lErr.style.display = 'block';
+    resetGBtn();
   }
 });
 
-// ── FIREBASE ──────────────────────────────────────────────────────────────────
+onAuthStateChanged(auth, user => {
+  if (user && user.email.toLowerCase() === ALLOWED) {
+    document.getElementById('login-wrap').style.display    = 'none';
+    document.getElementById('app-wrap').style.display      = 'flex';
+    document.getElementById('admin-email').textContent     = user.email;
+    document.getElementById('set-email').value             = user.email;
+    addLog('login', `✅ Signed in as ${user.email}`);
+    initDB();
+    initCats();
+    document.getElementById('nb-log').textContent = actLog.length;
+  } else if (user) {
+    signOut(auth);
+    lErr.innerHTML = `❌ Only <b>${ALLOWED}</b> allowed.`;
+    lErr.style.display = 'block';
+    resetGBtn();
+  } else {
+    document.getElementById('login-wrap').style.display  = 'flex';
+    document.getElementById('app-wrap').style.display    = 'none';
+    resetGBtn();
+  }
+});
+
+async function doLogout() {
+  addLog('login', '🚪 Admin signed out');
+  await signOut(auth);
+}
+document.getElementById('btn-logout').addEventListener('click', doLogout);
+document.getElementById('btn-logout2').addEventListener('click', doLogout);
+
+// ── FIREBASE DB ───────────────────────────────────────────────────────
 function initDB() {
-  const imgRef = ref(db, 'images');
-  onValue(imgRef, snap => {
-    document.getElementById('db-status').innerHTML = '<span style="color:var(--green)">🟢 Connected</span>';
+  onValue(ref(db, 'images'), snap => {
     images = snap.exists() ? Object.values(snap.val()) : [];
+    document.getElementById('db-status').textContent = 'Live';
     updateAll();
-  }, err => {
-    document.getElementById('db-status').innerHTML = '<span style="color:var(--accent)">🔴 Error</span>';
-    console.error(err);
+  }, () => {
+    document.getElementById('db-status').textContent = 'Error';
   });
 }
 
-function updateAll() {
-  const n = images.length;
-  document.getElementById('nav-count').textContent = n;
-  document.getElementById('top-count').textContent = n + ' images';
-
-  // Stats
-  document.getElementById('s-total').textContent    = n;
-  document.getElementById('s-featured').textContent = images.filter(i=>i.isFeatured).length;
-  document.getElementById('s-trending').textContent = images.filter(i=>i.isTrending).length;
-  document.getElementById('s-popular').textContent  = images.filter(i=>i.isPopular).length;
-  document.getElementById('s-new').textContent      = images.filter(i=>i.isNew).length;
-  const totalViews = images.reduce((a,i)=>a+(i.views||0),0);
-  document.getElementById('s-views').textContent = totalViews.toLocaleString();
-
-  renderCatChart();
-  renderDonut();
-  renderDashLog();
-  renderRecentImages();
-  renderTable();
+function initCats() {
+  onValue(ref(db, 'categories'), snap => {
+    cats = snap.exists() ? Object.values(snap.val()) : [];
+    document.getElementById('nb-cat').textContent = cats.length;
+    renderCatTable();
+    populateCatFilter();
+  });
 }
 
-// ── CHARTS ───────────────────────────────────────────────────────────────────
-const CAT_COLORS = {cyberpunk:'#E02424',artistic:'#a855f7',fitness:'#22c55e',cosplay:'#f59e0b',glamour:'#ec4899',amateur:'#06b6d4',model:'#3b82f6','high-fashion':'#f97316'};
+// ── STATS & CHARTS ────────────────────────────────────────────────────
+const CAT_CLR = {cyberpunk:'#E02424',artistic:'#a855f7',fitness:'#22c55e',cosplay:'#f59e0b',glamour:'#ec4899',amateur:'#06b6d4',model:'#3b82f6','high-fashion':'#f97316'};
+
+function updateAll() {
+  const n = images.length;
+  document.getElementById('nb-img').textContent   = n;
+  document.getElementById('top-count').textContent = n + ' images';
+  document.getElementById('s-total').textContent  = n;
+  document.getElementById('s-ft').textContent     = images.filter(i=>i.isFeatured).length;
+  document.getElementById('s-tr').textContent     = images.filter(i=>i.isTrending).length;
+  document.getElementById('s-pp').textContent     = images.filter(i=>i.isPopular).length;
+  document.getElementById('s-nw').textContent     = images.filter(i=>i.isNew).length;
+  document.getElementById('s-views').textContent  = images.reduce((a,i)=>a+(i.views||0),0).toLocaleString();
+  renderCatChart(); renderDonut(); renderDashLog(); renderDashImgs(); renderTable();
+}
 
 function renderCatChart() {
-  const cats = {};
-  images.forEach(i=>{ cats[i.category]=(cats[i.category]||0)+1; });
-  const max = Math.max(...Object.values(cats),1);
-  const el = document.getElementById('cat-chart');
-  el.innerHTML = Object.entries(cats).map(([cat,cnt])=>`
-    <div class="bar-wrap">
-      <div class="bar-val">${cnt}</div>
-      <div class="bar" style="height:${Math.max((cnt/max)*90,3)}px;background:${CAT_COLORS[cat]||'#888'}"></div>
-      <div class="bar-label">${cat.slice(0,6)}</div>
-    </div>`).join('') || '<div style="color:var(--muted);font-size:12px;margin:auto">No data</div>';
+  const m = {};
+  images.forEach(i => m[i.category] = (m[i.category]||0)+1);
+  const max = Math.max(...Object.values(m), 1);
+  document.getElementById('cat-chart').innerHTML = Object.entries(m).map(([c,n])=>`
+    <div class="b-wrap">
+      <div class="b-val">${n}</div>
+      <div class="b-bar" style="height:${Math.max((n/max)*80,3)}px;background:${CAT_CLR[c]||'#888'}"></div>
+      <div class="b-lbl">${c.slice(0,7)}</div>
+    </div>`).join('') || '<div style="color:var(--mu);font-size:12px;margin:auto">No data</div>';
 }
 
 function renderDonut() {
   const flags = [
-    {label:'Featured', key:'isFeatured', color:'#a855f7'},
-    {label:'Trending',  key:'isTrending', color:'#3b82f6'},
-    {label:'Popular',   key:'isPopular',  color:'#22c55e'},
-    {label:'New',       key:'isNew',      color:'#f59e0b'},
-    {label:'None',      key:'none',       color:'#2a2a2a'},
+    {label:'Featured',key:'isFeatured',color:'#a855f7'},
+    {label:'Trending', key:'isTrending', color:'#3b82f6'},
+    {label:'Popular',  key:'isPopular',  color:'#22c55e'},
+    {label:'New',      key:'isNew',      color:'#f59e0b'},
+    {label:'None',     key:'none',       color:'#2a2a2a'},
   ];
-  const counts = flags.map(f=>{
-    if(f.key==='none') return images.filter(i=>!i.isFeatured&&!i.isTrending&&!i.isPopular&&!i.isNew).length;
-    return images.filter(i=>i[f.key]).length;
-  });
+  const counts = flags.map(f => f.key==='none'
+    ? images.filter(i=>!i.isFeatured&&!i.isTrending&&!i.isPopular&&!i.isNew).length
+    : images.filter(i=>i[f.key]).length);
   const total = counts.reduce((a,b)=>a+b,0)||1;
-  const canvas = document.getElementById('donut-canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,110,110);
-  let angle = -Math.PI/2;
+  const cv = document.getElementById('donut'); if(!cv) return;
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,100,100);
+  let ang = -Math.PI/2;
   counts.forEach((c,i)=>{
     if(!c) return;
-    const slice = (c/total)*Math.PI*2;
-    ctx.beginPath();ctx.moveTo(55,55);
-    ctx.arc(55,55,50,angle,angle+slice);
-    ctx.closePath();ctx.fillStyle=flags[i].color;ctx.fill();
-    angle+=slice;
+    const sl = (c/total)*Math.PI*2;
+    ctx.beginPath(); ctx.moveTo(50,50);
+    ctx.arc(50,50,45,ang,ang+sl); ctx.closePath();
+    ctx.fillStyle = flags[i].color; ctx.fill(); ang+=sl;
   });
-  ctx.beginPath();ctx.arc(55,55,30,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();
-  ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(images.length,55,55);
-
-  document.getElementById('donut-legend').innerHTML = flags.map((f,i)=>`
-    <div class="donut-row"><div class="donut-dot" style="background:${f.color}"></div>
-    <span style="color:var(--muted)">${f.label}</span><span style="margin-left:auto;font-weight:700">${counts[i]}</span></div>`).join('');
+  ctx.beginPath(); ctx.arc(50,50,26,0,Math.PI*2);
+  ctx.fillStyle='#111'; ctx.fill();
+  ctx.fillStyle='#fff'; ctx.font='bold 11px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(images.length, 50, 50);
+  document.getElementById('donut-leg').innerHTML = flags.map((f,i)=>`
+    <div class="leg-row"><div class="leg-dot" style="background:${f.color}"></div>
+    <span style="color:var(--mu)">${f.label}</span>
+    <span style="margin-left:auto;font-weight:700">${counts[i]}</span></div>`).join('');
 }
 
-function renderDashLog() {
-  const el = document.getElementById('dash-log-list');
-  const recent = [...actLog].slice(0,5);
-  el.innerHTML = recent.length ? recent.map(logHTML).join('') : '<div class="empty"><div class="em-icon">📋</div>No activity yet</div>';
-}
-
-function renderRecentImages() {
-  const el = document.getElementById('dash-recent');
-  const recent = [...images].slice(0,12);
-  el.innerHTML = recent.map(img=>`
-    <div title="${img.title}" onclick="openEdit('${img.id}')" style="cursor:pointer">
-      <img src="${img.thumbnailUrl||''}" alt="${img.title||''}" onerror="this.src=''" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:7px;border:1px solid var(--border)"/>
-    </div>`).join('') || '<div style="color:var(--muted);font-size:12px;padding:10px">No images yet</div>';
-}
-
-// ── TABLE ─────────────────────────────────────────────────────────────────────
-window.renderTable = function() {
-  const q    = (document.getElementById('q')?.value||'').toLowerCase();
-  const fcat = document.getElementById('fcat')?.value||'';
-  const fflag= document.getElementById('fflag')?.value||'';
-  const fsort= document.getElementById('fsort')?.value||'newest';
-
-  let list = images.filter(img=>{
-    const mq = !q || [img.title,img.modelName,img.id,img.slug].some(s=>(s||'').toLowerCase().includes(q));
-    const mc = !fcat  || img.category===fcat;
-    const mf = !fflag || img[fflag];
-    return mq&&mc&&mf;
+function renderDashImgs() {
+  document.getElementById('dash-imgs').innerHTML = images.slice(0,12).map(img=>`
+    <div style="cursor:pointer" title="${img.title||''}" data-edit="${img.id}">
+      <img src="${img.thumbnailUrl||''}" onerror="this.src=''" alt=""
+        style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:7px;border:1px solid var(--br)"/>
+    </div>`).join('') || '<div style="color:var(--mu);font-size:12px">No images yet</div>';
+  document.querySelectorAll('#dash-imgs [data-edit]').forEach(el => {
+    el.addEventListener('click', () => openEditImg(el.dataset.edit));
   });
-
-  if(fsort==='views')  list.sort((a,b)=>(b.views||0)-(a.views||0));
-  else if(fsort==='likes') list.sort((a,b)=>(b.likes||0)-(a.likes||0));
-  else if(fsort==='az') list.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
-  else if(fsort==='oldest') {}
-  else list.reverse();
-
-  const tbody = document.getElementById('tbody');
-  document.getElementById('tfoot').textContent = `Showing ${list.length} of ${images.length} images`;
-
-  if(!list.length){
-    tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="em-icon">🖼️</div>No images found</div></td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = list.map(img=>{
-    const isSel = selected.has(img.id);
-    return `<tr class="${isSel?'selected':''}">
-      <td><input type="checkbox" ${isSel?'checked':''} onchange="toggleRow('${img.id}',this.checked)" style="accent-color:var(--accent)"/></td>
-      <td><img class="thumb" src="${img.thumbnailUrl||''}" alt="" onerror="this.src=''"/></td>
-      <td>
-        <div style="font-weight:700;font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${img.title||'—'}</div>
-        <div style="font-size:10px;color:var(--muted);font-family:monospace;margin-top:2px">${img.id||''}</div>
-        ${img.modelName?`<div style="font-size:10px;color:var(--muted2)">👤 ${img.modelName}</div>`:''}
-      </td>
-      <td><span class="tag cat">${img.category||'—'}</span></td>
-      <td>
-        ${img.isFeatured?'<span class="tag featured">⭐ Featured</span> ':''}
-        ${img.isTrending?'<span class="tag trending">🔥 Trending</span> ':''}
-        ${img.isPopular?'<span class="tag popular">❤️ Popular</span> ':''}
-        ${img.isNew?'<span class="tag new">✨ New</span>':''}
-      </td>
-      <td>
-        <div style="font-size:10px;color:var(--muted)">👁 ${(img.views||0).toLocaleString()}</div>
-        <div style="font-size:10px;color:var(--muted)">❤️ ${(img.likes||0).toLocaleString()}</div>
-        <div style="font-size:10px;color:var(--muted2);font-family:monospace">${img.uploadedAt||''}</div>
-      </td>
-      <td><div class="actions-cell">
-        <button class="btn btn-ghost btn-xs" onclick="openEdit('${img.id}')">✏️</button>
-        <button class="btn btn-danger btn-xs" onclick="deleteImg('${img.id}','${(img.title||'').replace(/'/g,"\\'")}')">🗑</button>
-      </div></td>
-    </tr>`;
-  }).join('');
-};
-
-// ── SELECTION ─────────────────────────────────────────────────────────────────
-window.toggleAll = function(checked) {
-  const list = getFiltered();
-  list.forEach(img=>checked?selected.add(img.id):selected.delete(img.id));
-  updateBulkBar();
-  renderTable();
-};
-window.toggleRow = function(id,checked) {
-  checked?selected.add(id):selected.delete(id);
-  updateBulkBar();
-};
-window.clearSel = function() {
-  selected.clear();
-  document.getElementById('check-all').checked=false;
-  updateBulkBar();
-  renderTable();
-};
-function updateBulkBar() {
-  const bar = document.getElementById('bulk-bar');
-  const n = selected.size;
-  document.getElementById('sel-count').textContent = n + ' selected';
-  bar.classList.toggle('visible', n>0);
 }
-function getFiltered() {
-  const q    = (document.getElementById('q')?.value||'').toLowerCase();
-  const fcat = document.getElementById('fcat')?.value||'';
-  const fflag= document.getElementById('fflag')?.value||'';
-  return images.filter(img=>{
+
+// ── IMAGE TABLE ───────────────────────────────────────────────────────
+function populateCatFilter() {
+  const sel = document.getElementById('f-cat');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All Categories</option>';
+  [...new Set(images.map(i=>i.category).filter(Boolean))].sort().forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c; if(c===cur) o.selected=true;
+    sel.appendChild(o);
+  });
+}
+
+function renderTable() {
+  const q    = (document.getElementById('q-img')?.value||'').toLowerCase();
+  const fcat = document.getElementById('f-cat')?.value||'';
+  const fflag= document.getElementById('f-flag')?.value||'';
+  const fsort= document.getElementById('f-sort')?.value||'def';
+
+  let list = images.filter(img => {
     const mq = !q || [img.title,img.modelName,img.id].some(s=>(s||'').toLowerCase().includes(q));
     return mq && (!fcat||img.category===fcat) && (!fflag||img[fflag]);
   });
-}
 
-// ── MODAL ─────────────────────────────────────────────────────────────────────
-window.openAdd = function() {
-  editId=null;
-  document.getElementById('modal-title').textContent='➕ Add New Image';
-  document.getElementById('save-btn').textContent='💾 Save to Firebase';
-  clearForm();
-  document.getElementById('modal').style.display='flex';
-};
-window.openEdit = function(id) {
-  const img=images.find(i=>i.id===id);
-  if(!img) return;
-  editId=id;
-  document.getElementById('modal-title').textContent='✏️ Edit Image';
-  document.getElementById('save-btn').textContent='💾 Update Firebase';
-  document.getElementById('f-id').value    = img.id||'';
-  document.getElementById('f-slug').value  = img.slug||'';
-  document.getElementById('f-title').value = img.title||'';
-  document.getElementById('f-desc').value  = img.description||'';
-  document.getElementById('f-cat').value   = img.category||'cyberpunk';
-  document.getElementById('f-aspect').value= img.aspectRatio||'portrait';
-  document.getElementById('f-thumb').value = img.thumbnailUrl||'';
-  document.getElementById('f-hires').value = img.highResUrl||'';
-  document.getElementById('f-gallery').value=(img.galleryImages||[]).join('\n');
-  document.getElementById('f-model').value = img.modelName||'';
-  document.getElementById('f-res').value   = img.resolution||'';
-  document.getElementById('f-fmt').value   = img.format||'WebP';
-  document.getElementById('f-size').value  = img.fileSize||'';
-  document.getElementById('f-views').value = img.views||'';
-  document.getElementById('f-likes').value = img.likes||'';
-  document.getElementById('f-w').value     = img.width||'';
-  document.getElementById('f-h').value     = img.height||'';
-  document.getElementById('f-up').value    = img.uploadedAt||'';
-  document.getElementById('f-tags').value  = (img.tags||[]).join(', ');
-  document.getElementById('f-featured').checked=!!img.isFeatured;
-  document.getElementById('f-trending').checked=!!img.isTrending;
-  document.getElementById('f-popular').checked=!!img.isPopular;
-  document.getElementById('f-new').checked=!!img.isNew;
-  if(img.thumbnailUrl) prevImg('f-thumb','p-thumb');
-  if(img.highResUrl)   prevImg('f-hires','p-hires');
-  document.getElementById('modal').style.display='flex';
-};
-window.closeModal=function(){ document.getElementById('modal').style.display='none'; editId=null; };
-function clearForm() {
-  ['f-id','f-slug','f-title','f-desc','f-thumb','f-hires','f-gallery','f-model','f-res','f-size','f-views','f-likes','f-w','f-h','f-up','f-tags'].forEach(id=>{ document.getElementById(id).value=''; });
-  document.getElementById('f-cat').value='cyberpunk';
-  document.getElementById('f-aspect').value='portrait';
-  document.getElementById('f-fmt').value='WebP';
-  ['f-featured','f-trending','f-popular','f-new'].forEach(id=>{ document.getElementById(id).checked=false; });
-  document.getElementById('p-thumb').style.display='none';
-  document.getElementById('p-hires').style.display='none';
-}
+  if(fsort==='views') list.sort((a,b)=>(b.views||0)-(a.views||0));
+  else if(fsort==='likes') list.sort((a,b)=>(b.likes||0)-(a.likes||0));
+  else if(fsort==='az') list.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
 
-// ── SAVE IMAGE ────────────────────────────────────────────────────────────────
-window.saveImg = async function() {
-  const id    = document.getElementById('f-id').value.trim();
-  const title = document.getElementById('f-title').value.trim();
-  const thumb = document.getElementById('f-thumb').value.trim();
-  const hires = document.getElementById('f-hires').value.trim();
-  const slug  = document.getElementById('f-slug').value.trim();
-  if(!id||!title||!thumb||!hires||!slug){ toast('❌ ID, Slug, Title, Thumbnail & HighRes required!','error'); return; }
+  document.getElementById('img-foot').textContent = `Showing ${list.length} of ${images.length} images`;
 
-  const gallery = document.getElementById('f-gallery').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
-  const tags    = document.getElementById('f-tags').value.split(',').map(s=>s.trim()).filter(Boolean);
-
-  const data = {
-    id,slug,title,
-    description: document.getElementById('f-desc').value.trim(),
-    category:    document.getElementById('f-cat').value,
-    aspectRatio: document.getElementById('f-aspect').value,
-    thumbnailUrl:thumb, highResUrl:hires, galleryImages:gallery,
-    modelName:   document.getElementById('f-model').value.trim(),
-    resolution:  document.getElementById('f-res').value.trim(),
-    format:      document.getElementById('f-fmt').value,
-    fileSize:    document.getElementById('f-size').value.trim(),
-    views:  parseInt(document.getElementById('f-views').value)||0,
-    likes:  parseInt(document.getElementById('f-likes').value)||0,
-    width:  parseInt(document.getElementById('f-w').value)||0,
-    height: parseInt(document.getElementById('f-h').value)||0,
-    uploadedAt: document.getElementById('f-up').value.trim()||'Just now',
-    tags,
-    isFeatured: document.getElementById('f-featured').checked,
-    isTrending: document.getElementById('f-trending').checked,
-    isPopular:  document.getElementById('f-popular').checked,
-    isNew:      document.getElementById('f-new').checked,
-  };
-
-  const btn=document.getElementById('save-btn');
-  btn.textContent='⏳ Saving...'; btn.disabled=true;
-  try {
-    await set(ref(db,'images/'+id),data);
-    const action = editId ? 'edit' : 'add';
-    logActivity(action, `${editId?'Updated':'Added'} image: "${title}"`, editId?'✏️':'➕');
-    toast(`✅ Image ${editId?'updated':'saved'} successfully!`,'success');
-    closeModal();
-  } catch(e) {
-    toast('❌ Firebase error: '+e.message,'error');
-  } finally { btn.textContent='💾 Save to Firebase'; btn.disabled=false; }
-};
-
-// ── DELETE ────────────────────────────────────────────────────────────────────
-window.deleteImg = async function(id,title) {
-  if(!confirm(`Delete "${title}"?\nThis is permanent.`)) return;
-  try {
-    await remove(ref(db,'images/'+id));
-    logActivity('del',`Deleted image: "${title}"`, '🗑️');
-    toast('🗑️ Image deleted','success');
-    selected.delete(id);
-    updateBulkBar();
-  } catch(e){ toast('❌ '+e.message,'error'); }
-};
-
-// ── BULK ACTIONS ───────────────────────────────────────────────────────────────
-window.bulkFlag = async function(flag,val) {
-  if(!selected.size){ toast('No images selected','info'); return; }
-  const updates={};
-  selected.forEach(id=>{ updates[`images/${id}/${flag}`]=val; });
-  try {
-    await update(ref(db),updates);
-    logActivity('edit',`Bulk flag "${flag}"=${val} on ${selected.size} images`,'⚡');
-    toast(`✅ Updated ${selected.size} images`,'success');
-    clearSel();
-  } catch(e){ toast('❌ '+e.message,'error'); }
-};
-
-window.bulkDelete = async function() {
-  if(!selected.size){ toast('No images selected','info'); return; }
-  if(!confirm(`Delete ${selected.size} selected images permanently?`)) return;
-  try {
-    await Promise.all([...selected].map(id=>remove(ref(db,'images/'+id))));
-    logActivity('del',`Bulk deleted ${selected.size} images`,'🗑️');
-    toast(`🗑️ Deleted ${selected.size} images`,'success');
-    clearSel();
-  } catch(e){ toast('❌ '+e.message,'error'); }
-};
-
-window.massFlag = async function(flag,val) {
-  if(!images.length){ toast('No images in database','info'); return; }
-  if(flag==='all'){
-    if(!confirm('Clear ALL flags from ALL images?')) return;
-    const updates={};
-    images.forEach(img=>{
-      updates[`images/${img.id}/isFeatured`]=false;
-      updates[`images/${img.id}/isTrending`]=false;
-      updates[`images/${img.id}/isPopular`]=false;
-      updates[`images/${img.id}/isNew`]=false;
-    });
-    await update(ref(db),updates);
-    logActivity('edit','Cleared all flags from all images','🧹');
-    toast('✅ All flags cleared','success');
+  const tbody = document.getElementById('img-tbody');
+  if(!list.length){
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-ic">🖼️</div>No images found</div></td></tr>`;
     return;
   }
-  if(!confirm(`Set "${flag}"=${val} on ALL ${images.length} images?`)) return;
-  const updates={};
-  images.forEach(img=>{ updates[`images/${img.id}/${flag}`]=val; });
-  await update(ref(db),updates);
-  logActivity('edit',`Mass set "${flag}"=${val} on ${images.length} images`,'⚡');
-  toast(`✅ Updated ${images.length} images`,'success');
-};
+  tbody.innerHTML = list.map(img => `
+    <tr class="${selected.has(img.id)?'sel':''}">
+      <td><input type="checkbox" ${selected.has(img.id)?'checked':''} data-chk="${img.id}" style="accent-color:var(--red)"/></td>
+      <td><img class="thumb" src="${img.thumbnailUrl||''}" onerror="this.src=''" alt=""/></td>
+      <td>
+        <div style="font-weight:700;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${img.title||'—'}</div>
+        <div style="font-size:10px;color:var(--mu);font-family:monospace">${img.id}</div>
+        ${img.modelName?`<div style="font-size:10px;color:var(--mu2)">👤 ${img.modelName}</div>`:''}
+      </td>
+      <td><span class="tag cat">${img.category||'—'}</span></td>
+      <td>
+        ${img.isFeatured?'<span class="tag ft">⭐</span>':''}
+        ${img.isTrending?'<span class="tag tr">🔥</span>':''}
+        ${img.isPopular?'<span class="tag pp">❤️</span>':''}
+        ${img.isNew?'<span class="tag nw">✨</span>':''}
+      </td>
+      <td>
+        <div style="font-size:10px;color:var(--mu)">👁 ${(img.views||0).toLocaleString()}</div>
+        <div style="font-size:10px;color:var(--mu)">❤️ ${(img.likes||0).toLocaleString()}</div>
+      </td>
+      <td><div class="act-row">
+        <button class="btn btn-g btn-xs" data-edit="${img.id}">✏️</button>
+        <button class="btn btn-d btn-xs" data-del="${img.id}" data-title="${(img.title||'').replace(/"/g,'&quot;')}">🗑</button>
+      </div></td>
+    </tr>`).join('');
 
-window.deleteAll = async function() {
+  // Attach row events
+  tbody.querySelectorAll('[data-chk]').forEach(el => el.addEventListener('change', () => toggleRow(el.dataset.chk, el.checked)));
+  tbody.querySelectorAll('[data-edit]').forEach(el => el.addEventListener('click', () => openEditImg(el.dataset.edit)));
+  tbody.querySelectorAll('[data-del]').forEach(el => el.addEventListener('click', () => deleteImg(el.dataset.del, el.dataset.title)));
+}
+
+// Table filter/sort listeners
+['q-img','f-cat','f-flag','f-sort'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', renderTable);
+  document.getElementById(id)?.addEventListener('change', renderTable);
+});
+
+// ── SELECTION ─────────────────────────────────────────────────────────
+function toggleRow(id, checked) {
+  checked ? selected.add(id) : selected.delete(id);
+  updateBulkBar();
+}
+function updateBulkBar() {
+  const n = selected.size;
+  document.getElementById('sel-count').textContent = n + ' selected';
+  document.getElementById('bulk-bar').classList.toggle('on', n > 0);
+}
+document.getElementById('chk-all').addEventListener('change', e => {
+  images.forEach(img => e.target.checked ? selected.add(img.id) : selected.delete(img.id));
+  updateBulkBar(); renderTable();
+});
+document.getElementById('bb-clr').addEventListener('click', () => {
+  selected.clear(); updateBulkBar(); renderTable();
+});
+
+// ── IMAGE MODAL ───────────────────────────────────────────────────────
+function openAddImg() {
+  editImgId = null;
+  document.getElementById('img-modal-title').textContent = '➕ Add New Image';
+  document.getElementById('img-modal-save').textContent  = '💾 Save to Firebase';
+  ['m-id','m-slug','m-title','m-desc','m-thumb','m-hires','m-gallery','m-model','m-res','m-size','m-tags','m-up'].forEach(id => document.getElementById(id).value = '');
+  ['m-views','m-likes','m-w','m-h'].forEach(id => document.getElementById(id).value = '0');
+  ['m-ft','m-tr','m-pp','m-nw'].forEach(id => document.getElementById(id).checked = false);
+  document.getElementById('m-cat').value    = 'cyberpunk';
+  document.getElementById('m-aspect').value = 'portrait';
+  document.getElementById('m-fmt').value    = 'WebP';
+  document.getElementById('p-thumb').style.display = 'none';
+  document.getElementById('p-hires').style.display = 'none';
+  document.getElementById('m-id').disabled  = false;
+  document.getElementById('img-modal').style.display = 'flex';
+}
+function openEditImg(id) {
+  const img = images.find(i => i.id === id); if(!img) return;
+  editImgId = id;
+  document.getElementById('img-modal-title').textContent = '✏️ Edit Image';
+  document.getElementById('img-modal-save').textContent  = '💾 Update Firebase';
+  document.getElementById('m-id').value      = img.id||'';
+  document.getElementById('m-slug').value    = img.slug||'';
+  document.getElementById('m-title').value   = img.title||'';
+  document.getElementById('m-desc').value    = img.description||'';
+  document.getElementById('m-cat').value     = img.category||'cyberpunk';
+  document.getElementById('m-aspect').value  = img.aspectRatio||'portrait';
+  document.getElementById('m-thumb').value   = img.thumbnailUrl||'';
+  document.getElementById('m-hires').value   = img.highResUrl||'';
+  document.getElementById('m-gallery').value = (img.galleryImages||[]).join('\n');
+  document.getElementById('m-model').value   = img.modelName||'';
+  document.getElementById('m-res').value     = img.resolution||'';
+  document.getElementById('m-fmt').value     = img.format||'WebP';
+  document.getElementById('m-size').value    = img.fileSize||'';
+  document.getElementById('m-views').value   = img.views||0;
+  document.getElementById('m-likes').value   = img.likes||0;
+  document.getElementById('m-w').value       = img.width||0;
+  document.getElementById('m-h').value       = img.height||0;
+  document.getElementById('m-up').value      = img.uploadedAt||'';
+  document.getElementById('m-tags').value    = (img.tags||[]).join(', ');
+  document.getElementById('m-ft').checked    = !!img.isFeatured;
+  document.getElementById('m-tr').checked    = !!img.isTrending;
+  document.getElementById('m-pp').checked    = !!img.isPopular;
+  document.getElementById('m-nw').checked    = !!img.isNew;
+  document.getElementById('m-id').disabled   = true;
+  prevImg('m-thumb','p-thumb'); prevImg('m-hires','p-hires');
+  document.getElementById('img-modal').style.display = 'flex';
+}
+
+document.getElementById('btn-add-img').addEventListener('click', openAddImg);
+document.getElementById('img-modal-cancel').addEventListener('click', () => { document.getElementById('img-modal').style.display='none'; });
+
+document.getElementById('img-modal-save').addEventListener('click', async () => {
+  const id    = document.getElementById('m-id').value.trim();
+  const title = document.getElementById('m-title').value.trim();
+  const thumb = document.getElementById('m-thumb').value.trim();
+  const hires = document.getElementById('m-hires').value.trim();
+  const slug  = document.getElementById('m-slug').value.trim();
+  if(!id||!title||!thumb||!hires||!slug){ toast('❌ ID, Slug, Title, Thumb & HiRes required!','err'); return; }
+
+  const data = {
+    id, slug, title,
+    description:  document.getElementById('m-desc').value.trim(),
+    category:     document.getElementById('m-cat').value,
+    aspectRatio:  document.getElementById('m-aspect').value,
+    thumbnailUrl: thumb, highResUrl: hires,
+    galleryImages:document.getElementById('m-gallery').value.trim().split('\n').map(s=>s.trim()).filter(Boolean),
+    modelName:    document.getElementById('m-model').value.trim(),
+    resolution:   document.getElementById('m-res').value.trim(),
+    format:       document.getElementById('m-fmt').value,
+    fileSize:     document.getElementById('m-size').value.trim(),
+    views:  parseInt(document.getElementById('m-views').value)||0,
+    likes:  parseInt(document.getElementById('m-likes').value)||0,
+    width:  parseInt(document.getElementById('m-w').value)||0,
+    height: parseInt(document.getElementById('m-h').value)||0,
+    uploadedAt: document.getElementById('m-up').value.trim()||'Just now',
+    tags: document.getElementById('m-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    isFeatured: document.getElementById('m-ft').checked,
+    isTrending: document.getElementById('m-tr').checked,
+    isPopular:  document.getElementById('m-pp').checked,
+    isNew:      document.getElementById('m-nw').checked,
+  };
+
+  const btn = document.getElementById('img-modal-save');
+  btn.textContent = '⏳ Saving...'; btn.disabled = true;
+  try {
+    await set(ref(db, 'images/' + id), data);
+    addLog(editImgId?'edit':'add', `${editImgId?'Updated':'Added'} image: "${title}"`);
+    toast(`✅ Image ${editImgId?'updated':'saved'}!`);
+    document.getElementById('img-modal').style.display = 'none';
+  } catch(e) { toast('❌ ' + e.message, 'err'); }
+  finally { btn.textContent='💾 Save to Firebase'; btn.disabled=false; }
+});
+
+// Preview images
+function prevImg(inId, prevId) {
+  const url = document.getElementById(inId)?.value.trim();
+  const img = document.getElementById(prevId);
+  if(!img) return;
+  if(url){ img.src=url; img.style.display='block'; img.onerror=()=>img.style.display='none'; }
+  else img.style.display='none';
+}
+['m-thumb','m-hires'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    prevImg('m-thumb','p-thumb'); prevImg('m-hires','p-hires');
+  });
+});
+document.getElementById('c-img').addEventListener('input', () => prevImg('c-img','p-cimg'));
+
+// Delete image
+async function deleteImg(id, title) {
+  if(!confirm(`Delete "${title}"?\nThis is permanent.`)) return;
+  try {
+    await remove(ref(db, 'images/' + id));
+    addLog('del', `Deleted image: "${title}"`);
+    toast('🗑️ Deleted', 'ok');
+    selected.delete(id); updateBulkBar();
+  } catch(e) { toast('❌ ' + e.message, 'err'); }
+}
+
+// ── BULK SELECTION ACTIONS ────────────────────────────────────────────
+async function bulkSetFlag(flag, val) {
+  if(!selected.size){ toast('Select images first','inf'); return; }
+  const updates = {};
+  selected.forEach(id => updates[`images/${id}/${flag}`] = val);
+  try {
+    await update(ref(db), updates);
+    addLog('edit', `Bulk ${flag}=${val} on ${selected.size} images`);
+    toast(`✅ Updated ${selected.size} images`);
+    selected.clear(); updateBulkBar();
+  } catch(e) { toast('❌ ' + e.message,'err'); }
+}
+async function bulkDelSelected() {
+  if(!selected.size){ toast('Select images first','inf'); return; }
+  if(!confirm(`Delete ${selected.size} images permanently?`)) return;
+  try {
+    await Promise.all([...selected].map(id => remove(ref(db,'images/'+id))));
+    addLog('del', `Bulk deleted ${selected.size} images`);
+    toast(`🗑️ Deleted ${selected.size} images`);
+    selected.clear(); updateBulkBar();
+  } catch(e) { toast('❌ ' + e.message,'err'); }
+}
+
+document.getElementById('bb-ft').addEventListener('click',  () => bulkSetFlag('isFeatured', true));
+document.getElementById('bb-uft').addEventListener('click', () => bulkSetFlag('isFeatured', false));
+document.getElementById('bb-tr').addEventListener('click',  () => bulkSetFlag('isTrending', true));
+document.getElementById('bb-del').addEventListener('click', bulkDelSelected);
+
+// ── CATEGORIES ────────────────────────────────────────────────────────
+function renderCatTable() {
+  const tbody = document.getElementById('cat-tbody'); if(!tbody) return;
+  if(!cats.length){
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-ic">📂</div>No categories yet</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = cats.map(cat => {
+    const cnt = images.filter(i=>i.category===cat.id).length;
+    return `<tr>
+      <td><code style="font-family:monospace;font-size:11px;background:var(--s2);padding:2px 6px;border-radius:4px">${cat.id}</code></td>
+      <td style="font-weight:700">${cat.name}</td>
+      <td style="font-size:11px;color:var(--mu)">${cat.description||'—'}</td>
+      <td><span class="tag cat">${cnt}</span></td>
+      <td><div class="act-row">
+        <button class="btn btn-g btn-xs" data-edit-cat="${cat.id}">✏️ Edit</button>
+        <button class="btn btn-d btn-xs" data-del-cat="${cat.id}" data-cat-name="${cat.name}">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  tbody.querySelectorAll('[data-edit-cat]').forEach(el => el.addEventListener('click', () => openEditCat(el.dataset.editCat)));
+  tbody.querySelectorAll('[data-del-cat]').forEach(el => el.addEventListener('click', () => deleteCat(el.dataset.delCat, el.dataset.catName)));
+}
+
+function openAddCat() {
+  editCatId = null;
+  document.getElementById('cat-modal-title').textContent = '📂 Add Category';
+  document.getElementById('cat-modal-save').textContent  = '💾 Save Category';
+  document.getElementById('c-id').value   = '';
+  document.getElementById('c-name').value = '';
+  document.getElementById('c-desc').value = '';
+  document.getElementById('c-img').value  = '';
+  document.getElementById('p-cimg').style.display = 'none';
+  document.getElementById('c-id').disabled = false;
+  document.getElementById('cat-modal').style.display = 'flex';
+}
+function openEditCat(id) {
+  const cat = cats.find(c=>c.id===id); if(!cat) return;
+  editCatId = id;
+  document.getElementById('cat-modal-title').textContent = '✏️ Edit Category';
+  document.getElementById('cat-modal-save').textContent  = '💾 Update Category';
+  document.getElementById('c-id').value   = cat.id;
+  document.getElementById('c-name').value = cat.name||'';
+  document.getElementById('c-desc').value = cat.description||'';
+  document.getElementById('c-img').value  = cat.featuredImageUrl||'';
+  document.getElementById('c-id').disabled = true;
+  prevImg('c-img','p-cimg');
+  document.getElementById('cat-modal').style.display = 'flex';
+}
+
+document.getElementById('btn-add-cat').addEventListener('click', openAddCat);
+document.getElementById('cat-modal-cancel').addEventListener('click', () => document.getElementById('cat-modal').style.display='none');
+
+document.getElementById('cat-modal-save').addEventListener('click', async () => {
+  const id   = document.getElementById('c-id').value.trim().toLowerCase().replace(/\s+/g,'-');
+  const name = document.getElementById('c-name').value.trim();
+  if(!id||!name){ toast('❌ ID and Name required!','err'); return; }
+  const data = { id, name, description: document.getElementById('c-desc').value.trim(), featuredImageUrl: document.getElementById('c-img').value.trim(), iconName:'Grid', slug:id, tags:[], count:0 };
+  const btn = document.getElementById('cat-modal-save');
+  btn.textContent='⏳ Saving...'; btn.disabled=true;
+  try {
+    await set(ref(db,'categories/'+id), data);
+    addLog('add', `${editCatId?'Updated':'Added'} category: "${name}"`);
+    toast(`✅ Category "${name}" saved!`);
+    document.getElementById('cat-modal').style.display='none';
+  } catch(e){ toast('❌ '+e.message,'err'); }
+  finally{ btn.textContent='💾 Save Category'; btn.disabled=false; }
+});
+
+async function deleteCat(id, name) {
+  if(!confirm(`Delete category "${name}"?\nImages will NOT be deleted.`)) return;
+  try {
+    await remove(ref(db,'categories/'+id));
+    addLog('del', `Deleted category: "${name}"`);
+    toast('🗑️ Category deleted');
+  } catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+// ── ACTIVITY LOG CONTROLS ─────────────────────────────────────────────
+document.getElementById('log-filter').addEventListener('change', renderLog);
+document.getElementById('btn-clr-log').addEventListener('click', () => {
+  if(!confirm('Clear all activity logs?')) return;
+  actLog = [];
+  localStorage.setItem('mnx_log','[]');
+  document.getElementById('nb-log').textContent = '0';
+  renderLog(); renderDashLog();
+  toast('Log cleared');
+});
+
+// ── BULK PAGE BUTTONS ─────────────────────────────────────────────────
+document.querySelectorAll('.bulk-op').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const flag = btn.dataset.flag;
+    const val  = btn.dataset.val === 'true';
+    if(!images.length){ toast('No images in database','inf'); return; }
+    if(!confirm(`Set ${flag}=${val} on ALL ${images.length} images?`)) return;
+    const updates = {};
+    images.forEach(img => updates[`images/${img.id}/${flag}`] = val);
+    try {
+      await update(ref(db), updates);
+      addLog('edit', `Mass set ${flag}=${val} on ${images.length} images`);
+      toast(`✅ Updated ${images.length} images`);
+    } catch(e){ toast('❌ '+e.message,'err'); }
+  });
+});
+
+document.getElementById('bulk-clear-flags').addEventListener('click', async () => {
+  if(!images.length){ toast('No images','inf'); return; }
+  if(!confirm(`Clear ALL flags from ALL ${images.length} images?`)) return;
+  const updates = {};
+  images.forEach(img => {
+    ['isFeatured','isTrending','isPopular','isNew'].forEach(f => updates[`images/${img.id}/${f}`] = false);
+  });
+  try {
+    await update(ref(db), updates);
+    addLog('edit','Cleared all flags from all images');
+    toast('✅ All flags cleared');
+  } catch(e){ toast('❌ '+e.message,'err'); }
+});
+
+document.getElementById('bulk-export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(images,null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='moon-night-x-images.json'; a.click();
+  addLog('add','Exported JSON backup');
+  toast('✅ JSON exported!');
+});
+
+document.getElementById('bulk-del-all').addEventListener('click', async () => {
   if(!confirm(`DELETE ALL ${images.length} images from Firebase?\nThis CANNOT be undone!`)) return;
   if(!confirm('Are you absolutely sure?')) return;
   try {
     await remove(ref(db,'images'));
-    logActivity('del',`Deleted ALL ${images.length} images`,'💥');
-    toast('💥 All images deleted','success');
-  } catch(e){ toast('❌ '+e.message,'error'); }
-};
+    addLog('del',`Deleted ALL images`);
+    toast('💥 All images deleted');
+  } catch(e){ toast('❌ '+e.message,'err'); }
+});
 
-// ── EXPORT / IMPORT ────────────────────────────────────────────────────────────
-window.exportJSON = function() {
-  const blob=new Blob([JSON.stringify(images,null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='moon-night-x-images.json'; a.click();
-  logActivity('add','Exported JSON backup','⬇️');
-  toast('✅ JSON exported!','success');
-};
-
-window.importJSON = async function() {
+document.getElementById('bulk-import').addEventListener('click', async () => {
   const raw = document.getElementById('import-json').value.trim();
-  if(!raw){ toast('Paste JSON first','info'); return; }
+  if(!raw){ toast('Paste JSON first','inf'); return; }
   try {
     const arr = JSON.parse(raw);
     if(!Array.isArray(arr)) throw new Error('Must be a JSON array');
     if(!confirm(`Import ${arr.length} images to Firebase?`)) return;
-    const updates={};
-    arr.forEach(img=>{ if(img.id) updates[`images/${img.id}`]=img; });
-    await update(ref(db),updates);
-    logActivity('add',`Imported ${arr.length} images via JSON`,'📤');
-    toast(`✅ Imported ${arr.length} images!`,'success');
+    const updates = {};
+    arr.forEach(img => { if(img.id) updates[`images/${img.id}`] = img; });
+    await update(ref(db), updates);
+    addLog('add',`Imported ${arr.length} images`);
+    toast(`✅ Imported ${arr.length} images!`);
     document.getElementById('import-json').value='';
-  } catch(e){ toast('❌ Invalid JSON: '+e.message,'error'); }
-};
+  } catch(e){ toast('❌ '+e.message,'err'); }
+});
 
-// ── ACTIVITY LOG ───────────────────────────────────────────────────────────────
-function logActivity(type,msg,icon='📝') {
-  actLog.unshift({ type, msg, icon, time: new Date().toISOString() });
-  if(actLog.length>200) actLog=actLog.slice(0,200);
-  localStorage.setItem('mnx_admin_log',JSON.stringify(actLog));
-  document.getElementById('nav-log-count').textContent=actLog.length;
-  renderLog();
-  renderDashLog();
-}
-function logHTML(entry) {
-  const d=new Date(entry.time);
-  const timeStr=d.toLocaleDateString()+' '+d.toLocaleTimeString();
-  return `<div class="log-item">
-    <div class="log-dot ${entry.type}"></div>
-    <div class="log-content">
-      <div class="log-msg">${entry.icon||''} ${entry.msg}</div>
-      <div class="log-time">${timeStr}</div>
-    </div>
-  </div>`;
-}
-window.renderLog = function() {
-  const f=document.getElementById('log-filter')?.value||'';
-  const filtered=f?actLog.filter(e=>e.type===f):actLog;
-  document.getElementById('nav-log-count').textContent=actLog.length;
-  const el=document.getElementById('log-list');
-  el.innerHTML=filtered.length?filtered.map(logHTML).join(''):'<div class="empty"><div class="em-icon">📋</div>No activity logged yet</div>';
-};
-window.clearLog = function() {
-  if(!confirm('Clear all activity logs?')) return;
-  actLog=[];
-  localStorage.setItem('mnx_admin_log','[]');
-  logActivity('clear','Log cleared','🗑️');
-  toast('Log cleared','success');
-};
-
-// ── SETTINGS ──────────────────────────────────────────────────────────────────
-window.saveSettings = function() {
-  const u=document.getElementById('set-user').value.trim();
-  const p=document.getElementById('set-pass').value.trim();
-  if(u) settings.user=u;
-  if(p) settings.pass=p;
-  localStorage.setItem('mnx_admin_settings',JSON.stringify(settings));
-  toast('✅ Settings saved','success');
-};
-window.checkCache = function() {
-  const keys=['mnx_images_cache','mnx_images_ts'];
-  let info='';
-  keys.forEach(k=>{
-    const v=localStorage.getItem(k);
-    if(v) info+=`${k}: ${(v.length/1024).toFixed(1)} KB\n`;
-  });
+// ── SETTINGS BUTTONS ──────────────────────────────────────────────────
+document.getElementById('btn-check-cache').addEventListener('click', () => {
+  const keys = ['mnx_images_cache','mnx_images_ts','mnx_categories_cache','mnx_categories_ts'];
+  let info = '';
+  keys.forEach(k => { const v=localStorage.getItem(k); if(v) info+=`${k}: ${(v.length/1024).toFixed(1)}KB\n`; });
   document.getElementById('cache-info').textContent = info || 'No cache found';
-};
-window.clearCache = function() {
-  localStorage.removeItem('mnx_images_cache');
-  localStorage.removeItem('mnx_images_ts');
-  toast('✅ Site cache cleared','success');
-  document.getElementById('cache-info').textContent='Cache cleared!';
-};
+});
+document.getElementById('btn-clear-cache').addEventListener('click', () => {
+  ['mnx_images_cache','mnx_images_ts','mnx_categories_cache','mnx_categories_ts'].forEach(k=>localStorage.removeItem(k));
+  toast('✅ Site cache cleared');
+  document.getElementById('cache-info').textContent = 'Cache cleared!';
+});
 
-// ── NAVIGATION ────────────────────────────────────────────────────────────────
-window.showPage = function(name) {
-  currentPage=name;
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const pg=document.getElementById('page-'+name);
-  if(pg) pg.classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>{
-    if(n.getAttribute('onclick')?.includes("'"+name+"'")) n.classList.add('active');
-  });
-  const titles={dashboard:'📊 Dashboard',images:'🖼️ Images',categories:'📂 Categories',activity:'📋 Activity Log',bulk:'⚡ Bulk Actions',settings:'⚙️ Settings'};
-  document.getElementById('page-title').textContent=titles[name]||name;
-  if(name==='activity') renderLog();
-  if(name==='categories') renderCatTable();
-};
-
-// ── PREVIEW ────────────────────────────────────────────────────────────────────
-window.prevImg = function(inId,prevId) {
-  const url=document.getElementById(inId).value.trim();
-  const img=document.getElementById(prevId);
-  if(url){ img.src=url; img.style.display='block'; img.onerror=()=>{img.style.display='none'}; }
-  else img.style.display='none';
-};
-
-// ── TOAST ─────────────────────────────────────────────────────────────────────
-function toast(msg,type='success') {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='show '+type;
-  clearTimeout(window._tt);
-  window._tt=setTimeout(()=>{ t.className=''; },3000);
-}
-
-// ── CATEGORIES ───────────────────────────────────────────────────────────────
-let allCategories = [];
-let editCatId = null;
-
-function initCategories() {
-  const catRef = ref(db, 'categories');
-  onValue(catRef, snap => {
-    allCategories = snap.exists() ? Object.values(snap.val()) : [];
-    document.getElementById('nav-cat-count').textContent = allCategories.length;
-    renderCatTable();
-  });
-}
-
-function renderCatTable() {
-  const tbody = document.getElementById('cat-tbody');
-  if (!tbody) return;
-  if (!allCategories.length) {
-    tbody.innerHTML = '<tr><td colspan="5"><div class="empty"><div class="em-icon">📂</div>No categories yet. Add one!</div></td></tr>';
-    return;
-  }
-  tbody.innerHTML = allCategories.map(cat => {
-    const imgCount = images.filter(i => i.category === cat.id).length;
-    return `<tr>
-      <td><code style="font-family:monospace;font-size:11px;background:var(--surface2);padding:2px 7px;border-radius:5px">${cat.id}</code></td>
-      <td style="font-weight:700">${cat.name}</td>
-      <td style="font-size:11px;color:var(--muted);max-width:200px">${cat.description||'—'}</td>
-      <td><span class="tag cat">${imgCount} images</span></td>
-      <td><div class="actions-cell">
-        <button class="btn btn-ghost btn-xs" onclick="openEditCat('${cat.id}')">✏️ Edit</button>
-        <button class="btn btn-danger btn-xs" onclick="deleteCat('${cat.id}','${(cat.name||'').replace(/'/g,"\\'")}')">🗑</button>
-      </div></td>
-    </tr>`;
-  }).join('');
-}
-
-window.openAddCat = function() {
-  editCatId = null;
-  document.getElementById('cat-modal-title').textContent = '📂 Add Category';
-  document.getElementById('cat-save-btn').textContent = '💾 Save Category';
-  document.getElementById('cf-id').value = '';
-  document.getElementById('cf-name').value = '';
-  document.getElementById('cf-desc').value = '';
-  document.getElementById('cf-img').value = '';
-  document.getElementById('cf-prev').style.display = 'none';
-  document.getElementById('cf-id').disabled = false;
-  document.getElementById('cat-modal').style.display = 'flex';
-};
-
-window.openEditCat = function(id) {
-  const cat = allCategories.find(c => c.id === id);
-  if (!cat) return;
-  editCatId = id;
-  document.getElementById('cat-modal-title').textContent = '✏️ Edit Category';
-  document.getElementById('cat-save-btn').textContent = '💾 Update Category';
-  document.getElementById('cf-id').value = cat.id;
-  document.getElementById('cf-name').value = cat.name||''
-  document.getElementById('cf-desc').value = cat.description||'';
-  document.getElementById('cf-img').value = cat.featuredImageUrl||'';
-  document.getElementById('cf-id').disabled = true;
-  if (cat.featuredImageUrl) prevImg('cf-img','cf-prev');
-  document.getElementById('cat-modal').style.display = 'flex';
-};
-
-window.closeAddCat = function() {
-  document.getElementById('cat-modal').style.display = 'none';
-  editCatId = null;
-};
-
-window.saveCat = async function() {
-  const id   = document.getElementById('cf-id').value.trim().toLowerCase().replace(/\s+/g,'-');
-  const name = document.getElementById('cf-name').value.trim();
-  if (!id || !name) { toast('❌ ID aur Name required!','error'); return; }
-
-  const data = {
-    id, name,
-    description:     document.getElementById('cf-desc').value.trim(),
-    featuredImageUrl:document.getElementById('cf-img').value.trim(),
-    iconName: 'Grid', slug: id, tags: [], count: 0
-  };
-
-  const btn = document.getElementById('cat-save-btn');
-  btn.textContent = '⏳ Saving...'; btn.disabled = true;
-  try {
-    await set(ref(db, 'categories/' + id), data);
-    logActivity('add', `${editCatId?'Updated':'Added'} category: "${name}"`, '📂');
-    toast(`✅ Category "${name}" ${editCatId?'updated':'saved'}!`, 'success');
-    closeAddCat();
-  } catch(e) {
-    toast('❌ ' + e.message, 'error');
-  } finally { btn.textContent='💾 Save Category'; btn.disabled=false; }
-};
-
-window.deleteCat = async function(id, name) {
-  if (!confirm(`Delete category "${name}"?\nImages will NOT be deleted.`)) return;
-  try {
-    await remove(ref(db, 'categories/' + id));
-    logActivity('del', `Deleted category: "${name}"`, '📂');
-    toast(`🗑️ Category deleted`, 'success');
-  } catch(e) { toast('❌ ' + e.message, 'error'); }
-};
-
-// ── INIT ─────────────────────────────────────────────────────────────────────
-document.getElementById('nav-log-count').textContent=actLog.length;
+// ── INIT LOG COUNT ────────────────────────────────────────────────────
+document.getElementById('nb-log').textContent = actLog.length;
 renderLog();
-
-// Show current domain in login page helper
-(function(){
-  const domEl = document.getElementById('current-domain');
-  const noticeEl = document.getElementById('domain-notice');
-  if(domEl) {
-    const domain = window.location.hostname;
-    domEl.textContent = domain;
-    // Show notice only if not localhost
-    if(noticeEl && domain !== 'localhost' && domain !== '127.0.0.1') {
-      noticeEl.style.display = 'block';
-    }
-  }
-})();
-
-// Attach event listener directly inside the module script using addEventListener after DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    const googleBtn = document.getElementById('google-btn');
-    if (googleBtn) {
-      googleBtn.addEventListener('click', loginGoogle);
-    }
-  });
-} else {
-  const googleBtn = document.getElementById('google-btn');
-  if (googleBtn) {
-    googleBtn.addEventListener('click', loginGoogle);
-  }
-}
 </script>
 </body>
 </html>

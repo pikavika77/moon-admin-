@@ -34,11 +34,11 @@ input,select,textarea,button{font-family:inherit}
 .login-input{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;margin-bottom:14px;outline:none;transition:border .2s}
 .login-input:focus{border-color:var(--accent)}
 .login-error{color:var(--accent);font-size:12px;margin-bottom:12px;display:none;padding:10px 14px;background:#1a0505;border:1px solid #3a1010;border-radius:8px}
-.login-btn{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s}
-.login-btn:hover{background:var(--accent2)}
-.google-btn{width:100%;padding:13px;background:#fff;color:#333;border:1.5px solid #ddd;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px}
-.google-btn:hover{background:#f5f5f5;border-color:#bbb;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.google-btn{width:100%;padding:15px;background:#fff;color:#333;border:1.5px solid #ddd;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:12px;margin-top:8px}
+.google-btn:hover{background:#f5f5f5;border-color:#bbb;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .google-btn:active{transform:scale(.98)}
+.google-btn:disabled{opacity:.6;cursor:not-allowed}
+.login-info{font-size:12px;color:#666;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:10px 14px;margin-bottom:16px;text-align:center}
 
 /* ── APP SHELL ── */
 #app{display:none;height:100vh;overflow:hidden}
@@ -211,21 +211,12 @@ tr.selected td{background:rgba(224,36,36,.04)}
   <div class="login-box">
     <div class="login-logo"><div class="dot"></div><h1>Moon <span>Night X</span></h1></div>
     <p class="login-subtitle">Admin Control Panel — Restricted Access</p>
+    <div class="login-info">🔒 Only authorized Google account can access this panel</div>
     <button class="google-btn" onclick="loginGoogle()" id="google-btn">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Continue with Google
     </button>
-    <div style="display:flex;align-items:center;gap:10px;margin:16px 0">
-      <div style="flex:1;height:1px;background:#2a2a2a"></div>
-      <span style="font-size:11px;color:#555">or email login</span>
-      <div style="flex:1;height:1px;background:#2a2a2a"></div>
-    </div>
-    <label class="login-label">Email Address</label>
-    <input class="login-input" id="u" type="email" placeholder="aryakaran836@gmail.com" autocomplete="email"/>
-    <label class="login-label">Password</label>
-    <input class="login-input" id="p" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
-    <div class="login-error" id="lerr">❌ Invalid credentials. Try again.</div>
-    <button class="login-btn" onclick="login()">Login with Email →</button>
+    <div class="login-error" id="lerr"></div>
   </div>
 </div>
 
@@ -572,7 +563,7 @@ tr.selected td{background:rgba(224,36,36,.04)}
 
 <script type="module">
 import { initializeApp }              from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getDatabase, ref, onValue, set, remove, update, off }
                                        from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
@@ -596,7 +587,7 @@ let currentPage = 'dashboard';
 
 // ── EXPOSE GLOBALS ───────────────────────────────────────────────────────────
 Object.assign(window, {
-  login, loginGoogle, logout, showPage, openAdd, openEdit, closeModal, saveImg,
+  loginGoogle, logout, showPage, openAdd, openEdit, closeModal, saveImg,
   deleteImg, renderTable, renderLog, toggleAll, toggleRow, clearSel,
   bulkFlag, bulkDelete, massFlag, deleteAll, exportJSON, importJSON,
   saveSettings, checkCache, clearCache, clearLog, prevImg,
@@ -604,48 +595,12 @@ Object.assign(window, {
 });
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
-async function login() {
-  const email = document.getElementById('u').value.trim();
-  const pass  = document.getElementById('p').value;
-  const errEl = document.getElementById('lerr');
-  const btn   = document.querySelector('.login-btn');
-
-  if (!email || !pass) { errEl.textContent = '❌ Email aur password dono fill karo.'; errEl.style.display = 'block'; return; }
-
-  // Only allow specific email
-  if (email.toLowerCase() !== ALLOWED_EMAIL) {
-    errEl.textContent = '❌ Access denied. Unauthorized email.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  btn.textContent = '⏳ Logging in...';
-  btn.disabled = true;
-  errEl.style.display = 'none';
-
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-    // onAuthStateChanged handles the rest
-  } catch(e) {
-    let msg = '❌ Login failed. Check credentials.';
-    if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') msg = '❌ Wrong password. Try again.';
-    else if (e.code === 'auth/user-not-found') msg = '❌ No account found for this email.';
-    else if (e.code === 'auth/too-many-requests') msg = '❌ Too many attempts. Try later.';
-    else if (e.code === 'auth/network-request-failed') msg = '❌ Network error. Check connection.';
-    errEl.textContent = msg;
-    errEl.style.display = 'block';
-    btn.textContent = 'Login to Admin Panel →';
-    btn.disabled = false;
-  }
-}
-
 async function logout() {
   logActivity('login', 'Admin logged out', '🚪');
   await signOut(auth);
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('p').value = '';
-  document.getElementById('u').value = '';
+
 }
 
 // ── AUTH STATE LISTENER ───────────────────────────────────────────────────────
@@ -654,8 +609,8 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     document.getElementById('admin-name').textContent = user.email;
-    document.querySelector('.login-btn').textContent = 'Login to Admin Panel →';
-    document.querySelector('.login-btn').disabled = false;
+    const btn = document.getElementById('google-btn');
+    if(btn){ btn.innerHTML='Continue with Google'; btn.disabled=false; }
     logActivity('login', `Signed in as ${user.email}`, '👤');
     initDB();
     initCategories();

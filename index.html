@@ -568,7 +568,7 @@ tr.selected td{background:rgba(224,36,36,.04)}
 
 <script type="module">
 import { initializeApp }              from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getDatabase, ref, onValue, set, remove, update, off }
                                        from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
@@ -589,6 +589,7 @@ let selected = new Set();
 let actLog   = JSON.parse(localStorage.getItem('mnx_admin_log') || '[]');
 let settings = JSON.parse(localStorage.getItem('mnx_admin_settings') || '{"user":"admin","pass":"moonnightx@2024"}');
 let currentPage = 'dashboard';
+let isAuthenticating = false;
 
 // ── EXPOSE GLOBALS ───────────────────────────────────────────────────────────
 Object.assign(window, {
@@ -607,7 +608,58 @@ const GOOGLE_SVG = `<svg width="20" height="20" viewBox="0 0 48 48">
   <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
 </svg> Continue with Google`;
 
+function handleAuthError(e) {
+  console.error('Google Sign-In Error:', e.code, e.message);
+  const errEl = document.getElementById('lerr');
+  const btn   = document.getElementById('google-btn');
+  if (!errEl || !btn) return;
+
+  let msg = '❌ ' + (e.message || 'Unknown error');
+
+  if (e.code === 'auth/popup-closed-by-user')
+    msg = '❌ Popup closed. Please try again.';
+  else if (e.code === 'auth/popup-blocked')
+    msg = '❌ Popup blocked! Allow popups for this site in browser settings, or wait for fallback redirect.';
+  else if (e.code === 'auth/cancelled-popup-request')
+    msg = '❌ Request cancelled. Try again.';
+  else if (e.code === 'auth/network-request-failed')
+    msg = '❌ Network error. Check your internet connection.';
+  else if (e.code === 'auth/unauthorized-domain')
+    msg = '❌ Domain not authorized! Go to Firebase Console → Authentication → Settings → Authorized domains → Add: ' + location.hostname;
+  else if (e.code === 'auth/operation-not-allowed')
+    msg = '❌ Google sign-in not enabled in Firebase Console.';
+  else if (e.code === 'auth/invalid-api-key')
+    msg = '❌ Invalid Firebase API key.';
+
+  errEl.textContent   = msg;
+  errEl.style.display = 'block';
+  btn.innerHTML = GOOGLE_SVG;
+  btn.disabled  = false;
+}
+
+// Check redirect result on page load
+getRedirectResult(auth)
+  .then(async (result) => {
+    if (result && result.user) {
+      const email = result.user.email.toLowerCase();
+      if (email !== ALLOWED_EMAIL) {
+        await signOut(auth);
+        const errEl = document.getElementById('lerr');
+        if (errEl) {
+          errEl.innerHTML = `❌ Access denied.<br><small>Only <b>${ALLOWED_EMAIL}</b> is authorized.</small>`;
+          errEl.style.display = 'block';
+        }
+      }
+    }
+  })
+  .catch((e) => {
+    handleAuthError(e);
+  });
+
 async function loginGoogle() {
+  if (isAuthenticating) return;
+  isAuthenticating = true;
+
   const errEl = document.getElementById('lerr');
   const btn   = document.getElementById('google-btn');
 
@@ -630,29 +682,22 @@ async function loginGoogle() {
     // If email matches — onAuthStateChanged handles the rest
 
   } catch(e) {
-    console.error('Google Sign-In Error:', e.code, e.message);
-
-    let msg = '❌ ' + (e.message || 'Unknown error');
-
-    if (e.code === 'auth/popup-closed-by-user')
-      msg = '❌ Popup closed. Please try again.';
-    else if (e.code === 'auth/popup-blocked')
-      msg = '❌ Popup blocked! Allow popups for this site in browser settings, then retry.';
-    else if (e.code === 'auth/cancelled-popup-request')
-      msg = '❌ Request cancelled. Try again.';
-    else if (e.code === 'auth/network-request-failed')
-      msg = '❌ Network error. Check your internet connection.';
-    else if (e.code === 'auth/unauthorized-domain')
-      msg = '❌ Domain not authorized! Go to Firebase Console → Authentication → Settings → Authorized domains → Add: ' + location.hostname;
-    else if (e.code === 'auth/operation-not-allowed')
-      msg = '❌ Google sign-in not enabled in Firebase Console.';
-    else if (e.code === 'auth/invalid-api-key')
-      msg = '❌ Invalid Firebase API key.';
-
-    errEl.textContent   = msg;
-    errEl.style.display = 'block';
-    btn.innerHTML = GOOGLE_SVG;
-    btn.disabled  = false;
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
+      console.log('Popup failed, falling back to redirect...', e);
+      if (errEl) {
+        errEl.textContent = '⏳ Popup blocked/closed. Redirecting to Google Sign-In...';
+        errEl.style.display = 'block';
+      }
+      try {
+        await signInWithRedirect(auth, googleProvider);
+      } catch (redirectErr) {
+        handleAuthError(redirectErr);
+      }
+    } else {
+      handleAuthError(e);
+    }
+  } finally {
+    isAuthenticating = false;
   }
 }
 

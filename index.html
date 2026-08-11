@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>MoonNight X — Super Admin</title>
+<title>MoonNight X</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#050505;--s1:#111;--s2:#1a1a1a;--s3:#222;
   --br:#2a2a2a;--tx:#fff;--mu:#888;--mu2:#555;
   --red:#E02424;--red2:#c01c1c;
-  --grn:#22c55e;--ylw:#f59e0b;--blu:#3b82f6;--pur:#a855f7;--cyn:#06b6d4;
+  --grn:#22c55e;--ylw:#f59e0b;--blu:#3b82f6;--pur:#a855f7;
 }
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
@@ -19,55 +19,65 @@ input,select,textarea,button{font-family:inherit}
 ::-webkit-scrollbar-track{background:var(--s1)}
 ::-webkit-scrollbar-thumb{background:var(--br);border-radius:3px}
 
-/* LOGIN */
-#login-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 0%,#1a0505,var(--bg) 70%);z-index:999}
-.lbox{background:var(--s1);border:1px solid var(--br);border-radius:20px;padding:44px 40px;width:100%;max-width:400px;box-shadow:0 25px 80px rgba(224,36,36,.08)}
+/* ── ROUTER VIEWS ── */
+#view-login,#view-super,#view-client{display:none;height:100vh;flex-direction:column}
+#view-login{align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 0%,#1a0505,var(--bg) 70%)}
+
+/* ── LOGIN BOX ── */
+.lbox{background:var(--s1);border:1px solid var(--br);border-radius:20px;padding:44px 40px;width:100%;max-width:420px;box-shadow:0 25px 80px rgba(224,36,36,.08)}
 .llogo{font-size:22px;font-weight:900;margin-bottom:4px}.llogo span{color:var(--red)}
 .lsub{color:var(--mu);font-size:13px;margin-bottom:6px}
-.lbadge{display:inline-block;background:rgba(224,36,36,.15);color:var(--red);border:1px solid rgba(224,36,36,.3);border-radius:99px;font-size:10px;font-weight:800;padding:3px 10px;margin-bottom:22px;letter-spacing:.05em}
-.linfo{margin-bottom:16px;padding:10px 14px;background:var(--s2);border:1px solid var(--br);border-radius:10px;font-size:11px;color:var(--mu);text-align:center}
+.lbadge{display:inline-block;border-radius:99px;font-size:10px;font-weight:800;padding:3px 10px;margin-bottom:20px;letter-spacing:.05em}
+.lbadge.owner{background:rgba(224,36,36,.15);color:var(--red);border:1px solid rgba(224,36,36,.3)}
+.lbadge.client{background:rgba(59,130,246,.15);color:var(--blu);border:1px solid rgba(59,130,246,.3)}
+.linfo{margin-bottom:16px;padding:10px 14px;background:var(--s2);border:1px solid var(--br);border-radius:10px;font-size:11px;color:var(--mu);text-align:center;line-height:1.6}
 .gbtn{width:100%;padding:15px;background:#fff;color:#333;border:1.5px solid #ddd;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:all .2s}
 .gbtn:hover{background:#f5f5f5;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .gbtn:active{transform:scale(.98)}
 .gbtn:disabled{opacity:.6;cursor:not-allowed;transform:none}
 .lerr{margin-top:14px;padding:12px 14px;background:#1a0505;border:1px solid #3a1010;border-radius:10px;font-size:12px;color:var(--red);display:none;line-height:1.6}
 
-/* APP */
-#app-wrap{display:none;height:100vh;flex-direction:column}
+/* ── APP SHELL ── */
 .topbar{background:var(--s1);border-bottom:1px solid var(--br);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .tlogo{font-size:15px;font-weight:900}.tlogo span{color:var(--red)}
-.tbadge{background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:6px}
+.tlogo-client{font-size:15px;font-weight:900}.tlogo-client span{color:var(--blu)}
+.tbadge{font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:6px}
+.tbadge.owner{background:var(--red);color:#fff}
+.tbadge.client{background:var(--blu);color:#fff}
 .tright{display:flex;align-items:center;gap:10px}
 .bwrap{display:flex;flex:1;overflow:hidden;height:calc(100vh - 49px)}
 
-/* SIDEBAR */
+/* ── SIDEBAR ── */
 .sb{width:210px;min-width:210px;background:var(--s1);border-right:1px solid var(--br);display:flex;flex-direction:column;overflow-y:auto}
 .sb-sec{padding:16px 16px 6px;font-size:10px;font-weight:800;color:var(--mu2);text-transform:uppercase;letter-spacing:.08em}
 .sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:13px;font-weight:500;color:var(--mu);cursor:pointer;transition:all .15s;border-left:3px solid transparent;user-select:none}
 .sb-item:hover{color:var(--tx);background:var(--s2)}
-.sb-item.on{color:var(--tx);background:rgba(224,36,36,.08);border-left-color:var(--red);font-weight:700}
+.sb-item.on{color:var(--tx);font-weight:700}
+.super-nav .sb-item.on{background:rgba(224,36,36,.08);border-left-color:var(--red)}
+.client-nav .sb-item.on{background:rgba(59,130,246,.08);border-left-color:var(--blu)}
 .sb-item .ic{font-size:15px;width:18px;text-align:center}
 .sbn{margin-left:auto;background:var(--s3);color:var(--mu);font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;min-width:20px;text-align:center}
-.sb-item.on .sbn{background:rgba(224,36,36,.2);color:var(--red)}
+.super-nav .sb-item.on .sbn{background:rgba(224,36,36,.2);color:var(--red)}
+.client-nav .sb-item.on .sbn{background:rgba(59,130,246,.2);color:var(--blu)}
 .sb-foot{padding:14px 16px;border-top:1px solid var(--br);margin-top:auto}
 .sb-user strong{color:var(--tx);display:block;font-size:12px;margin-bottom:2px}
 .sb-user{font-size:11px;color:var(--mu);margin-bottom:10px}
 
-/* MAIN */
+/* ── MAIN ── */
 .main{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:18px}
 .page{display:none;flex-direction:column;gap:18px}
 .page.on{display:flex}
 .phdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .ptitle{font-size:16px;font-weight:800}
 
-/* CARDS */
+/* ── CARDS ── */
 .card{background:var(--s1);border:1px solid var(--br);border-radius:14px;overflow:hidden}
 .chdr{padding:14px 18px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .ctitle{font-size:13px;font-weight:700}
 .cbody{padding:18px}
 
-/* STATS */
-.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+/* ── STATS ── */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
 .scard{background:var(--s1);border:1px solid var(--br);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
 .scard::after{content:'';position:absolute;top:-15px;right:-15px;width:70px;height:70px;border-radius:50%;opacity:.07}
 .scard.r::after{background:var(--red)}.scard.g::after{background:var(--grn)}
@@ -77,7 +87,7 @@ input,select,textarea,button{font-family:inherit}
 .r .sval{color:var(--red)}.g .sval{color:var(--grn)}.b .sval{color:var(--blu)}.y .sval{color:var(--ylw)}.p .sval{color:var(--pur)}
 .ssub{font-size:11px;color:var(--mu);margin-top:3px}
 
-/* TABLE */
+/* ── TABLE ── */
 .twrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse}
 thead tr{background:var(--s2)}
@@ -86,86 +96,83 @@ td{padding:10px 13px;font-size:12px;border-bottom:1px solid var(--br);vertical-a
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(255,255,255,.015)}
 .tfoot{padding:9px 14px;font-size:11px;color:var(--mu);border-top:1px solid var(--br)}
-.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;white-space:nowrap}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;white-space:nowrap;margin:1px}
 .tag.red{background:#1a0505;color:var(--red);border:1px solid #3a0f0f}
 .tag.grn{background:#051808;color:var(--grn);border:1px solid #0d4015}
 .tag.ylw{background:#1e1200;color:var(--ylw);border:1px solid #4a2f00}
 .tag.blu{background:#0a1225;color:var(--blu);border:1px solid #1a3060}
 .tag.mu{background:var(--s2);color:var(--mu);border:1px solid var(--br)}
+.tag.cat{background:#0a1225;color:var(--blu);border:1px solid #1a3060}
+.tag.ft{background:#1a0a2a;color:var(--pur);border:1px solid #3a1a5a}
 .arow{display:flex;gap:5px;flex-wrap:wrap}
+.thumb{width:42px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--br)}
+.empty{padding:48px 20px;text-align:center;color:var(--mu)}
+.eic{font-size:36px;margin-bottom:10px}
 
-/* BUTTONS */
+/* ── BUTTONS ── */
 .btn{padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .btn:active{transform:scale(.97)}
-.btn-p{background:var(--red);color:#fff}.btn-p:hover{background:var(--red2)}
+.btn-r{background:var(--red);color:#fff}.btn-r:hover{background:var(--red2)}
+.btn-b{background:var(--blu);color:#fff}.btn-b:hover{background:#2563eb}
 .btn-g{background:var(--s2);color:var(--mu);border:1px solid var(--br)}.btn-g:hover{color:var(--tx);border-color:#555}
 .btn-d{background:#160404;color:var(--red);border:1px solid #2a0808}.btn-d:hover{background:#2a0808}
 .btn-grn{background:#051808;color:var(--grn);border:1px solid #0d4015}.btn-grn:hover{background:#0d4015}
-.btn-blu{background:#0a1225;color:var(--blu);border:1px solid #1a3060}.btn-blu:hover{background:#1a3060}
 .btn-sm{padding:5px 10px;font-size:11px;border-radius:7px}
 .btn-xs{padding:3px 8px;font-size:10px;border-radius:5px}
 
-/* MODAL */
+/* ── MODAL ── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
 .modal{background:var(--s1);border:1px solid var(--br);border-radius:18px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;padding:28px}
+.modal-lg{max-width:720px}
 .modal h2{font-size:16px;font-weight:800;margin-bottom:18px}
 .fg{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
 .fg label{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em}
 .fg input,.fg select,.fg textarea{padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:13px;outline:none;width:100%;transition:border .2s}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--red)}
-.fg input[type=range]{padding:4px 0;cursor:pointer;accent-color:var(--red)}
+.fg textarea{resize:vertical;min-height:70px}
 .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .full{grid-column:1/-1}
+.checks{display:flex;flex-wrap:wrap;gap:12px;padding:8px 0}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.chk input[type=checkbox]{accent-color:var(--blu);width:14px;height:14px}
 .mfoot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--br)}
+.prev-img{width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--br);margin-top:6px;background:var(--s2);display:none}
 
-/* LOG */
-.llist{display:flex;flex-direction:column}
-.litem{display:flex;align-items:flex-start;gap:11px;padding:11px 18px;border-bottom:1px solid var(--br)}
-.litem:last-child{border-bottom:none}
-.litem:hover{background:var(--s2)}
-.ldot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
-.ldot.add{background:var(--grn)}.ldot.edit{background:var(--blu)}.ldot.del{background:var(--red)}.ldot.login{background:var(--ylw)}
-.lmsg{font-size:12px;font-weight:600}.ltime{font-size:10px;color:var(--mu);font-family:monospace;margin-top:2px}
-.empty{padding:48px 20px;text-align:center;color:var(--mu)}
-.eic{font-size:36px;margin-bottom:10px}
+/* ── BARCHART ── */
+.barchart{display:flex;align-items:flex-end;gap:6px;height:90px;margin-top:8px}
+.bwrp{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bbar{width:100%;border-radius:3px 3px 0 0;min-height:3px;transition:height .4s}
+.bval{font-size:9px;font-weight:700}.blbl{font-size:9px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
 
-/* STATUS DOT */
+/* ── EARN BAR ── */
+.earn-bar{height:8px;background:var(--s3);border-radius:4px;overflow:hidden;margin:8px 0}
+.earn-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--blu),var(--grn));transition:width .6s}
+
+/* ── STATUS ── */
 .sdot{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700}
 .sdot::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
 .sdot.live{color:var(--grn);animation:blink 2s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
 
-/* SLIDER */
-.slider-wrap{display:flex;align-items:center;gap:10px}
-.slider-wrap input[type=range]{flex:1}
-.slider-val{font-size:14px;font-weight:800;color:var(--red);min-width:40px;text-align:right}
-
-/* CHARTS */
-.barchart{display:flex;align-items:flex-end;gap:6px;height:100px;margin-top:10px}
-.bwrp{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
-.bbar{width:100%;border-radius:3px 3px 0 0;min-height:3px;transition:height .4s}
-.bval{font-size:9px;font-weight:700}
-.blbl{font-size:9px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
-
-/* TOAST */
+/* ── TOAST ── */
 #toast{position:fixed;bottom:22px;right:22px;z-index:999;background:var(--s1);border:1px solid var(--br);border-radius:12px;padding:12px 18px;font-size:13px;font-weight:600;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 12px 40px rgba(0,0,0,.5);min-width:220px}
 #toast.on{transform:translateY(0);opacity:1}
 #toast.ok{border-color:var(--grn);color:var(--grn)}
 #toast.err{border-color:var(--red);color:var(--red)}
 #toast.inf{border-color:var(--blu);color:var(--blu)}
 
-@media(max-width:800px){.sb{display:none}.fgrid{grid-template-columns:1fr}.sgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:800px){.sb{display:none}.sgrid{grid-template-columns:repeat(2,1fr)}.fgrid{grid-template-columns:1fr}.full{grid-column:1}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-wrap">
-  <div class="lbox">
-    <div class="llogo">Moon <span>Night X</span></div>
-    <p class="lsub">Platform Control Center</p>
-    <div class="lbadge">🔐 SUPER ADMIN ONLY</div>
-    <div class="linfo">Only <strong>aryakaran836@gmail.com</strong> can access this panel</div>
+<!-- ══ LOGIN VIEW ════════════════════════════════════════════════════════ -->
+<div id="view-login" style="display:flex">
+  <div class="lbox" id="login-box">
+    <div class="llogo" id="l-logo">Moon <span>Night X</span></div>
+    <p class="lsub" id="l-sub">Loading...</p>
+    <div class="lbadge owner" id="l-badge">ADMIN</div>
+    <div class="linfo" id="l-info">Sign in with Google to continue</div>
     <button class="gbtn" id="g-btn">
       <svg width="20" height="20" viewBox="0 0 48 48">
         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/>
@@ -179,238 +186,395 @@ tr:hover td{background:rgba(255,255,255,.015)}
   </div>
 </div>
 
-<!-- APP -->
-<div id="app-wrap">
-  <!-- Topbar -->
+<!-- ══ SUPER ADMIN VIEW ══════════════════════════════════════════════════ -->
+<div id="view-super">
   <div class="topbar">
-    <div class="tlogo">Moon <span>Night X</span><span class="tbadge">SUPER ADMIN</span></div>
+    <div class="tlogo">Moon <span>Night X</span><span class="tbadge owner">SUPER ADMIN</span></div>
     <div class="tright">
-      <span class="sdot live" id="db-st">Connecting</span>
-      <button class="btn btn-p btn-sm" id="btn-add-client">+ Add Client</button>
-      <button class="btn btn-g btn-sm" id="btn-logout">Logout</button>
+      <span class="sdot live" id="sa-db-st">Connecting</span>
+      <button class="btn btn-r btn-sm" id="sa-btn-add">+ Add Client</button>
+      <button class="btn btn-g btn-sm" id="sa-btn-logout">Logout</button>
     </div>
   </div>
-
   <div class="bwrap">
-    <!-- Sidebar -->
-    <aside class="sb">
+    <aside class="sb super-nav">
       <div class="sb-sec">Main</div>
-      <div class="sb-item on" data-page="dashboard"><span class="ic">📊</span>Dashboard</div>
-      <div class="sb-item" data-page="clients"><span class="ic">👥</span>Clients<span class="sbn" id="nb-clients">0</span></div>
+      <div class="sb-item on" data-sa-page="dashboard"><span class="ic">📊</span>Dashboard</div>
+      <div class="sb-item" data-sa-page="clients"><span class="ic">👥</span>Clients<span class="sbn" id="sa-nb-clients">0</span></div>
       <div class="sb-sec">Finance</div>
-      <div class="sb-item" data-page="revenue"><span class="ic">💰</span>Revenue</div>
-      <div class="sb-item" data-page="traffic"><span class="ic">📈</span>Traffic</div>
+      <div class="sb-item" data-sa-page="revenue"><span class="ic">💰</span>Revenue</div>
+      <div class="sb-item" data-sa-page="traffic"><span class="ic">📈</span>Traffic</div>
       <div class="sb-sec">System</div>
-      <div class="sb-item" data-page="activity"><span class="ic">📋</span>Activity<span class="sbn" id="nb-log">0</span></div>
+      <div class="sb-item" data-sa-page="activity"><span class="ic">📋</span>Activity<span class="sbn" id="sa-nb-log">0</span></div>
+      <div class="sb-item" data-sa-page="settings"><span class="ic">⚙️</span>Settings</div>
       <div class="sb-foot">
         <div class="sb-user"><strong id="sa-email">—</strong>Super Admin</div>
-        <button class="btn btn-g btn-sm" id="btn-logout2" style="width:100%;justify-content:center">Sign Out</button>
+        <button class="btn btn-g btn-sm" id="sa-btn-logout2" style="width:100%;justify-content:center">Sign Out</button>
       </div>
     </aside>
-
-    <!-- Main Content -->
-    <div class="main">
+    <div class="main" id="sa-main">
 
       <!-- DASHBOARD -->
-      <div class="page on" id="page-dashboard">
-        <div class="phdr"><div class="ptitle">📊 Dashboard Overview</div></div>
+      <div class="page on" id="sa-page-dashboard">
+        <div class="phdr"><div class="ptitle">📊 Dashboard</div></div>
         <div class="sgrid">
-          <div class="scard r"><div class="slbl">Total Clients</div><div class="sval" id="d-clients">—</div><div class="ssub">Active platforms</div></div>
-          <div class="scard g"><div class="slbl">Platform Revenue</div><div class="sval" id="d-rev">₹0</div><div class="ssub">All time</div></div>
-          <div class="scard b"><div class="slbl">My Earnings</div><div class="sval" id="d-mine">₹0</div><div class="ssub">After client share</div></div>
-          <div class="scard y"><div class="slbl">Total Traffic</div><div class="sval" id="d-traffic">0</div><div class="ssub">All clients visits</div></div>
-          <div class="scard p"><div class="slbl">Active Clients</div><div class="sval" id="d-active">—</div><div class="ssub">Running sites</div></div>
-          <div class="scard r"><div class="slbl">Today Visits</div><div class="sval" id="d-today">0</div><div class="ssub">Across all sites</div></div>
+          <div class="scard r"><div class="slbl">Total Clients</div><div class="sval" id="sa-d-clients">—</div><div class="ssub">Active platforms</div></div>
+          <div class="scard g"><div class="slbl">Platform Revenue</div><div class="sval" id="sa-d-rev">₹0</div><div class="ssub">All time</div></div>
+          <div class="scard b"><div class="slbl">My Earnings</div><div class="sval" id="sa-d-mine">₹0</div><div class="ssub">After client share</div></div>
+          <div class="scard y"><div class="slbl">Total Traffic</div><div class="sval" id="sa-d-traffic">0</div><div class="ssub">All clients</div></div>
+          <div class="scard p"><div class="slbl">Active</div><div class="sval" id="sa-d-active">—</div><div class="ssub">Running sites</div></div>
+          <div class="scard r"><div class="slbl">Today Visits</div><div class="sval" id="sa-d-today">0</div><div class="ssub">Live</div></div>
         </div>
-
-        <!-- Revenue Chart -->
         <div class="card">
           <div class="chdr"><div class="ctitle">💰 Revenue per Client</div></div>
-          <div class="cbody"><div class="barchart" id="rev-chart"></div></div>
+          <div class="cbody"><div class="barchart" id="sa-rev-chart"></div></div>
         </div>
-
-        <!-- Recent clients table -->
         <div class="card">
-          <div class="chdr">
-            <div class="ctitle">👥 All Clients Overview</div>
-            <button class="btn btn-g btn-sm" data-goto="clients">View All →</button>
-          </div>
-          <div class="twrap">
-            <table>
-              <thead><tr><th>Client</th><th>Status</th><th>Traffic</th><th>Revenue</th><th>Share %</th></tr></thead>
-              <tbody id="dash-clients"></tbody>
-            </table>
-          </div>
+          <div class="chdr"><div class="ctitle">👥 Clients Overview</div><button class="btn btn-g btn-sm" data-sa-goto="clients">View All →</button></div>
+          <div class="twrap"><table>
+            <thead><tr><th>Client</th><th>Username</th><th>Status</th><th>Traffic</th><th>Revenue</th><th>Share</th></tr></thead>
+            <tbody id="sa-dash-clients"></tbody>
+          </table></div>
         </div>
-
-        <!-- Recent Activity -->
         <div class="card">
-          <div class="chdr">
-            <div class="ctitle">🕒 Recent Activity</div>
-            <button class="btn btn-g btn-sm" data-goto="activity">View All →</button>
-          </div>
-          <div class="llist" id="dash-log"></div>
+          <div class="chdr"><div class="ctitle">🕒 Recent Activity</div><button class="btn btn-g btn-sm" data-sa-goto="activity">View All →</button></div>
+          <div id="sa-dash-log"></div>
         </div>
       </div>
 
       <!-- CLIENTS -->
-      <div class="page" id="page-clients">
+      <div class="page" id="sa-page-clients">
         <div class="phdr">
           <div class="ptitle">👥 Client Manager</div>
-          <button class="btn btn-p btn-sm" id="btn-add-client2">+ Add New Client</button>
+          <button class="btn btn-r btn-sm" id="sa-btn-add2">+ Add New Client</button>
         </div>
         <div class="card">
           <div class="chdr">
             <div class="ctitle">All Clients</div>
-            <input class="fg" type="search" id="q-client" placeholder="🔍 Search client..." style="padding:7px 12px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;width:180px"/>
+            <input type="search" id="sa-q-client" placeholder="🔍 Search..." style="padding:7px 12px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;width:180px"/>
           </div>
-          <div class="twrap">
-            <table>
-              <thead><tr>
-                <th>Name</th><th>Site URL</th><th>Email</th>
-                <th>Status</th><th>Share %</th><th>Revenue</th><th>Actions</th>
-              </tr></thead>
-              <tbody id="clients-tbody"></tbody>
-            </table>
-          </div>
-          <div class="tfoot" id="clients-foot"></div>
+          <div class="twrap"><table>
+            <thead><tr><th>Name</th><th>Username / URLs</th><th>Email</th><th>Status</th><th>Share%</th><th>Revenue</th><th>Actions</th></tr></thead>
+            <tbody id="sa-clients-tbody"></tbody>
+          </table></div>
+          <div class="tfoot" id="sa-clients-foot"></div>
         </div>
       </div>
 
       <!-- REVENUE -->
-      <div class="page" id="page-revenue">
+      <div class="page" id="sa-page-revenue">
         <div class="phdr"><div class="ptitle">💰 Revenue Control</div></div>
         <div class="sgrid">
-          <div class="scard g"><div class="slbl">Total Platform Revenue</div><div class="sval" id="r-total">₹0</div><div class="ssub">All time combined</div></div>
-          <div class="scard b"><div class="slbl">My Net Earnings</div><div class="sval" id="r-mine">₹0</div><div class="ssub">After client payouts</div></div>
-          <div class="scard r"><div class="slbl">Client Payouts</div><div class="sval" id="r-payout">₹0</div><div class="ssub">Total paid to clients</div></div>
+          <div class="scard g"><div class="slbl">Total Revenue</div><div class="sval" id="sa-r-total">₹0</div></div>
+          <div class="scard b"><div class="slbl">My Net</div><div class="sval" id="sa-r-mine">₹0</div></div>
+          <div class="scard r"><div class="slbl">Client Payouts</div><div class="sval" id="sa-r-payout">₹0</div></div>
         </div>
-
         <div class="card">
-          <div class="chdr"><div class="ctitle">💸 Per Client Revenue Management</div></div>
-          <div class="twrap">
-            <table>
-              <thead><tr>
-                <th>Client</th><th>Total Revenue</th><th>Share %</th>
-                <th>Client Gets</th><th>You Keep</th><th>Actions</th>
-              </tr></thead>
-              <tbody id="rev-tbody"></tbody>
-            </table>
-          </div>
+          <div class="chdr"><div class="ctitle">💸 Per Client Revenue</div></div>
+          <div class="twrap"><table>
+            <thead><tr><th>Client</th><th>Total</th><th>Share %</th><th>Client Gets</th><th>You Keep</th><th>Actions</th></tr></thead>
+            <tbody id="sa-rev-tbody"></tbody>
+          </table></div>
         </div>
-
-        <!-- Add earnings manually -->
         <div class="card">
-          <div class="chdr"><div class="ctitle">➕ Add Earnings Manually</div></div>
+          <div class="chdr"><div class="ctitle">➕ Add Earning Manually</div></div>
           <div class="cbody">
             <div class="fgrid">
-              <div class="fg"><label>Select Client</label>
-                <select id="earn-client"><option value="">Choose client...</option></select>
-              </div>
-              <div class="fg"><label>Amount (₹)</label>
-                <input type="number" id="earn-amount" placeholder="500" min="0"/>
-              </div>
-              <div class="fg"><label>Note</label>
-                <input type="text" id="earn-note" placeholder="Adsterra October earnings"/>
-              </div>
-              <div class="fg" style="justify-content:flex-end;padding-top:18px">
-                <button class="btn btn-grn" id="btn-add-earn">+ Add Earning</button>
-              </div>
+              <div class="fg"><label>Select Client</label><select id="sa-earn-client"><option value="">Choose...</option></select></div>
+              <div class="fg"><label>Amount (₹)</label><input type="number" id="sa-earn-amount" placeholder="500"/></div>
+              <div class="fg"><label>Note</label><input id="sa-earn-note" placeholder="Adsterra earnings Oct"/></div>
+              <div class="fg" style="justify-content:flex-end;padding-top:18px"><button class="btn btn-grn" id="sa-btn-earn">+ Add Earning</button></div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- TRAFFIC -->
-      <div class="page" id="page-traffic">
+      <div class="page" id="sa-page-traffic">
         <div class="phdr"><div class="ptitle">📈 Traffic Monitor</div></div>
         <div class="sgrid">
-          <div class="scard b"><div class="slbl">Total Visits</div><div class="sval" id="t-total">0</div><div class="ssub">All clients combined</div></div>
-          <div class="scard g"><div class="slbl">Today Visits</div><div class="sval" id="t-today">0</div><div class="ssub">Live count</div></div>
-          <div class="scard y"><div class="slbl">Total Views</div><div class="sval" id="t-views">0</div><div class="ssub">Image views</div></div>
+          <div class="scard b"><div class="slbl">Total Visits</div><div class="sval" id="sa-t-total">0</div></div>
+          <div class="scard g"><div class="slbl">Today</div><div class="sval" id="sa-t-today">0</div></div>
+          <div class="scard y"><div class="slbl">Total Views</div><div class="sval" id="sa-t-views">0</div></div>
         </div>
         <div class="card">
-          <div class="chdr"><div class="ctitle">📊 Traffic per Client</div></div>
-          <div class="twrap">
-            <table>
-              <thead><tr>
-                <th>Client</th><th>Site URL</th><th>Today</th>
-                <th>Total Visits</th><th>Total Views</th><th>Status</th>
-              </tr></thead>
-              <tbody id="traffic-tbody"></tbody>
-            </table>
-          </div>
+          <div class="chdr"><div class="ctitle">Traffic per Client</div></div>
+          <div class="twrap"><table>
+            <thead><tr><th>Client</th><th>Site URL</th><th>Today</th><th>Total Visits</th><th>Views</th><th>Status</th></tr></thead>
+            <tbody id="sa-traffic-tbody"></tbody>
+          </table></div>
         </div>
       </div>
 
       <!-- ACTIVITY -->
-      <div class="page" id="page-activity">
+      <div class="page" id="sa-page-activity">
         <div class="phdr">
           <div class="ptitle">📋 Activity Log</div>
           <div style="display:flex;gap:8px">
-            <select id="log-filter" style="padding:7px 12px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none">
-              <option value="">All</option>
-              <option value="add">Add</option>
-              <option value="edit">Edit</option>
-              <option value="del">Delete</option>
-              <option value="login">Login</option>
+            <select id="sa-log-filter" style="padding:7px 12px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none">
+              <option value="">All</option><option value="add">Add</option><option value="edit">Edit</option><option value="del">Delete</option><option value="login">Login</option>
             </select>
-            <button class="btn btn-d btn-sm" id="btn-clr-log">🗑 Clear</button>
+            <button class="btn btn-d btn-sm" id="sa-btn-clr-log">🗑 Clear</button>
+          </div>
+        </div>
+        <div class="card"><div id="sa-log-list" style="display:flex;flex-direction:column"></div></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="sa-page-settings">
+        <div class="phdr"><div class="ptitle">⚙️ Settings</div></div>
+        <div class="card">
+          <div class="chdr"><div class="ctitle">🌐 Platform Base URL</div></div>
+          <div class="cbody">
+            <div style="font-size:12px;color:var(--mu);margin-bottom:14px;line-height:1.8">
+              Ye woh domain hai jahan ye file host hai. Client URLs isi se banenge.<br>
+              <strong style="color:var(--tx)">Jaise:</strong> <code style="background:var(--s2);padding:2px 6px;border-radius:4px;font-size:11px">https://moonlightx.qd.je</code>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+              <div style="flex:1;min-width:200px">
+                <div style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Base URL</div>
+                <input id="sa-base-url" type="url" placeholder="https://moonlightx.qd.je"
+                  style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:13px;outline:none"/>
+              </div>
+              <button class="btn btn-r" id="sa-save-base">💾 Save</button>
+            </div>
+            <div style="margin-top:12px;padding:12px 14px;background:var(--bg);border:1px solid var(--br);border-radius:10px;font-size:11px;font-family:monospace;color:var(--mu)">
+              Preview Admin URL: <span id="sa-url-preview" style="color:var(--grn)">—</span><br>
+              Preview Site URL: <span id="sa-site-preview" style="color:var(--blu)">—</span>
+            </div>
           </div>
         </div>
         <div class="card">
-          <div class="llist" id="log-list"></div>
+          <div class="chdr"><div class="ctitle">🔐 Account</div></div>
+          <div class="cbody" style="font-size:12px;color:var(--mu);line-height:2">
+            <strong style="color:var(--tx)">Signed in:</strong> <span id="sa-set-email" style="color:var(--grn)">—</span><br>
+            <strong style="color:var(--tx)">Firebase:</strong> moon-night-x-default-rtdb.firebaseio.com
+          </div>
         </div>
       </div>
 
-    </div><!-- /main -->
-  </div><!-- /bwrap -->
-</div><!-- /app-wrap -->
-
-<!-- CLIENT MODAL -->
-<div class="overlay" id="client-modal" style="display:none">
-  <div class="modal">
-    <h2 id="cm-title">👥 Add New Client</h2>
-    <div class="fgrid">
-      <div class="fg full"><label>Client Name *</label><input id="cm-name" placeholder="John Gallery"/></div>
-      <div class="fg full"><label>Client Google Email * (for their login)</label><input id="cm-email" type="email" placeholder="client@gmail.com"/></div>
-      <div class="fg full">
-        <label>🌐 Real Site URL <span style="color:var(--mu);font-weight:400;font-size:10px">(client ki website — baad mein set kar sakte ho)</span></label>
-        <input id="cm-site" placeholder="https://client1.github.io/" style="border-color:#1a3060"/>
-      </div>
-      <div class="fg full">
-        <label>⚙️ Admin Panel URL <span style="color:var(--mu);font-weight:400;font-size:10px">(generate karne ke baad yahan paste karo)</span></label>
-        <input id="cm-admin" placeholder="https://client1.github.io/admin.html" style="border-color:#0d4015"/>
-      </div>
-      <div class="fg full">
-        <label>Earning Share % (client gets this much) — Currently: <span id="pct-val">40</span>%</label>
-        <div class="slider-wrap">
-          <input type="range" id="cm-pct" min="0" max="100" value="40"/>
-          <div class="slider-val" id="pct-display">40%</div>
-        </div>
-        <div style="font-size:11px;color:var(--mu);margin-top:4px">You keep: <strong id="keep-pct" style="color:var(--grn)">60%</strong></div>
-      </div>
-      <div class="fg"><label>Status</label>
-        <select id="cm-status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
-      </div>
-      <div class="fg"><label>Adsterra Site ID</label><input id="cm-adsterra" placeholder="123456"/></div>
-      <div class="fg full"><label>Notes</label><textarea id="cm-notes" style="min-height:60px" placeholder="Any notes about this client..."></textarea></div>
-    </div>
-    <div class="mfoot">
-      <button class="btn btn-g" id="cm-cancel">Cancel</button>
-      <button class="btn btn-grn" id="cm-gen" style="display:none">⬇️ Generate Admin</button>
-      <button class="btn btn-p" id="cm-save">💾 Save Client</button>
     </div>
   </div>
 </div>
 
-<!-- EARNING MODAL -->
-<div class="overlay" id="earn-modal" style="display:none">
-  <div class="modal" style="max-width:440px">
-    <h2>💰 Earning History</h2>
-    <div id="earn-hist-content"></div>
+<!-- ══ CLIENT ADMIN VIEW ═════════════════════════════════════════════════ -->
+<div id="view-client">
+  <div class="topbar">
+    <div class="tlogo-client"><span id="cl-site-name">My Gallery</span><span class="tbadge client">ADMIN</span></div>
+    <div class="tright">
+      <span class="sdot live" id="cl-db-st">Connecting</span>
+      <button class="btn btn-b btn-sm" id="cl-btn-add-img">+ Add Image</button>
+      <button class="btn btn-g btn-sm" id="cl-btn-logout">Logout</button>
+    </div>
+  </div>
+  <div class="bwrap">
+    <aside class="sb client-nav">
+      <div class="sb-sec">My Panel</div>
+      <div class="sb-item on" data-cl-page="dashboard"><span class="ic">📊</span>Dashboard</div>
+      <div class="sb-item" data-cl-page="images"><span class="ic">🖼️</span>Images<span class="sbn" id="cl-nb-img">0</span></div>
+      <div class="sb-item" data-cl-page="categories"><span class="ic">📂</span>Categories<span class="sbn" id="cl-nb-cat">0</span></div>
+      <div class="sb-item" data-cl-page="earning"><span class="ic">💰</span>My Earning</div>
+      <div class="sb-foot">
+        <div class="sb-user"><strong id="cl-email">—</strong>Client Admin</div>
+        <button class="btn btn-g btn-sm" id="cl-btn-logout2" style="width:100%;justify-content:center">Sign Out</button>
+      </div>
+    </aside>
+    <div class="main" id="cl-main">
+
+      <!-- DASHBOARD -->
+      <div class="page on" id="cl-page-dashboard">
+        <div class="phdr"><div class="ptitle">📊 My Dashboard</div></div>
+        <div class="sgrid">
+          <div class="scard g"><div class="slbl">My Earning</div><div class="sval" id="cl-d-earn">₹0</div><div class="ssub">All time</div></div>
+          <div class="scard b"><div class="slbl">This Month</div><div class="sval" id="cl-d-month">₹0</div></div>
+          <div class="scard y"><div class="slbl">Total Visits</div><div class="sval" id="cl-d-visits">0</div></div>
+          <div class="scard r"><div class="slbl">Today</div><div class="sval" id="cl-d-today">0</div></div>
+          <div class="scard p"><div class="slbl">Total Images</div><div class="sval" id="cl-d-images">0</div></div>
+          <div class="scard b"><div class="slbl">My Share %</div><div class="sval" id="cl-d-pct">—</div></div>
+        </div>
+        <div class="card">
+          <div class="chdr"><div class="ctitle">💰 Earning Progress</div></div>
+          <div class="cbody">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-bottom:4px">
+              <span>This month</span><span id="cl-earn-pct-lbl">0%</span>
+            </div>
+            <div class="earn-bar"><div class="earn-fill" id="cl-earn-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="chdr"><div class="ctitle">🆕 Recent Images</div><button class="btn btn-g btn-sm" data-cl-goto="images">View All →</button></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(75px,1fr));gap:8px;padding:16px" id="cl-dash-imgs"></div>
+        </div>
+      </div>
+
+      <!-- IMAGES -->
+      <div class="page" id="cl-page-images">
+        <div class="card">
+          <div class="chdr">
+            <div class="ctitle">🖼️ My Images</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <input type="search" id="cl-q-img" placeholder="🔍 Search..." style="padding:7px 12px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;width:150px"/>
+              <select id="cl-f-cat" style="padding:7px 12px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none">
+                <option value="">All Categories</option>
+              </select>
+            </div>
+          </div>
+          <div class="twrap"><table>
+            <thead><tr><th>Thumb</th><th>Title/ID</th><th>Category</th><th>Flags</th><th>Stats</th><th>Actions</th></tr></thead>
+            <tbody id="cl-img-tbody"></tbody>
+          </table></div>
+          <div class="tfoot" id="cl-img-foot"></div>
+        </div>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="page" id="cl-page-categories">
+        <div class="card">
+          <div class="chdr"><div class="ctitle">📂 My Categories</div><button class="btn btn-b btn-sm" id="cl-btn-add-cat">+ Add Category</button></div>
+          <div class="twrap"><table>
+            <thead><tr><th>ID</th><th>Name</th><th>Images</th><th>Actions</th></tr></thead>
+            <tbody id="cl-cat-tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- EARNING -->
+      <div class="page" id="cl-page-earning">
+        <div class="phdr"><div class="ptitle">💰 My Earning</div></div>
+        <div class="sgrid">
+          <div class="scard g"><div class="slbl">Total Earned</div><div class="sval" id="cl-e-total">₹0</div></div>
+          <div class="scard b"><div class="slbl">My Share</div><div class="sval" id="cl-e-pct">—</div></div>
+        </div>
+        <div class="card">
+          <div class="chdr"><div class="ctitle">📋 Earning History</div></div>
+          <div class="twrap"><table>
+            <thead><tr><th>Date</th><th>Total Added</th><th>My Share</th><th>Note</th></tr></thead>
+            <tbody id="cl-earn-tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ SUPER ADMIN: CLIENT MODAL ════════════════════════════════════════ -->
+<div class="overlay" id="sa-client-modal" style="display:none">
+  <div class="modal">
+    <h2 id="sa-cm-title">👥 Add New Client</h2>
+    <div class="fgrid">
+      <div class="fg full"><label>Client Name *</label><input id="sa-cm-name" placeholder="John Gallery"/></div>
+      <div class="fg full">
+        <label>Username * <span style="color:var(--mu);font-weight:400">(URL mein aayega — sirf lowercase, no spaces)</span></label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input id="sa-cm-username" placeholder="johngallery" style="flex:1;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:13px;outline:none" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')"/>
+        </div>
+        <div style="font-size:10px;color:var(--mu);margin-top:4px" id="sa-username-preview">Preview: —</div>
+      </div>
+      <div class="fg full"><label>Client Gmail * (for their login)</label><input id="sa-cm-email" type="email" placeholder="client@gmail.com"/></div>
+      <div class="fg full">
+        <label>Earning Share % — Client gets: <span id="sa-pct-val">40</span>% | You keep: <span id="sa-keep-val">60</span>%</label>
+        <input type="range" id="sa-cm-pct" min="0" max="100" value="40" style="width:100%;accent-color:var(--red);margin-top:6px"/>
+      </div>
+      <div class="fg"><label>Status</label>
+        <select id="sa-cm-status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+      </div>
+      <div class="fg"><label>Adsterra Site ID</label><input id="sa-cm-adsterra" placeholder="123456"/></div>
+      <div class="fg full"><label>Notes</label><textarea id="sa-cm-notes" style="min-height:55px"></textarea></div>
+    </div>
     <div class="mfoot">
-      <button class="btn btn-g" id="earn-modal-close">Close</button>
+      <button class="btn btn-g" id="sa-cm-cancel">Cancel</button>
+      <button class="btn btn-r" id="sa-cm-save">💾 Save & Generate URLs</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SHARE MODAL ════════════════════════════════════════════════════════ -->
+<div class="overlay" id="share-modal" style="display:none">
+  <div class="modal">
+    <h2>📤 Share with Client</h2>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px">Client: <strong id="sm-name" style="color:var(--tx)">—</strong></div>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;font-weight:800;color:var(--grn);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">⚙️ Admin Panel URL</div>
+      <div style="background:var(--bg);border:1px solid #0d4015;border-radius:12px;padding:12px 14px;margin-bottom:8px">
+        <div id="sm-admin-url" style="font-size:12px;color:var(--grn);font-family:monospace;word-break:break-all"></div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-grn btn-sm" id="sm-copy-admin">📋 Copy</button>
+        <button class="btn btn-g btn-sm" id="sm-open-admin">🔗 Open</button>
+      </div>
+      <div style="font-size:10px;color:var(--mu2);margin-top:5px">Client apni Gmail se login karega</div>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;font-weight:800;color:var(--blu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🌐 Real Site URL</div>
+      <div style="background:var(--bg);border:1px solid #1a3060;border-radius:12px;padding:12px 14px;margin-bottom:8px">
+        <div id="sm-site-url" style="font-size:12px;color:var(--blu);font-family:monospace;word-break:break-all"></div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm" style="background:#0a1225;color:var(--blu);border:1px solid #1a3060" id="sm-copy-site">📋 Copy</button>
+        <button class="btn btn-g btn-sm" id="sm-open-site">🔗 Open</button>
+      </div>
+    </div>
+
+    <div style="background:var(--bg);border:1px solid var(--br);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-size:10px;font-weight:700;color:var(--mu);margin-bottom:8px;text-transform:uppercase">📋 Copy Both (WhatsApp/Email ready)</div>
+      <button class="btn btn-g" id="sm-copy-both" style="width:100%;justify-content:center">📋 Copy Both Links</button>
+    </div>
+
+    <button class="btn btn-r" id="sm-close" style="width:100%;justify-content:center">Done ✓</button>
+  </div>
+</div>
+
+<!-- ══ CLIENT: IMAGE MODAL ═══════════════════════════════════════════════ -->
+<div class="overlay" id="cl-img-modal" style="display:none">
+  <div class="modal modal-lg">
+    <h2 id="cl-im-title">➕ Add Image</h2>
+    <div class="fgrid">
+      <div class="fg"><label>Image ID *</label><input id="cl-m-id" placeholder="img-001"/></div>
+      <div class="fg"><label>Slug *</label><input id="cl-m-slug" placeholder="my-slug"/></div>
+      <div class="fg full"><label>Title *</label><input id="cl-m-title"/></div>
+      <div class="fg full"><label>Description</label><textarea id="cl-m-desc"></textarea></div>
+      <div class="fg"><label>Category</label><select id="cl-m-cat"><option value="general">General</option></select></div>
+      <div class="fg"><label>Aspect Ratio</label><select id="cl-m-aspect"><option value="portrait">Portrait</option><option value="landscape">Landscape</option><option value="square">Square</option></select></div>
+      <div class="fg full"><label>Thumbnail URL *</label><input id="cl-m-thumb"/><img class="prev-img" id="cl-p-thumb"/></div>
+      <div class="fg full"><label>High Res URL *</label><input id="cl-m-hires"/><img class="prev-img" id="cl-p-hires"/></div>
+      <div class="fg full"><label>Gallery Images (one per line)</label><textarea id="cl-m-gallery" style="min-height:70px"></textarea></div>
+      <div class="fg"><label>Model Name</label><input id="cl-m-model"/></div>
+      <div class="fg"><label>Resolution</label><input id="cl-m-res" placeholder="3840x5120"/></div>
+      <div class="fg"><label>Format</label><select id="cl-m-fmt"><option>WebP</option><option>AVIF</option><option>JPEG</option></select></div>
+      <div class="fg"><label>File Size</label><input id="cl-m-size" placeholder="1.8 MB"/></div>
+      <div class="fg"><label>Views</label><input id="cl-m-views" type="number" value="0"/></div>
+      <div class="fg"><label>Likes</label><input id="cl-m-likes" type="number" value="0"/></div>
+      <div class="fg"><label>Uploaded At</label><input id="cl-m-up" placeholder="Just now"/></div>
+      <div class="fg"><label>Tags (comma sep)</label><input id="cl-m-tags"/></div>
+      <div class="fg full"><label>Flags</label>
+        <div class="checks">
+          <label class="chk"><input type="checkbox" id="cl-m-ft"/> ⭐ Featured</label>
+          <label class="chk"><input type="checkbox" id="cl-m-tr"/> 🔥 Trending</label>
+          <label class="chk"><input type="checkbox" id="cl-m-pp"/> ❤️ Popular</label>
+          <label class="chk"><input type="checkbox" id="cl-m-nw"/> ✨ New</label>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-g" id="cl-im-cancel">Cancel</button>
+      <button class="btn btn-b" id="cl-im-save">💾 Save Image</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CLIENT: CATEGORY MODAL ═══════════════════════════════════════════ -->
+<div class="overlay" id="cl-cat-modal" style="display:none">
+  <div class="modal" style="max-width:440px">
+    <h2 id="cl-cm-title">📂 Add Category</h2>
+    <div class="fg"><label>Category ID *</label><input id="cl-c-id" placeholder="glamour"/></div>
+    <div class="fg"><label>Display Name *</label><input id="cl-c-name" placeholder="Glamour"/></div>
+    <div class="fg"><label>Description</label><textarea id="cl-c-desc" style="min-height:55px"></textarea></div>
+    <div class="mfoot">
+      <button class="btn btn-g" id="cl-cm-cancel">Cancel</button>
+      <button class="btn btn-b" id="cl-cm-save">💾 Save</button>
     </div>
   </div>
 </div>
@@ -421,7 +585,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 import { initializeApp }   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
                            from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-import { getDatabase, ref, onValue, set, remove, update, push, get }
+import { getDatabase, ref, onValue, set, remove, update, get }
                            from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
 
 const FB = {
@@ -441,9 +605,16 @@ const db    = getDatabase(fbApp);
 const gp    = new GoogleAuthProvider();
 gp.setCustomParameters({ login_hint: OWNER });
 
-let clients = [];
-let actLog  = JSON.parse(localStorage.getItem('sa_log') || '[]');
-let editClientId = null;
+// ── STATE ──────────────────────────────────────────────────────────────
+let saClients   = [];
+let clImages    = [];
+let clCats      = [];
+let clClientData= null;
+let saEditId    = null;
+let clEditImgId = null;
+let clEditCatId = null;
+let currentRoute= '';
+let saActLog    = JSON.parse(localStorage.getItem('sa_log') || '[]');
 
 // ── TOAST ──────────────────────────────────────────────────────────────
 function toast(msg, type='ok') {
@@ -452,567 +623,831 @@ function toast(msg, type='ok') {
   clearTimeout(t._t); t._t = setTimeout(() => t.className = '', 3000);
 }
 
-// ── LOG ────────────────────────────────────────────────────────────────
-function addLog(type, msg) {
-  actLog.unshift({ type, msg, t: new Date().toISOString() });
-  if(actLog.length > 300) actLog = actLog.slice(0, 300);
-  localStorage.setItem('sa_log', JSON.stringify(actLog));
-  document.getElementById('nb-log').textContent = actLog.length;
-  renderLog(); renderDashLog();
+// ── ROUTER ─────────────────────────────────────────────────────────────
+// Routes:
+//   #/           → login
+//   #/super      → super admin (owner only)
+//   #/admin/username → client admin panel
+//   #/username   → (future: real site)
+
+function getRoute() {
+  const hash = window.location.hash || '#/';
+  return hash.replace('#', '');
 }
 
-function logHTML(e) {
-  const d = new Date(e.t);
-  return `<div class="litem"><div class="ldot ${e.type}"></div>
-    <div><div class="lmsg">${e.msg}</div>
-    <div class="ltime">${d.toLocaleDateString()} ${d.toLocaleTimeString()}</div></div></div>`;
-}
-function renderLog() {
-  const f = document.getElementById('log-filter')?.value || '';
-  const el = document.getElementById('log-list');
-  const filtered = f ? actLog.filter(e => e.type === f) : actLog;
-  el.innerHTML = filtered.length ? filtered.map(logHTML).join('')
-    : '<div class="empty"><div class="eic">📋</div>No activity yet</div>';
-}
-function renderDashLog() {
-  document.getElementById('dash-log').innerHTML = actLog.slice(0, 6).map(logHTML).join('')
-    || '<div class="empty"><div class="eic">📋</div>No activity yet</div>';
+function parseRoute(path) {
+  const parts = path.split('/').filter(Boolean);
+  if (!parts.length)          return { type: 'login' };
+  if (parts[0] === 'super')   return { type: 'super' };
+  if (parts[0] === 'admin' && parts[1]) return { type: 'client', username: parts[1] };
+  return { type: 'login' };
 }
 
-// ── NAVIGATION ─────────────────────────────────────────────────────────
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.sb-item[data-page]').forEach(i => i.classList.remove('on'));
-  document.getElementById('page-' + name)?.classList.add('on');
-  document.querySelector(`.sb-item[data-page="${name}"]`)?.classList.add('on');
-  if(name === 'activity') renderLog();
-  if(name === 'revenue')  renderRevenue();
-  if(name === 'traffic')  renderTraffic();
-  if(name === 'clients')  renderClients();
+function navigate(path) {
+  window.location.hash = '#' + path;
 }
-document.querySelectorAll('.sb-item[data-page]').forEach(el =>
-  el.addEventListener('click', () => showPage(el.dataset.page)));
-document.querySelectorAll('[data-goto]').forEach(el =>
-  el.addEventListener('click', () => showPage(el.dataset.goto)));
 
-// ── GOOGLE AUTH ────────────────────────────────────────────────────────
-const gBtn = document.getElementById('g-btn');
-const lErr = document.getElementById('l-err');
-const G_SVG = gBtn.innerHTML;
+function getBase() {
+  return (localStorage.getItem('mnx_base_url') || window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '')).replace(/\/+$/, '');
+}
 
-function resetBtn() { gBtn.innerHTML = G_SVG; gBtn.disabled = false; }
+// ── AUTH STATE ─────────────────────────────────────────────────────────
+const G_SVG = document.getElementById('g-btn').innerHTML;
+function resetGBtn() {
+  document.getElementById('g-btn').innerHTML = G_SVG;
+  document.getElementById('g-btn').disabled = false;
+}
 
-gBtn.addEventListener('click', async () => {
-  gBtn.innerHTML = '⏳ Opening Google...'; gBtn.disabled = true;
-  lErr.style.display = 'none';
-  try {
-    const r = await signInWithPopup(auth, gp);
-    if(r.user.email.toLowerCase() !== OWNER) {
+onAuthStateChanged(auth, async user => {
+  const route = parseRoute(getRoute());
+
+  if (!user) {
+    // Not logged in — show login
+    showView('login');
+    setupLoginUI(route);
+    resetGBtn();
+    return;
+  }
+
+  const email = user.email.toLowerCase();
+
+  if (route.type === 'super') {
+    // Super admin route
+    if (email !== OWNER) {
       await signOut(auth);
-      lErr.innerHTML = `❌ Access denied. Only <b>${OWNER}</b> allowed.`;
-      lErr.style.display = 'block'; resetBtn();
+      showView('login');
+      showErr('❌ Access denied. Only owner can access super admin.');
+      return;
     }
-  } catch(e) {
-    const msgs = {
-      'auth/popup-closed-by-user': '❌ Popup closed. Try again.',
-      'auth/popup-blocked': '❌ Popup blocked! Allow popups for this site.',
-      'auth/unauthorized-domain': `❌ Add "${location.hostname}" to Firebase Console → Authentication → Authorized domains.`,
-      'auth/operation-not-allowed': '❌ Enable Google sign-in in Firebase Console.',
-    };
-    lErr.textContent = msgs[e.code] || ('❌ ' + e.code);
-    lErr.style.display = 'block'; resetBtn();
+    showView('super');
+    document.getElementById('sa-email').textContent    = user.email;
+    document.getElementById('sa-set-email').textContent= user.email;
+    saAddLog('login', `✅ Super Admin signed in: ${user.email}`);
+    saInitDB();
+
+  } else if (route.type === 'client') {
+    // Client admin route
+    const username = route.username;
+    showView('login');
+    document.getElementById('l-sub').textContent   = 'Verifying access...';
+    document.getElementById('g-btn').style.display = 'none';
+
+    // Find client by username
+    const snap = await get(ref(db, 'superAdmin/clients'));
+    if (!snap.exists()) {
+      await signOut(auth); showErr('❌ No clients found.'); resetGBtn(); document.getElementById('g-btn').style.display='flex'; return;
+    }
+    const allClients = Object.values(snap.val());
+    const client = allClients.find(c => c.username === username);
+
+    if (!client) {
+      await signOut(auth); showErr(`❌ Username "${username}" not found.`); resetGBtn(); document.getElementById('g-btn').style.display='flex'; return;
+    }
+    if (client.googleEmail.toLowerCase() !== email) {
+      await signOut(auth); showErr(`❌ Access denied. This panel is for ${client.googleEmail}`); resetGBtn(); document.getElementById('g-btn').style.display='flex'; return;
+    }
+    if (client.status !== 'active') {
+      await signOut(auth); showErr('❌ Your account is inactive. Contact admin.'); resetGBtn(); document.getElementById('g-btn').style.display='flex'; return;
+    }
+
+    // Valid client
+    clClientData = client;
+    showView('client');
+    document.getElementById('cl-email').textContent    = user.email;
+    document.getElementById('cl-site-name').textContent = client.name || 'My Gallery';
+    document.title = (client.name || 'My Gallery') + ' — Admin';
+    clInitDB(client.id);
+
+  } else {
+    // Default — show login
+    showView('login');
+    setupLoginUI(route);
+    resetGBtn();
   }
 });
 
-onAuthStateChanged(auth, user => {
-  if(user && user.email.toLowerCase() === OWNER) {
-    document.getElementById('login-wrap').style.display   = 'none';
-    document.getElementById('app-wrap').style.display     = 'flex';
-    document.getElementById('sa-email').textContent       = user.email;
-    addLog('login', `✅ Super Admin signed in: ${user.email}`);
-    initDB();
-  } else if(user) {
-    signOut(auth);
-    lErr.innerHTML = `❌ Only <b>${OWNER}</b> allowed.`;
-    lErr.style.display = 'block'; resetBtn();
+window.addEventListener('hashchange', () => {
+  // Re-trigger auth check on route change
+  onAuthStateChanged(auth, () => {});
+  window.location.reload(); // Simple: reload on hash change
+});
+
+function showView(name) {
+  ['login','super','client'].forEach(v => {
+    const el = document.getElementById('view-' + v);
+    el.style.display = v === name ? (v === 'login' ? 'flex' : 'flex') : 'none';
+    if (v !== 'login') el.style.flexDirection = 'column';
+  });
+}
+
+function setupLoginUI(route) {
+  const badge = document.getElementById('l-badge');
+  const info  = document.getElementById('l-info');
+  const sub   = document.getElementById('l-sub');
+
+  if (route.type === 'client' && route.username) {
+    badge.className = 'lbadge client';
+    badge.textContent = 'CLIENT ACCESS';
+    sub.textContent   = 'Client Admin Panel';
+    info.innerHTML    = `Sign in with your authorized Google account<br>to access panel for <strong>${route.username}</strong>`;
+  } else if (route.type === 'super') {
+    badge.className   = 'lbadge owner';
+    badge.textContent = 'SUPER ADMIN';
+    sub.textContent   = 'Owner Control Panel';
+    info.innerHTML    = `Only <strong>${OWNER}</strong> can access this panel`;
   } else {
-    document.getElementById('login-wrap').style.display   = 'flex';
-    document.getElementById('app-wrap').style.display     = 'none';
-    resetBtn();
+    badge.className   = 'lbadge owner';
+    badge.textContent = 'ADMIN';
+    sub.textContent   = 'Platform Admin';
+    info.textContent  = 'Sign in with Google to continue';
+  }
+}
+
+function showErr(msg) {
+  const el = document.getElementById('l-err');
+  el.innerHTML = msg;
+  el.style.display = 'block';
+}
+
+// ── GOOGLE LOGIN ────────────────────────────────────────────────────────
+document.getElementById('g-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('g-btn');
+  btn.innerHTML = '⏳ Opening Google...'; btn.disabled = true;
+  document.getElementById('l-err').style.display = 'none';
+  try {
+    await signInWithPopup(auth, gp);
+  } catch(e) {
+    const msgs = {
+      'auth/popup-closed-by-user':  '❌ Popup closed. Try again.',
+      'auth/popup-blocked':         '❌ Popup blocked! Allow popups for this site.',
+      'auth/unauthorized-domain':   `❌ Add "${location.hostname}" to Firebase Console → Authentication → Authorized domains.`,
+      'auth/operation-not-allowed': '❌ Enable Google sign-in in Firebase Console.',
+    };
+    showErr(msgs[e.code] || ('❌ ' + e.code));
+    resetGBtn();
   }
 });
 
 async function doLogout() {
-  addLog('login', '🚪 Super Admin signed out');
+  saAddLog('login', '🚪 Signed out');
   await signOut(auth);
+  navigate('/');
+  window.location.reload();
 }
-document.getElementById('btn-logout').addEventListener('click', doLogout);
-document.getElementById('btn-logout2').addEventListener('click', doLogout);
+document.getElementById('sa-btn-logout').addEventListener('click', doLogout);
+document.getElementById('sa-btn-logout2').addEventListener('click', doLogout);
+document.getElementById('cl-btn-logout').addEventListener('click', doLogout);
+document.getElementById('cl-btn-logout2').addEventListener('click', doLogout);
 
-// ── FIREBASE DB ────────────────────────────────────────────────────────
-function initDB() {
+// ══════════════════════════════════════════════════════════════════════
+// ── SUPER ADMIN ────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════
+
+function saShowPage(name) {
+  document.querySelectorAll('#view-super .page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('[data-sa-page]').forEach(i => i.classList.remove('on'));
+  document.getElementById('sa-page-' + name)?.classList.add('on');
+  document.querySelector(`[data-sa-page="${name}"]`)?.classList.add('on');
+  if(name === 'activity') saRenderLog();
+  if(name === 'revenue')  saRenderRevenue();
+  if(name === 'traffic')  saRenderTraffic();
+  if(name === 'settings') saLoadSettings();
+}
+document.querySelectorAll('[data-sa-page]').forEach(el =>
+  el.addEventListener('click', () => saShowPage(el.dataset.saPage)));
+document.querySelectorAll('[data-sa-goto]').forEach(el =>
+  el.addEventListener('click', () => saShowPage(el.dataset.saGoto)));
+
+// LOG
+function saAddLog(type, msg) {
+  saActLog.unshift({ type, msg, t: new Date().toISOString() });
+  if(saActLog.length > 300) saActLog = saActLog.slice(0, 300);
+  localStorage.setItem('sa_log', JSON.stringify(saActLog));
+  document.getElementById('sa-nb-log').textContent = saActLog.length;
+  saRenderLog(); saRenderDashLog();
+}
+function saLogHTML(e) {
+  const d = new Date(e.t);
+  const colors = { add:'var(--grn)', edit:'var(--blu)', del:'var(--red)', login:'var(--ylw)' };
+  return `<div style="display:flex;gap:11px;padding:11px 18px;border-bottom:1px solid var(--br)">
+    <div style="width:7px;height:7px;border-radius:50%;background:${colors[e.type]||'#888'};margin-top:5px;flex-shrink:0"></div>
+    <div><div style="font-size:12px;font-weight:600">${e.msg}</div>
+    <div style="font-size:10px;color:var(--mu);font-family:monospace;margin-top:2px">${d.toLocaleDateString()} ${d.toLocaleTimeString()}</div></div>
+  </div>`;
+}
+function saRenderLog() {
+  const f  = document.getElementById('sa-log-filter')?.value || '';
+  const el = document.getElementById('sa-log-list');
+  const list = f ? saActLog.filter(e => e.type === f) : saActLog;
+  el.innerHTML = list.length ? list.map(saLogHTML).join('')
+    : '<div class="empty"><div class="eic">📋</div>No activity</div>';
+}
+function saRenderDashLog() {
+  document.getElementById('sa-dash-log').innerHTML =
+    saActLog.slice(0,5).map(saLogHTML).join('') ||
+    '<div class="empty"><div class="eic">📋</div>No activity yet</div>';
+}
+
+// DB
+function saInitDB() {
   onValue(ref(db, 'superAdmin/clients'), snap => {
-    clients = snap.exists() ? Object.values(snap.val()) : [];
-    document.getElementById('db-st').textContent = 'Live';
-    document.getElementById('nb-clients').textContent = clients.length;
-    updateDash();
-    renderClients();
-    populateEarnSelect();
-  }, () => { document.getElementById('db-st').textContent = 'Error'; });
+    saClients = snap.exists() ? Object.values(snap.val()) : [];
+    document.getElementById('sa-db-st').textContent   = 'Live';
+    document.getElementById('sa-nb-clients').textContent = saClients.length;
+    saUpdateDash();
+    saRenderClients();
+    saPopulateEarnSelect();
+  }, () => { document.getElementById('sa-db-st').textContent = 'Error'; });
 }
 
-// ── DASHBOARD ──────────────────────────────────────────────────────────
-function updateDash() {
-  const active = clients.filter(c => c.status === 'active').length;
-  const totalRev = clients.reduce((a, c) => a + (c.totalEarning || 0), 0);
-  const clientPayout = clients.reduce((a, c) => a + ((c.totalEarning||0) * (c.earningPercent||40) / 100), 0);
-  const myRev = totalRev - clientPayout;
-  const totalVisits = clients.reduce((a, c) => a + (c.totalVisits || 0), 0);
-  const todayVisits = clients.reduce((a, c) => a + (c.todayVisits || 0), 0);
+const COLORS = ['#E02424','#3b82f6','#22c55e','#f59e0b','#a855f7','#06b6d4','#ec4899','#f97316'];
 
-  document.getElementById('d-clients').textContent = clients.length;
-  document.getElementById('d-active').textContent  = active;
-  document.getElementById('d-rev').textContent     = '₹' + totalRev.toFixed(0);
-  document.getElementById('d-mine').textContent    = '₹' + myRev.toFixed(0);
-  document.getElementById('d-traffic').textContent = totalVisits.toLocaleString();
-  document.getElementById('d-today').textContent   = todayVisits.toLocaleString();
+function saUpdateDash() {
+  const active   = saClients.filter(c => c.status === 'active').length;
+  const totalRev = saClients.reduce((a,c) => a+(c.totalEarning||0), 0);
+  const payout   = saClients.reduce((a,c) => a+(c.totalEarning||0)*(c.earningPercent||40)/100, 0);
+  const visits   = saClients.reduce((a,c) => a+(c.totalVisits||0), 0);
+  const today    = saClients.reduce((a,c) => a+(c.todayVisits||0), 0);
 
-  // Revenue bar chart
-  const max = Math.max(...clients.map(c => c.totalEarning || 0), 1);
-  const COLORS = ['#E02424','#3b82f6','#22c55e','#f59e0b','#a855f7','#06b6d4','#ec4899','#f97316'];
-  document.getElementById('rev-chart').innerHTML = clients.length
-    ? clients.map((c, i) => `
+  document.getElementById('sa-d-clients').textContent = saClients.length;
+  document.getElementById('sa-d-active').textContent  = active;
+  document.getElementById('sa-d-rev').textContent     = '₹' + totalRev.toFixed(0);
+  document.getElementById('sa-d-mine').textContent    = '₹' + (totalRev-payout).toFixed(0);
+  document.getElementById('sa-d-traffic').textContent = visits.toLocaleString();
+  document.getElementById('sa-d-today').textContent   = today.toLocaleString();
+
+  const max = Math.max(...saClients.map(c=>c.totalEarning||0), 1);
+  document.getElementById('sa-rev-chart').innerHTML = saClients.length
+    ? saClients.map((c,i) => `
         <div class="bwrp">
           <div class="bval">₹${(c.totalEarning||0).toFixed(0)}</div>
-          <div class="bbar" style="height:${Math.max(((c.totalEarning||0)/max)*85,3)}px;background:${COLORS[i%COLORS.length]}"></div>
+          <div class="bbar" style="height:${Math.max(((c.totalEarning||0)/max)*80,3)}px;background:${COLORS[i%COLORS.length]}"></div>
           <div class="blbl">${(c.name||'').slice(0,8)}</div>
         </div>`).join('')
     : '<div style="color:var(--mu);font-size:12px;margin:auto">No clients yet</div>';
 
-  // Dashboard clients table
-  document.getElementById('dash-clients').innerHTML = clients.map(c => `
+  document.getElementById('sa-dash-clients').innerHTML = saClients.map(c => `
     <tr>
       <td style="font-weight:700">${c.name||'—'}</td>
+      <td style="font-family:monospace;font-size:11px;color:var(--mu)">${c.username||'—'}</td>
       <td><span class="tag ${c.status==='active'?'grn':'mu'}">${c.status||'inactive'}</span></td>
-      <td style="font-size:11px;color:var(--mu)">${(c.totalVisits||0).toLocaleString()} visits</td>
+      <td style="font-size:11px">${(c.totalVisits||0).toLocaleString()}</td>
       <td style="color:var(--grn);font-weight:700">₹${(c.totalEarning||0).toFixed(0)}</td>
       <td>${c.earningPercent||40}%</td>
-    </tr>`).join('') || '<tr><td colspan="5"><div class="empty"><div class="eic">👥</div>No clients yet</div></td></tr>';
+    </tr>`).join('') || '<tr><td colspan="6"><div class="empty"><div class="eic">👥</div>No clients</div></td></tr>';
 
-  renderDashLog();
+  saRenderDashLog();
 }
 
-// ── CLIENTS TABLE ──────────────────────────────────────────────────────
-function renderClients() {
-  const q = (document.getElementById('q-client')?.value || '').toLowerCase();
-  const list = clients.filter(c =>
-    !q || (c.name||'').toLowerCase().includes(q) || (c.googleEmail||'').toLowerCase().includes(q));
+function saRenderClients() {
+  const q    = (document.getElementById('sa-q-client')?.value||'').toLowerCase();
+  const list = saClients.filter(c => !q || (c.name||'').toLowerCase().includes(q) || (c.username||'').toLowerCase().includes(q));
+  const base = getBase();
 
-  document.getElementById('clients-foot').textContent = `Showing ${list.length} of ${clients.length} clients`;
-  document.getElementById('clients-tbody').innerHTML = list.length ? list.map(c => `
-    <tr>
+  document.getElementById('sa-clients-foot').textContent = `${list.length} of ${saClients.length} clients`;
+  document.getElementById('sa-clients-tbody').innerHTML = list.length ? list.map(c => {
+    const adminUrl = `${base}/#/admin/${c.username}`;
+    const siteUrl  = c.siteUrl || `${base}/#/${c.username}`;
+    return `<tr>
+      <td><div style="font-weight:700">${c.name||'—'}</div><div style="font-size:10px;color:var(--mu);font-family:monospace">${c.id}</div></td>
       <td>
-        <div style="font-weight:700">${c.name||'—'}</div>
-        <div style="font-size:10px;color:var(--mu);font-family:monospace">${c.id}</div>
-      </td>
-      <td>
-        ${c.siteUrl ? `<a href="${c.siteUrl}" target="_blank" style="color:var(--blu);font-size:11px;text-decoration:none">🌐 Site</a>` : '—'}
-        ${c.adminUrl ? `<br><a href="${c.adminUrl}" target="_blank" style="color:var(--pur);font-size:11px;text-decoration:none">⚙️ Admin</a>` : ''}
+        <div style="font-size:11px;font-family:monospace;color:var(--mu)">${c.username||'—'}</div>
+        <div style="display:flex;gap:4px;margin-top:4px">
+          <a href="${adminUrl}" target="_blank" style="font-size:10px;color:var(--grn);text-decoration:none">⚙️ Admin</a>
+          <span style="color:var(--mu)">·</span>
+          <a href="${siteUrl}" target="_blank" style="font-size:10px;color:var(--blu);text-decoration:none">🌐 Site</a>
+        </div>
       </td>
       <td style="font-size:11px">${c.googleEmail||'—'}</td>
       <td><span class="tag ${c.status==='active'?'grn':'mu'}">${c.status||'inactive'}</span></td>
-      <td>
-        <div style="font-weight:700;color:var(--red)">${c.earningPercent||40}%</div>
-        <div style="font-size:10px;color:var(--mu)">client gets</div>
-      </td>
+      <td style="color:var(--red);font-weight:700">${c.earningPercent||40}%</td>
       <td style="color:var(--grn);font-weight:700">₹${(c.totalEarning||0).toFixed(0)}</td>
-      <td>
-        <div class="arow">
-          <button class="btn btn-g btn-xs" data-edit="${c.id}">✏️</button>
-          <button class="btn btn-grn btn-xs" data-gen="${c.id}" data-gname="${c.name||''}">⬇️ Admin</button>
-        <button class="btn btn-blu btn-xs" data-share="${c.id}">📤 Share</button>
-          <button class="btn btn-d btn-xs" data-del="${c.id}" data-dname="${c.name||''}">🗑</button>
-        </div>
-      </td>
-    </tr>`).join('')
-    : '<tr><td colspan="7"><div class="empty"><div class="eic">👥</div>No clients found</div></td></tr>';
+      <td><div class="arow">
+        <button class="btn btn-grn btn-xs" data-share="${c.id}">📤 Share</button>
+        <button class="btn btn-g btn-xs" data-edit="${c.id}">✏️</button>
+        <button class="btn btn-d btn-xs" data-del="${c.id}" data-dname="${c.name||''}">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('')
+  : '<tr><td colspan="7"><div class="empty"><div class="eic">👥</div>No clients</div></td></tr>';
 
-  document.querySelectorAll('[data-edit]').forEach(btn =>
-    btn.addEventListener('click', () => openEditClient(btn.dataset.edit)));
-  document.querySelectorAll('[data-copy]').forEach(btn =>
-    btn.addEventListener('click', () => {
-      navigator.clipboard.writeText(btn.dataset.copy);
-      toast('📋 Admin URL copied!');
-    }));
-  document.querySelectorAll('[data-gen]').forEach(btn =>
-    btn.addEventListener('click', () => generateClientAdmin(btn.dataset.gen, btn.dataset.gname)));
-  document.querySelectorAll('[data-share]').forEach(btn =>
-    btn.addEventListener('click', () => {
-      const c = clients.find(x => x.id === btn.dataset.share);
-      if(c) showShareModal(c);
-    }));
-  document.querySelectorAll('[data-del]').forEach(btn =>
-    btn.addEventListener('click', () => deleteClient(btn.dataset.del, btn.dataset.dname)));
+  document.querySelectorAll('[data-share]').forEach(btn => btn.addEventListener('click', () => saShowShareModal(btn.dataset.share)));
+  document.querySelectorAll('[data-edit]').forEach(btn  => btn.addEventListener('click', () => saOpenEdit(btn.dataset.edit)));
+  document.querySelectorAll('[data-del]').forEach(btn   => btn.addEventListener('click', () => saDeleteClient(btn.dataset.del, btn.dataset.dname)));
 }
-document.getElementById('q-client').addEventListener('input', renderClients);
+document.getElementById('sa-q-client').addEventListener('input', saRenderClients);
 
-// ── REVENUE ────────────────────────────────────────────────────────────
-function renderRevenue() {
-  const totalRev    = clients.reduce((a,c) => a+(c.totalEarning||0), 0);
-  const clientPayout= clients.reduce((a,c) => a+(c.totalEarning||0)*(c.earningPercent||40)/100, 0);
-  document.getElementById('r-total').textContent  = '₹' + totalRev.toFixed(0);
-  document.getElementById('r-mine').textContent   = '₹' + (totalRev - clientPayout).toFixed(0);
-  document.getElementById('r-payout').textContent = '₹' + clientPayout.toFixed(0);
+// SHARE MODAL
+function saShowShareModal(clientId) {
+  const c    = saClients.find(x => x.id === clientId); if(!c) return;
+  const base = getBase();
+  const adminUrl = `${base}/#/admin/${c.username}`;
+  const siteUrl  = c.siteUrl || `${base}/#/${c.username}`;
 
-  document.getElementById('rev-tbody').innerHTML = clients.map(c => {
-    const total  = c.totalEarning || 0;
-    const pct    = c.earningPercent || 40;
-    const cGets  = total * pct / 100;
-    const iKeep  = total - cGets;
+  document.getElementById('sm-name').textContent       = c.name;
+  document.getElementById('sm-admin-url').textContent  = adminUrl;
+  document.getElementById('sm-site-url').textContent   = siteUrl;
+
+  document.getElementById('sm-copy-admin').onclick = () => {
+    navigator.clipboard.writeText(adminUrl);
+    document.getElementById('sm-copy-admin').textContent = '✅ Copied!';
+    setTimeout(() => document.getElementById('sm-copy-admin').textContent = '📋 Copy', 2000);
+  };
+  document.getElementById('sm-open-admin').onclick = () => window.open(adminUrl, '_blank');
+  document.getElementById('sm-copy-site').onclick  = () => {
+    navigator.clipboard.writeText(siteUrl);
+    document.getElementById('sm-copy-site').textContent = '✅ Copied!';
+    setTimeout(() => document.getElementById('sm-copy-site').textContent = '📋 Copy', 2000);
+  };
+  document.getElementById('sm-open-site').onclick  = () => window.open(siteUrl, '_blank');
+  document.getElementById('sm-copy-both').onclick  = () => {
+    const msg = `Hi! Ye rahe aapke 2 links:\n\n⚙️ Admin Panel:\n${adminUrl}\n\n🌐 Real Site:\n${siteUrl}\n\nAdmin panel pe apni Gmail se login karo.`;
+    navigator.clipboard.writeText(msg);
+    document.getElementById('sm-copy-both').textContent = '✅ Copied!';
+    setTimeout(() => document.getElementById('sm-copy-both').textContent = '📋 Copy Both Links', 2000);
+  };
+
+  // Save URLs to Firebase
+  update(ref(db, `superAdmin/clients/${clientId}`), { adminUrl, generatedAt: new Date().toISOString() });
+  saAddLog('add', `Generated URLs for "${c.name}" — admin: ${adminUrl}`);
+
+  document.getElementById('share-modal').style.display = 'flex';
+}
+document.getElementById('sm-close').addEventListener('click', () => document.getElementById('share-modal').style.display = 'none');
+
+// CLIENT MODAL
+document.getElementById('sa-cm-pct').addEventListener('input', () => {
+  const v = document.getElementById('sa-cm-pct').value;
+  document.getElementById('sa-pct-val').textContent  = v;
+  document.getElementById('sa-keep-val').textContent = 100 - v;
+});
+document.getElementById('sa-cm-username').addEventListener('input', () => {
+  const u    = document.getElementById('sa-cm-username').value;
+  const base = getBase();
+  document.getElementById('sa-username-preview').innerHTML =
+    u ? `Admin: <span style="color:var(--grn)">${base}/#/admin/${u}</span> &nbsp;|&nbsp; Site: <span style="color:var(--blu)">${base}/#/${u}</span>`
+      : 'Preview: —';
+});
+
+function saOpenAdd() {
+  saEditId = null;
+  document.getElementById('sa-cm-title').textContent = '👥 Add New Client';
+  document.getElementById('sa-cm-save').textContent  = '💾 Save & Generate URLs';
+  ['sa-cm-name','sa-cm-email','sa-cm-username','sa-cm-adsterra','sa-cm-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('sa-cm-pct').value = 40;
+  document.getElementById('sa-pct-val').textContent  = '40';
+  document.getElementById('sa-keep-val').textContent = '60';
+  document.getElementById('sa-cm-status').value = 'active';
+  document.getElementById('sa-username-preview').textContent = 'Preview: —';
+  document.getElementById('sa-client-modal').style.display = 'flex';
+}
+function saOpenEdit(id) {
+  const c = saClients.find(x => x.id === id); if(!c) return;
+  saEditId = id;
+  document.getElementById('sa-cm-title').textContent   = '✏️ Edit Client';
+  document.getElementById('sa-cm-save').textContent    = '💾 Update Client';
+  document.getElementById('sa-cm-name').value          = c.name||'';
+  document.getElementById('sa-cm-email').value         = c.googleEmail||'';
+  document.getElementById('sa-cm-username').value      = c.username||'';
+  document.getElementById('sa-cm-adsterra').value      = c.adsterraSiteId||'';
+  document.getElementById('sa-cm-notes').value         = c.notes||'';
+  document.getElementById('sa-cm-status').value        = c.status||'active';
+  const pct = c.earningPercent||40;
+  document.getElementById('sa-cm-pct').value           = pct;
+  document.getElementById('sa-pct-val').textContent    = pct;
+  document.getElementById('sa-keep-val').textContent   = 100 - pct;
+  // trigger preview
+  document.getElementById('sa-cm-username').dispatchEvent(new Event('input'));
+  document.getElementById('sa-client-modal').style.display = 'flex';
+}
+
+document.getElementById('sa-btn-add').addEventListener('click', saOpenAdd);
+document.getElementById('sa-btn-add2').addEventListener('click', saOpenAdd);
+document.getElementById('sa-cm-cancel').addEventListener('click', () => document.getElementById('sa-client-modal').style.display = 'none');
+
+document.getElementById('sa-cm-save').addEventListener('click', async () => {
+  const name     = document.getElementById('sa-cm-name').value.trim();
+  const email    = document.getElementById('sa-cm-email').value.trim();
+  const username = document.getElementById('sa-cm-username').value.trim();
+  if(!name||!email||!username) { toast('❌ Name, Email & Username required!','err'); return; }
+
+  const id   = saEditId || ('cl_' + username + '_' + Date.now());
+  const base = getBase();
+  const data = {
+    id, name, username,
+    googleEmail:    email,
+    earningPercent: parseInt(document.getElementById('sa-cm-pct').value),
+    status:         document.getElementById('sa-cm-status').value,
+    adsterraSiteId: document.getElementById('sa-cm-adsterra').value.trim(),
+    notes:          document.getElementById('sa-cm-notes').value.trim(),
+    createdAt:      saEditId ? (saClients.find(c=>c.id===id)?.createdAt||new Date().toISOString()) : new Date().toISOString(),
+    totalEarning:   saEditId ? (saClients.find(c=>c.id===id)?.totalEarning||0) : 0,
+    totalVisits:    saEditId ? (saClients.find(c=>c.id===id)?.totalVisits||0) : 0,
+    todayVisits:    saEditId ? (saClients.find(c=>c.id===id)?.todayVisits||0) : 0,
+    adminUrl:       `${base}/#/admin/${username}`,
+    siteUrl:        saEditId ? (saClients.find(c=>c.id===id)?.siteUrl||`${base}/#/${username}`) : `${base}/#/${username}`,
+  };
+
+  const btn = document.getElementById('sa-cm-save');
+  btn.textContent = '⏳ Saving...'; btn.disabled = true;
+  try {
+    await set(ref(db, `superAdmin/clients/${id}`), data);
+    saAddLog(saEditId?'edit':'add', `${saEditId?'Updated':'Created'} client: "${name}" (@${username})`);
+    toast(`✅ Client "${name}" ${saEditId?'updated':'created'}!`);
+    document.getElementById('sa-client-modal').style.display = 'none';
+    // Auto show share modal for new clients
+    if(!saEditId) {
+      setTimeout(() => saShowShareModal(id), 400);
+    }
+  } catch(e) { toast('❌ '+e.message,'err'); }
+  finally { btn.textContent='💾 Save & Generate URLs'; btn.disabled=false; }
+});
+
+async function saDeleteClient(id, name) {
+  if(!confirm(`Delete client "${name}"?`)) return;
+  try {
+    await remove(ref(db, `superAdmin/clients/${id}`));
+    saAddLog('del', `Deleted client: "${name}"`);
+    toast('🗑️ Client deleted');
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+// REVENUE
+function saRenderRevenue() {
+  const total  = saClients.reduce((a,c)=>a+(c.totalEarning||0),0);
+  const payout = saClients.reduce((a,c)=>a+(c.totalEarning||0)*(c.earningPercent||40)/100,0);
+  document.getElementById('sa-r-total').textContent  = '₹'+total.toFixed(0);
+  document.getElementById('sa-r-mine').textContent   = '₹'+(total-payout).toFixed(0);
+  document.getElementById('sa-r-payout').textContent = '₹'+payout.toFixed(0);
+  document.getElementById('sa-rev-tbody').innerHTML  = saClients.map(c => {
+    const t=c.totalEarning||0, p=c.earningPercent||40;
     return `<tr>
       <td style="font-weight:700">${c.name}</td>
-      <td style="color:var(--grn)">₹${total.toFixed(0)}</td>
+      <td style="color:var(--grn)">₹${t.toFixed(0)}</td>
       <td>
-        <input type="range" min="0" max="100" value="${pct}" data-cid="${c.id}"
-          class="pct-slider" style="width:80px;accent-color:var(--red)"/>
-        <span style="font-size:11px;font-weight:700;color:var(--red);margin-left:4px" id="psl-${c.id}">${pct}%</span>
+        <input type="range" min="0" max="100" value="${p}" data-cid="${c.id}" class="pct-sl" style="width:80px;accent-color:var(--red)"/>
+        <span id="psl-${c.id}" style="font-size:11px;font-weight:700;color:var(--red);margin-left:4px">${p}%</span>
       </td>
-      <td style="color:var(--ylw)">₹${cGets.toFixed(0)}</td>
-      <td style="color:var(--blu)">₹${iKeep.toFixed(0)}</td>
-      <td>
-        <div class="arow">
-          <button class="btn btn-grn btn-xs" data-save-pct="${c.id}">💾 Save %</button>
-          <button class="btn btn-g btn-xs" data-hist="${c.id}">📊 History</button>
-        </div>
-      </td>
+      <td style="color:var(--ylw)">₹${(t*p/100).toFixed(0)}</td>
+      <td style="color:var(--blu)">₹${(t*(100-p)/100).toFixed(0)}</td>
+      <td><button class="btn btn-grn btn-xs" data-sp="${c.id}">💾</button></td>
     </tr>`;
   }).join('') || '<tr><td colspan="6"><div class="empty"><div class="eic">💰</div>No clients</div></td></tr>';
 
-  document.querySelectorAll('.pct-slider').forEach(sl => {
-    sl.addEventListener('input', () => {
-      document.getElementById('psl-' + sl.dataset.cid).textContent = sl.value + '%';
-    });
-  });
-  document.querySelectorAll('[data-save-pct]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const cid = btn.dataset.savePct;
-      const sl  = document.querySelector(`.pct-slider[data-cid="${cid}"]`);
-      const pct = parseInt(sl.value);
-      try {
-        await update(ref(db, `superAdmin/clients/${cid}`), { earningPercent: pct });
-        addLog('edit', `Updated ${cid} earning % to ${pct}%`);
-        toast(`✅ Earning % updated to ${pct}%`);
-      } catch(e) { toast('❌ ' + e.message, 'err'); }
-    });
-  });
-  document.querySelectorAll('[data-hist]').forEach(btn => {
-    btn.addEventListener('click', () => showEarnHistory(btn.dataset.hist));
-  });
+  document.querySelectorAll('.pct-sl').forEach(sl => sl.addEventListener('input', () =>
+    document.getElementById('psl-'+sl.dataset.cid).textContent = sl.value+'%'));
+  document.querySelectorAll('[data-sp]').forEach(btn => btn.addEventListener('click', async () => {
+    const sl = document.querySelector(`.pct-sl[data-cid="${btn.dataset.sp}"]`);
+    try { await update(ref(db,`superAdmin/clients/${btn.dataset.sp}`),{earningPercent:parseInt(sl.value)}); toast('✅ % updated'); } catch(e){ toast('❌ '+e.message,'err'); }
+  }));
 }
 
-function showEarnHistory(cid) {
-  const c = clients.find(x => x.id === cid);
-  if(!c) return;
-  const hist = c.earningHistory || {};
-  const rows = Object.values(hist).reverse();
-  document.getElementById('earn-hist-content').innerHTML = `
-    <div style="font-size:14px;font-weight:700;margin-bottom:14px">${c.name} — Earning History</div>
-    ${rows.length ? `<table style="width:100%">
-      <thead><tr>
-        <th style="text-align:left;font-size:10px;color:var(--mu);padding:6px 0;border-bottom:1px solid var(--br)">Date</th>
-        <th style="text-align:left;font-size:10px;color:var(--mu);padding:6px 0;border-bottom:1px solid var(--br)">Amount</th>
-        <th style="text-align:left;font-size:10px;color:var(--mu);padding:6px 0;border-bottom:1px solid var(--br)">Note</th>
-      </tr></thead>
-      <tbody>${rows.map(r=>`<tr>
-        <td style="font-size:12px;padding:8px 0;border-bottom:1px solid var(--br)">${new Date(r.t).toLocaleDateString()}</td>
-        <td style="font-size:12px;color:var(--grn);font-weight:700;border-bottom:1px solid var(--br)">₹${r.amount}</td>
-        <td style="font-size:11px;color:var(--mu);border-bottom:1px solid var(--br)">${r.note||'—'}</td>
-      </tr>`).join('')}</tbody>
-    </table>`
-    : '<div class="empty"><div class="eic">📊</div>No history yet</div>'}`;
-  document.getElementById('earn-modal').style.display = 'flex';
-}
-document.getElementById('earn-modal-close').addEventListener('click', () =>
-  document.getElementById('earn-modal').style.display = 'none');
-
-// ── TRAFFIC ────────────────────────────────────────────────────────────
-function renderTraffic() {
-  const totalV = clients.reduce((a,c)=>a+(c.totalVisits||0),0);
-  const todayV = clients.reduce((a,c)=>a+(c.todayVisits||0),0);
-  const totalVw= clients.reduce((a,c)=>a+(c.totalViews||0),0);
-  document.getElementById('t-total').textContent = totalV.toLocaleString();
-  document.getElementById('t-today').textContent = todayV.toLocaleString();
-  document.getElementById('t-views').textContent = totalVw.toLocaleString();
-
-  const sorted = [...clients].sort((a,b)=>(b.totalVisits||0)-(a.totalVisits||0));
-  document.getElementById('traffic-tbody').innerHTML = sorted.map(c=>`
+function saRenderTraffic() {
+  document.getElementById('sa-t-total').textContent = saClients.reduce((a,c)=>a+(c.totalVisits||0),0).toLocaleString();
+  document.getElementById('sa-t-today').textContent = saClients.reduce((a,c)=>a+(c.todayVisits||0),0).toLocaleString();
+  document.getElementById('sa-t-views').textContent = saClients.reduce((a,c)=>a+(c.totalViews||0),0).toLocaleString();
+  document.getElementById('sa-traffic-tbody').innerHTML = [...saClients].sort((a,b)=>(b.totalVisits||0)-(a.totalVisits||0)).map(c=>`
     <tr>
       <td style="font-weight:700">${c.name}</td>
       <td><a href="${c.siteUrl||'#'}" target="_blank" style="color:var(--blu);font-size:11px">${c.siteUrl||'—'}</a></td>
       <td style="color:var(--ylw);font-weight:700">${(c.todayVisits||0).toLocaleString()}</td>
       <td style="color:var(--grn);font-weight:700">${(c.totalVisits||0).toLocaleString()}</td>
       <td>${(c.totalViews||0).toLocaleString()}</td>
-      <td><span class="tag ${c.status==='active'?'grn':'mu'}">${c.status||'inactive'}</span></td>
+      <td><span class="tag ${c.status==='active'?'grn':'mu'}">${c.status}</span></td>
     </tr>`).join('') || '<tr><td colspan="6"><div class="empty"><div class="eic">📈</div>No data</div></td></tr>';
 }
 
-// ── CLIENT MODAL ────────────────────────────────────────────────────────
-const pctSlider = document.getElementById('cm-pct');
-pctSlider.addEventListener('input', () => {
-  const v = pctSlider.value;
-  document.getElementById('pct-val').textContent     = v;
-  document.getElementById('pct-display').textContent = v + '%';
-  document.getElementById('keep-pct').textContent    = (100-v) + '%';
-});
-
-function openAddClient() {
-  editClientId = null;
-  document.getElementById('cm-title').textContent = '👥 Add New Client';
-  document.getElementById('cm-save').textContent  = '💾 Create Client';
-  ['cm-name','cm-email','cm-site','cm-admin','cm-adsterra','cm-notes'].forEach(id => document.getElementById(id).value='');
-  pctSlider.value = 40;
-  document.getElementById('pct-val').textContent     = '40';
-  document.getElementById('pct-display').textContent = '40%';
-  document.getElementById('keep-pct').textContent    = '60%';
-  document.getElementById('cm-status').value = 'active';
-  document.getElementById('cm-gen').style.display = 'none'; // hide generate btn for new client
-  document.getElementById('client-modal').style.display = 'flex';
-}
-
-function openEditClient(id) {
-  const c = clients.find(x => x.id===id); if(!c) return;
-  editClientId = id;
-  document.getElementById('cm-title').textContent = '✏️ Edit Client';
-  document.getElementById('cm-save').textContent  = '💾 Update Client';
-  document.getElementById('cm-name').value     = c.name||'';
-  document.getElementById('cm-email').value    = c.googleEmail||'';
-  document.getElementById('cm-site').value     = c.siteUrl||'';
-  document.getElementById('cm-admin').value    = c.adminUrl||'';
-  document.getElementById('cm-adsterra').value = c.adsterraSiteId||'';
-  document.getElementById('cm-notes').value    = c.notes||'';
-  document.getElementById('cm-status').value   = c.status||'active';
-  const pct = c.earningPercent||40;
-  pctSlider.value = pct;
-  document.getElementById('pct-val').textContent     = pct;
-  document.getElementById('pct-display').textContent = pct + '%';
-  document.getElementById('keep-pct').textContent    = (100-pct) + '%';
-  document.getElementById('cm-gen').style.display = 'inline-flex'; // show generate btn when editing
-  document.getElementById('client-modal').style.display = 'flex';
-}
-
-document.getElementById('btn-add-client').addEventListener('click', openAddClient);
-document.getElementById('btn-add-client2').addEventListener('click', openAddClient);
-document.getElementById('cm-cancel').addEventListener('click', () =>
-  document.getElementById('client-modal').style.display = 'none');
-
-document.getElementById('cm-save').addEventListener('click', async () => {
-  const name  = document.getElementById('cm-name').value.trim();
-  const email = document.getElementById('cm-email').value.trim();
-  if(!name || !email) { toast('❌ Name and Email required!','err'); return; }
-
-  const id   = editClientId || ('client_' + Date.now());
-  const data = {
-    id, name,
-    googleEmail:    email,
-    siteUrl:        document.getElementById('cm-site').value.trim(),
-    adminUrl:       document.getElementById('cm-admin').value.trim(),
-    earningPercent: parseInt(pctSlider.value),
-    status:         document.getElementById('cm-status').value,
-    adsterraSiteId: document.getElementById('cm-adsterra').value.trim(),
-    notes:          document.getElementById('cm-notes').value.trim(),
-    createdAt:      editClientId ? (clients.find(c=>c.id===id)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
-    totalEarning:   editClientId ? (clients.find(c=>c.id===id)?.totalEarning || 0) : 0,
-    totalVisits:    editClientId ? (clients.find(c=>c.id===id)?.totalVisits || 0) : 0,
-    todayVisits:    editClientId ? (clients.find(c=>c.id===id)?.todayVisits || 0) : 0,
-    totalViews:     editClientId ? (clients.find(c=>c.id===id)?.totalViews || 0) : 0,
-  };
-
-  const btn = document.getElementById('cm-save');
-  btn.textContent = '⏳ Saving...'; btn.disabled = true;
-  try {
-    await set(ref(db, `superAdmin/clients/${id}`), data);
-    addLog(editClientId?'edit':'add', `${editClientId?'Updated':'Created'} client: "${name}"`);
-    toast(`✅ Client "${name}" ${editClientId?'updated':'created'}!`);
-    document.getElementById('client-modal').style.display = 'none';
-  } catch(e) { toast('❌ ' + e.message,'err'); }
-  finally { btn.textContent='💾 Save Client'; btn.disabled=false; }
-});
-
-async function deleteClient(id, name) {
-  if(!confirm(`Delete client "${name}"?\nThis removes all their data.`)) return;
-  try {
-    await remove(ref(db, `superAdmin/clients/${id}`));
-    addLog('del', `Deleted client: "${name}"`);
-    toast('🗑️ Client deleted');
-  } catch(e) { toast('❌ ' + e.message,'err'); }
-}
-
-// ── ADD EARNING ────────────────────────────────────────────────────────
-function populateEarnSelect() {
-  const sel = document.getElementById('earn-client');
+// EARN ADD
+function saPopulateEarnSelect() {
+  const sel = document.getElementById('sa-earn-client');
   sel.innerHTML = '<option value="">Choose client...</option>';
-  clients.forEach(c => {
-    const o = document.createElement('option');
-    o.value = c.id; o.textContent = c.name;
-    sel.appendChild(o);
-  });
+  saClients.forEach(c => { const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; sel.appendChild(o); });
 }
-
-document.getElementById('btn-add-earn').addEventListener('click', async () => {
-  const cid    = document.getElementById('earn-client').value;
-  const amount = parseFloat(document.getElementById('earn-amount').value);
-  const note   = document.getElementById('earn-note').value.trim();
-  if(!cid)    { toast('Select a client','inf'); return; }
-  if(!amount) { toast('Enter amount','inf'); return; }
-
-  const c = clients.find(x => x.id===cid);
-  const newTotal = (c?.totalEarning||0) + amount;
-  const histKey  = 'earn_' + Date.now();
+document.getElementById('sa-btn-earn').addEventListener('click', async () => {
+  const cid    = document.getElementById('sa-earn-client').value;
+  const amount = parseFloat(document.getElementById('sa-earn-amount').value);
+  const note   = document.getElementById('sa-earn-note').value.trim();
+  if(!cid||!amount) { toast('Select client and amount','inf'); return; }
+  const c = saClients.find(x=>x.id===cid);
   try {
-    await update(ref(db, `superAdmin/clients/${cid}`), { totalEarning: newTotal });
-    await set(ref(db, `superAdmin/clients/${cid}/earningHistory/${histKey}`), {
-      amount, note, t: new Date().toISOString()
-    });
-    addLog('add', `Added ₹${amount} earning to "${c?.name}"`);
-    toast(`✅ ₹${amount} added to ${c?.name}`);
-    document.getElementById('earn-amount').value = '';
-    document.getElementById('earn-note').value   = '';
-  } catch(e) { toast('❌ ' + e.message,'err'); }
+    await update(ref(db,`superAdmin/clients/${cid}`),{totalEarning:(c?.totalEarning||0)+amount});
+    await set(ref(db,`superAdmin/clients/${cid}/earningHistory/earn_${Date.now()}`),{amount,note,t:new Date().toISOString()});
+    saAddLog('add',`Added ₹${amount} to "${c?.name}"`);
+    toast(`✅ ₹${amount} added`);
+    document.getElementById('sa-earn-amount').value='';
+    document.getElementById('sa-earn-note').value='';
+  } catch(e){ toast('❌ '+e.message,'err'); }
 });
 
-// ── ACTIVITY CONTROLS ──────────────────────────────────────────────────
-document.getElementById('log-filter').addEventListener('change', renderLog);
-document.getElementById('btn-clr-log').addEventListener('click', () => {
-  if(!confirm('Clear all activity logs?')) return;
-  actLog = []; localStorage.setItem('sa_log','[]');
-  document.getElementById('nb-log').textContent = '0';
-  renderLog(); renderDashLog();
+// SETTINGS
+function saLoadSettings() {
+  const base = getBase();
+  document.getElementById('sa-base-url').value = localStorage.getItem('mnx_base_url') || window.location.origin;
+  document.getElementById('sa-url-preview').textContent  = base + '/#/admin/username';
+  document.getElementById('sa-site-preview').textContent = base + '/#/username';
+}
+document.getElementById('sa-base-url').addEventListener('input', () => {
+  const v = document.getElementById('sa-base-url').value.trim();
+  document.getElementById('sa-url-preview').textContent  = v + '/#/admin/username';
+  document.getElementById('sa-site-preview').textContent = v + '/#/username';
+});
+document.getElementById('sa-save-base').addEventListener('click', () => {
+  const url = document.getElementById('sa-base-url').value.trim().replace(/\/+$/,'');
+  localStorage.setItem('mnx_base_url', url);
+  toast('✅ Base URL saved!');
+  saAddLog('edit','Updated base URL: '+url);
+});
+
+// ACTIVITY CONTROLS
+document.getElementById('sa-log-filter').addEventListener('change', saRenderLog);
+document.getElementById('sa-btn-clr-log').addEventListener('click', () => {
+  if(!confirm('Clear all logs?')) return;
+  saActLog=[]; localStorage.setItem('sa_log','[]');
+  document.getElementById('sa-nb-log').textContent='0';
+  saRenderLog(); saRenderDashLog();
   toast('Log cleared');
 });
 
-// ── CLIENT ADMIN GENERATOR ─────────────────────────────────────────────
-const CLIENT_TEMPLATE_B64 = "PCFkb2N0eXBlIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ii8+CjxtZXRhIG5hbWU9InZpZXdwb3J0IiBjb250ZW50PSJ3aWR0aD1kZXZpY2Utd2lkdGgsaW5pdGlhbC1zY2FsZT0xLjAiLz4KPHRpdGxlPk15IEdhbGxlcnkg4oCUIEFkbWluPC90aXRsZT4KPHN0eWxlPgoqLCo6OmJlZm9yZSwqOjphZnRlcntib3gtc2l6aW5nOmJvcmRlci1ib3g7bWFyZ2luOjA7cGFkZGluZzowfQo6cm9vdHsKICAtLWJnOiMwNTA1MDU7LS1zMTojMTExOy0tczI6IzFhMWExYTstLXMzOiMyMjI7CiAgLS1icjojMmEyYTJhOy0tdHg6I2ZmZjstLW11OiM4ODg7LS1tdTI6IzU1NTsKICAtLWFjYzojM2I4MmY2Oy0tYWNjMjojMjU2M2ViOwogIC0tZ3JuOiMyMmM1NWU7LS15bHc6I2Y1OWUwYjstLXJlZDojRTAyNDI0Oy0tcHVyOiNhODU1Zjc7Cn0KaHRtbCxib2R5e2hlaWdodDoxMDAlO292ZXJmbG93OmhpZGRlbn0KYm9keXtiYWNrZ3JvdW5kOnZhcigtLWJnKTtjb2xvcjp2YXIoLS10eCk7Zm9udC1mYW1pbHk6LWFwcGxlLXN5c3RlbSxCbGlua01hY1N5c3RlbUZvbnQsJ1NlZ29lIFVJJyxzYW5zLXNlcmlmfQppbnB1dCxzZWxlY3QsdGV4dGFyZWEsYnV0dG9ue2ZvbnQtZmFtaWx5OmluaGVyaXR9Cjo6LXdlYmtpdC1zY3JvbGxiYXJ7d2lkdGg6NXB4O2hlaWdodDo1cHh9Cjo6LXdlYmtpdC1zY3JvbGxiYXItdHJhY2t7YmFja2dyb3VuZDp2YXIoLS1zMSl9Cjo6LXdlYmtpdC1zY3JvbGxiYXItdGh1bWJ7YmFja2dyb3VuZDp2YXIoLS1icik7Ym9yZGVyLXJhZGl1czozcHh9CgovKiDilIDilIAgTE9HSU4g4pSA4pSAICovCiNsb2dpbi13cmFwe3Bvc2l0aW9uOmZpeGVkO2luc2V0OjA7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO2JhY2tncm91bmQ6cmFkaWFsLWdyYWRpZW50KGVsbGlwc2UgYXQgNTAlIDAlLCMwNTBkMWEsdmFyKC0tYmcpIDcwJSk7ei1pbmRleDo5OTl9Ci5sYm94e2JhY2tncm91bmQ6dmFyKC0tczEpO2JvcmRlcjoxcHggc29saWQgdmFyKC0tYnIpO2JvcmRlci1yYWRpdXM6MjBweDtwYWRkaW5nOjQ0cHggNDBweDt3aWR0aDoxMDAlO21heC13aWR0aDo0MDBweDtib3gtc2hhZG93OjAgMjVweCA4MHB4IHJnYmEoNTksMTMwLDI0NiwuMDgpfQoubGxvZ297Zm9udC1zaXplOjIycHg7Zm9udC13ZWlnaHQ6OTAwO21hcmdpbi1ib3R0b206NHB4fS5sbG9nbyBzcGFue2NvbG9yOnZhcigtLWFjYyl9Ci5sc3Vie2NvbG9yOnZhcigtLW11KTtmb250LXNpemU6MTNweDttYXJnaW4tYm90dG9tOjZweH0KLmxiYWRnZXtkaXNwbGF5OmlubGluZS1ibG9jaztiYWNrZ3JvdW5kOnJnYmEoNTksMTMwLDI0NiwuMTUpO2NvbG9yOnZhcigtLWFjYyk7Ym9yZGVyOjFweCBzb2xpZCByZ2JhKDU5LDEzMCwyNDYsLjMpO2JvcmRlci1yYWRpdXM6OTlweDtmb250LXNpemU6MTBweDtmb250LXdlaWdodDo4MDA7cGFkZGluZzozcHggMTBweDttYXJnaW4tYm90dG9tOjIycHg7bGV0dGVyLXNwYWNpbmc6LjA1ZW19Ci5saW5mb3ttYXJnaW4tYm90dG9tOjE2cHg7cGFkZGluZzoxMHB4IDE0cHg7YmFja2dyb3VuZDp2YXIoLS1zMik7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1icik7Ym9yZGVyLXJhZGl1czoxMHB4O2ZvbnQtc2l6ZToxMXB4O2NvbG9yOnZhcigtLW11KTt0ZXh0LWFsaWduOmNlbnRlcjtsaW5lLWhlaWdodDoxLjZ9Ci5nYnRue3dpZHRoOjEwMCU7cGFkZGluZzoxNXB4O2JhY2tncm91bmQ6I2ZmZjtjb2xvcjojMzMzO2JvcmRlcjoxLjVweCBzb2xpZCAjZGRkO2JvcmRlci1yYWRpdXM6MTJweDtmb250LXNpemU6MTVweDtmb250LXdlaWdodDo3MDA7Y3Vyc29yOnBvaW50ZXI7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO2dhcDoxMnB4O3RyYW5zaXRpb246YWxsIC4yc30KLmdidG46aG92ZXJ7YmFja2dyb3VuZDojZjVmNWY1O2JveC1zaGFkb3c6MCA0cHggMTZweCByZ2JhKDAsMCwwLC4yKX0KLmdidG46YWN0aXZle3RyYW5zZm9ybTpzY2FsZSguOTgpfQouZ2J0bjpkaXNhYmxlZHtvcGFjaXR5Oi42O2N1cnNvcjpub3QtYWxsb3dlZDt0cmFuc2Zvcm06bm9uZX0KLmxlcnJ7bWFyZ2luLXRvcDoxNHB4O3BhZGRpbmc6MTJweCAxNHB4O2JhY2tncm91bmQ6IzBhMTIyNTtib3JkZXI6MXB4IHNvbGlkICMxYTMwNjA7Ym9yZGVyLXJhZGl1czoxMHB4O2ZvbnQtc2l6ZToxMnB4O2NvbG9yOnZhcigtLWFjYyk7ZGlzcGxheTpub25lO2xpbmUtaGVpZ2h0OjEuNn0KCi8qIOKUgOKUgCBBUFAg4pSA4pSAICovCiNhcHAtd3JhcHtkaXNwbGF5Om5vbmU7aGVpZ2h0OjEwMHZoO2ZsZXgtZGlyZWN0aW9uOmNvbHVtbn0KLnRvcGJhcntiYWNrZ3JvdW5kOnZhcigtLXMxKTtib3JkZXItYm90dG9tOjFweCBzb2xpZCB2YXIoLS1icik7cGFkZGluZzoxMnB4IDIwcHg7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6c3BhY2UtYmV0d2VlbjtmbGV4LXNocmluazowfQoudGxvZ297Zm9udC1zaXplOjE1cHg7Zm9udC13ZWlnaHQ6OTAwO2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7Z2FwOjhweH0KLnRsb2dvIC5zaXRlLW5hbWV7Y29sb3I6dmFyKC0tYWNjKX0KLnRiYWRnZXtiYWNrZ3JvdW5kOnZhcigtLWFjYyk7Y29sb3I6I2ZmZjtmb250LXNpemU6OXB4O2ZvbnQtd2VpZ2h0OjgwMDtwYWRkaW5nOjJweCA4cHg7Ym9yZGVyLXJhZGl1czo5OXB4fQoudHJpZ2h0e2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7Z2FwOjEwcHh9Ci5id3JhcHtkaXNwbGF5OmZsZXg7ZmxleDoxO292ZXJmbG93OmhpZGRlbjtoZWlnaHQ6Y2FsYygxMDB2aCAtIDQ5cHgpfQoKLyog4pSA4pSAIFNJREVCQVIg4pSA4pSAICovCi5zYnt3aWR0aDoyMTBweDttaW4td2lkdGg6MjEwcHg7YmFja2dyb3VuZDp2YXIoLS1zMSk7Ym9yZGVyLXJpZ2h0OjFweCBzb2xpZCB2YXIoLS1icik7ZGlzcGxheTpmbGV4O2ZsZXgtZGlyZWN0aW9uOmNvbHVtbjtvdmVyZmxvdy15OmF1dG99Ci5zYi1zZWN7cGFkZGluZzoxNnB4IDE2cHggNnB4O2ZvbnQtc2l6ZToxMHB4O2ZvbnQtd2VpZ2h0OjgwMDtjb2xvcjp2YXIoLS1tdTIpO3RleHQtdHJhbnNmb3JtOnVwcGVyY2FzZTtsZXR0ZXItc3BhY2luZzouMDhlbX0KLnNiLWl0ZW17ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6OXB4O3BhZGRpbmc6OXB4IDE2cHg7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NTAwO2NvbG9yOnZhcigtLW11KTtjdXJzb3I6cG9pbnRlcjt0cmFuc2l0aW9uOmFsbCAuMTVzO2JvcmRlci1sZWZ0OjNweCBzb2xpZCB0cmFuc3BhcmVudDt1c2VyLXNlbGVjdDpub25lfQouc2ItaXRlbTpob3Zlcntjb2xvcjp2YXIoLS10eCk7YmFja2dyb3VuZDp2YXIoLS1zMil9Ci5zYi1pdGVtLm9ue2NvbG9yOnZhcigtLXR4KTtiYWNrZ3JvdW5kOnJnYmEoNTksMTMwLDI0NiwuMDgpO2JvcmRlci1sZWZ0LWNvbG9yOnZhcigtLWFjYyk7Zm9udC13ZWlnaHQ6NzAwfQouc2ItaXRlbSAuaWN7Zm9udC1zaXplOjE1cHg7d2lkdGg6MThweDt0ZXh0LWFsaWduOmNlbnRlcn0KLnNibnttYXJnaW4tbGVmdDphdXRvO2JhY2tncm91bmQ6dmFyKC0tczMpO2NvbG9yOnZhcigtLW11KTtmb250LXNpemU6MTBweDtmb250LXdlaWdodDo3MDA7cGFkZGluZzoxcHggN3B4O2JvcmRlci1yYWRpdXM6OTlweH0KLnNiLWl0ZW0ub24gLnNibntiYWNrZ3JvdW5kOnJnYmEoNTksMTMwLDI0NiwuMik7Y29sb3I6dmFyKC0tYWNjKX0KLnNiLWZvb3R7cGFkZGluZzoxNHB4IDE2cHg7Ym9yZGVyLXRvcDoxcHggc29saWQgdmFyKC0tYnIpO21hcmdpbi10b3A6YXV0b30KLnNiLXVzZXIgc3Ryb25ne2NvbG9yOnZhcigtLXR4KTtkaXNwbGF5OmJsb2NrO2ZvbnQtc2l6ZToxMnB4O21hcmdpbi1ib3R0b206MnB4fQouc2ItdXNlcntmb250LXNpemU6MTFweDtjb2xvcjp2YXIoLS1tdSk7bWFyZ2luLWJvdHRvbToxMHB4fQoKLyog4pSA4pSAIE1BSU4g4pSA4pSAICovCi5tYWlue2ZsZXg6MTtvdmVyZmxvdy15OmF1dG87cGFkZGluZzoyMHB4O2Rpc3BsYXk6ZmxleDtmbGV4LWRpcmVjdGlvbjpjb2x1bW47Z2FwOjE4cHh9Ci5wYWdle2Rpc3BsYXk6bm9uZTtmbGV4LWRpcmVjdGlvbjpjb2x1bW47Z2FwOjE4cHh9Ci5wYWdlLm9ue2Rpc3BsYXk6ZmxleH0KLnBoZHJ7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6c3BhY2UtYmV0d2VlbjtmbGV4LXdyYXA6d3JhcDtnYXA6MTBweH0KLnB0aXRsZXtmb250LXNpemU6MTZweDtmb250LXdlaWdodDo4MDB9CgovKiDilIDilIAgQ0FSRFMg4pSA4pSAICovCi5jYXJke2JhY2tncm91bmQ6dmFyKC0tczEpO2JvcmRlcjoxcHggc29saWQgdmFyKC0tYnIpO2JvcmRlci1yYWRpdXM6MTRweDtvdmVyZmxvdzpoaWRkZW59Ci5jaGRye3BhZGRpbmc6MTRweCAxOHB4O2JvcmRlci1ib3R0b206MXB4IHNvbGlkIHZhcigtLWJyKTtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpzcGFjZS1iZXR3ZWVuO2ZsZXgtd3JhcDp3cmFwO2dhcDo4cHh9Ci5jdGl0bGV7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NzAwfQouY2JvZHl7cGFkZGluZzoxOHB4fQoKLyog4pSA4pSAIFNUQVRTIOKUgOKUgCAqLwouc2dyaWR7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczpyZXBlYXQoYXV0by1maWxsLG1pbm1heCgxNTVweCwxZnIpKTtnYXA6MTJweH0KLnNjYXJke2JhY2tncm91bmQ6dmFyKC0tczEpO2JvcmRlcjoxcHggc29saWQgdmFyKC0tYnIpO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjE2cHggMThweDtwb3NpdGlvbjpyZWxhdGl2ZTtvdmVyZmxvdzpoaWRkZW59Ci5zY2FyZDo6YWZ0ZXJ7Y29udGVudDonJztwb3NpdGlvbjphYnNvbHV0ZTt0b3A6LTE1cHg7cmlnaHQ6LTE1cHg7d2lkdGg6NzBweDtoZWlnaHQ6NzBweDtib3JkZXItcmFkaXVzOjUwJTtvcGFjaXR5Oi4wN30KLnNjYXJkLmI6OmFmdGVye2JhY2tncm91bmQ6dmFyKC0tYWNjKX0uc2NhcmQuZzo6YWZ0ZXJ7YmFja2dyb3VuZDp2YXIoLS1ncm4pfQouc2NhcmQueTo6YWZ0ZXJ7YmFja2dyb3VuZDp2YXIoLS15bHcpfS5zY2FyZC5yOjphZnRlcntiYWNrZ3JvdW5kOnZhcigtLXJlZCl9LnNjYXJkLnA6OmFmdGVye2JhY2tncm91bmQ6dmFyKC0tcHVyKX0KLnNsYmx7Zm9udC1zaXplOjEwcHg7Zm9udC13ZWlnaHQ6NzAwO2NvbG9yOnZhcigtLW11KTt0ZXh0LXRyYW5zZm9ybTp1cHBlcmNhc2U7bGV0dGVyLXNwYWNpbmc6LjA2ZW07bWFyZ2luLWJvdHRvbTo2cHh9Ci5zdmFse2ZvbnQtc2l6ZToyNnB4O2ZvbnQtd2VpZ2h0OjkwMH0KLmIgLnN2YWx7Y29sb3I6dmFyKC0tYWNjKX0uZyAuc3ZhbHtjb2xvcjp2YXIoLS1ncm4pfS55IC5zdmFse2NvbG9yOnZhcigtLXlsdyl9LnIgLnN2YWx7Y29sb3I6dmFyKC0tcmVkKX0ucCAuc3ZhbHtjb2xvcjp2YXIoLS1wdXIpfQouc3N1Yntmb250LXNpemU6MTFweDtjb2xvcjp2YXIoLS1tdSk7bWFyZ2luLXRvcDozcHh9CgovKiDilIDilIAgVEFCTEUg4pSA4pSAICovCi50d3JhcHtvdmVyZmxvdy14OmF1dG99CnRhYmxle3dpZHRoOjEwMCU7Ym9yZGVyLWNvbGxhcHNlOmNvbGxhcHNlfQp0aGVhZCB0cntiYWNrZ3JvdW5kOnZhcigtLXMyKX0KdGh7cGFkZGluZzo5cHggMTNweDt0ZXh0LWFsaWduOmxlZnQ7Zm9udC1zaXplOjEwcHg7Zm9udC13ZWlnaHQ6ODAwO2NvbG9yOnZhcigtLW11KTt0ZXh0LXRyYW5zZm9ybTp1cHBlcmNhc2U7bGV0dGVyLXNwYWNpbmc6LjA2ZW07Ym9yZGVyLWJvdHRvbToxcHggc29saWQgdmFyKC0tYnIpO3doaXRlLXNwYWNlOm5vd3JhcH0KdGR7cGFkZGluZzoxMHB4IDEzcHg7Zm9udC1zaXplOjEycHg7Ym9yZGVyLWJvdHRvbToxcHggc29saWQgdmFyKC0tYnIpO3ZlcnRpY2FsLWFsaWduOm1pZGRsZX0KdHI6bGFzdC1jaGlsZCB0ZHtib3JkZXItYm90dG9tOm5vbmV9CnRyOmhvdmVyIHRke2JhY2tncm91bmQ6cmdiYSgyNTUsMjU1LDI1NSwuMDE1KX0KLnRmb290e3BhZGRpbmc6OXB4IDE0cHg7Zm9udC1zaXplOjExcHg7Y29sb3I6dmFyKC0tbXUpO2JvcmRlci10b3A6MXB4IHNvbGlkIHZhcigtLWJyKX0KLnRhZ3tkaXNwbGF5OmlubGluZS1mbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtwYWRkaW5nOjJweCA4cHg7Ym9yZGVyLXJhZGl1czo5OXB4O2ZvbnQtc2l6ZToxMHB4O2ZvbnQtd2VpZ2h0OjcwMDt3aGl0ZS1zcGFjZTpub3dyYXA7bWFyZ2luOjFweH0KLnRhZy5jYXR7YmFja2dyb3VuZDojMGExMjI1O2NvbG9yOnZhcigtLWFjYyk7Ym9yZGVyOjFweCBzb2xpZCAjMWEzMDYwfQoudGFnLmZ0e2JhY2tncm91bmQ6IzFhMGEyYTtjb2xvcjp2YXIoLS1wdXIpO2JvcmRlcjoxcHggc29saWQgIzNhMWE1YX0KLnRhZy50cntiYWNrZ3JvdW5kOiMwNTE4MDg7Y29sb3I6dmFyKC0tZ3JuKTtib3JkZXI6MXB4IHNvbGlkICMwZDQwMTV9Ci50YWcubnd7YmFja2dyb3VuZDojMWUxMjAwO2NvbG9yOnZhcigtLXlsdyk7Ym9yZGVyOjFweCBzb2xpZCAjNGEyZjAwfQouYXJvd3tkaXNwbGF5OmZsZXg7Z2FwOjVweDtmbGV4LXdyYXA6d3JhcH0KLnRodW1ie3dpZHRoOjQycHg7aGVpZ2h0OjU2cHg7b2JqZWN0LWZpdDpjb3Zlcjtib3JkZXItcmFkaXVzOjZweDtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWJyKX0KLmVtcHR5e3BhZGRpbmc6NDhweCAyMHB4O3RleHQtYWxpZ246Y2VudGVyO2NvbG9yOnZhcigtLW11KX0KLmVpY3tmb250LXNpemU6MzZweDttYXJnaW4tYm90dG9tOjEwcHh9CgovKiDilIDilIAgQlVUVE9OUyDilIDilIAgKi8KLmJ0bntwYWRkaW5nOjhweCAxNnB4O2JvcmRlci1yYWRpdXM6MTBweDtmb250LXNpemU6MTJweDtmb250LXdlaWdodDo3MDA7Y3Vyc29yOnBvaW50ZXI7Ym9yZGVyOm5vbmU7dHJhbnNpdGlvbjphbGwgLjE1cztkaXNwbGF5OmlubGluZS1mbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6NXB4O3doaXRlLXNwYWNlOm5vd3JhcH0KLmJ0bjphY3RpdmV7dHJhbnNmb3JtOnNjYWxlKC45Nyl9Ci5idG4tcHtiYWNrZ3JvdW5kOnZhcigtLWFjYyk7Y29sb3I6I2ZmZn0uYnRuLXA6aG92ZXJ7YmFja2dyb3VuZDp2YXIoLS1hY2MyKX0KLmJ0bi1ne2JhY2tncm91bmQ6dmFyKC0tczIpO2NvbG9yOnZhcigtLW11KTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWJyKX0uYnRuLWc6aG92ZXJ7Y29sb3I6dmFyKC0tdHgpO2JvcmRlci1jb2xvcjojNTU1fQouYnRuLWR7YmFja2dyb3VuZDojMTYwNDA0O2NvbG9yOnZhcigtLXJlZCk7Ym9yZGVyOjFweCBzb2xpZCAjMmEwODA4fS5idG4tZDpob3ZlcntiYWNrZ3JvdW5kOiMyYTA4MDh9Ci5idG4tZ3Jue2JhY2tncm91bmQ6IzA1MTgwODtjb2xvcjp2YXIoLS1ncm4pO2JvcmRlcjoxcHggc29saWQgIzBkNDAxNX0uYnRuLWdybjpob3ZlcntiYWNrZ3JvdW5kOiMwZDQwMTV9Ci5idG4tc217cGFkZGluZzo1cHggMTBweDtmb250LXNpemU6MTFweDtib3JkZXItcmFkaXVzOjdweH0KLmJ0bi14c3twYWRkaW5nOjNweCA4cHg7Zm9udC1zaXplOjEwcHg7Ym9yZGVyLXJhZGl1czo1cHh9CgovKiDilIDilIAgTU9EQUwg4pSA4pSAICovCi5vdmVybGF5e3Bvc2l0aW9uOmZpeGVkO2luc2V0OjA7YmFja2dyb3VuZDpyZ2JhKDAsMCwwLC44OCk7ei1pbmRleDoyMDA7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO3BhZGRpbmc6MTZweDtiYWNrZHJvcC1maWx0ZXI6Ymx1cigzcHgpfQoubW9kYWx7YmFja2dyb3VuZDp2YXIoLS1zMSk7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1icik7Ym9yZGVyLXJhZGl1czoxOHB4O3dpZHRoOjEwMCU7bWF4LXdpZHRoOjY4MHB4O21heC1oZWlnaHQ6OTJ2aDtvdmVyZmxvdy15OmF1dG87cGFkZGluZzoyOHB4fQoubW9kYWwgaDJ7Zm9udC1zaXplOjE2cHg7Zm9udC13ZWlnaHQ6ODAwO21hcmdpbi1ib3R0b206MThweH0KLmZne2Rpc3BsYXk6ZmxleDtmbGV4LWRpcmVjdGlvbjpjb2x1bW47Z2FwOjVweDttYXJnaW4tYm90dG9tOjEzcHh9Ci5mZyBsYWJlbHtmb250LXNpemU6MTBweDtmb250LXdlaWdodDo3MDA7Y29sb3I6dmFyKC0tbXUpO3RleHQtdHJhbnNmb3JtOnVwcGVyY2FzZTtsZXR0ZXItc3BhY2luZzouMDVlbX0KLmZnIGlucHV0LC5mZyBzZWxlY3QsLmZnIHRleHRhcmVhe3BhZGRpbmc6OXB4IDEzcHg7YmFja2dyb3VuZDp2YXIoLS1iZyk7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1icik7Ym9yZGVyLXJhZGl1czoxMHB4O2NvbG9yOnZhcigtLXR4KTtmb250LXNpemU6MTNweDtvdXRsaW5lOm5vbmU7d2lkdGg6MTAwJTt0cmFuc2l0aW9uOmJvcmRlciAuMnN9Ci5mZyBpbnB1dDpmb2N1cywuZmcgc2VsZWN0OmZvY3VzLC5mZyB0ZXh0YXJlYTpmb2N1c3tib3JkZXItY29sb3I6dmFyKC0tYWNjKX0KLmZnIHRleHRhcmVhe3Jlc2l6ZTp2ZXJ0aWNhbDttaW4taGVpZ2h0OjcwcHh9Ci5mZ3JpZHtkaXNwbGF5OmdyaWQ7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOjFmciAxZnI7Z2FwOjEycHh9Ci5mdWxse2dyaWQtY29sdW1uOjEvLTF9Ci5jaGVja3N7ZGlzcGxheTpmbGV4O2ZsZXgtd3JhcDp3cmFwO2dhcDoxMnB4O3BhZGRpbmc6OHB4IDB9Ci5jaGt7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6NnB4O2ZvbnQtc2l6ZToxM3B4O2N1cnNvcjpwb2ludGVyfQouY2hrIGlucHV0W3R5cGU9Y2hlY2tib3hde2FjY2VudC1jb2xvcjp2YXIoLS1hY2MpO3dpZHRoOjE0cHg7aGVpZ2h0OjE0cHh9Ci5tZm9vdHtkaXNwbGF5OmZsZXg7anVzdGlmeS1jb250ZW50OmZsZXgtZW5kO2dhcDoxMHB4O21hcmdpbi10b3A6MjBweDtwYWRkaW5nLXRvcDoxNnB4O2JvcmRlci10b3A6MXB4IHNvbGlkIHZhcigtLWJyKX0KLnByZXYtaW1ne3dpZHRoOjEwMCU7aGVpZ2h0OjEwMHB4O29iamVjdC1maXQ6Y292ZXI7Ym9yZGVyLXJhZGl1czo4cHg7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1icik7bWFyZ2luLXRvcDo2cHg7YmFja2dyb3VuZDp2YXIoLS1zMik7ZGlzcGxheTpub25lfQoKLyog4pSA4pSAIEVBUk5JTkcgQkFSIOKUgOKUgCAqLwouZWFybi1iYXJ7aGVpZ2h0OjhweDtiYWNrZ3JvdW5kOnZhcigtLXMzKTtib3JkZXItcmFkaXVzOjRweDtvdmVyZmxvdzpoaWRkZW47bWFyZ2luOjhweCAwfQouZWFybi1maWxse2hlaWdodDoxMDAlO2JvcmRlci1yYWRpdXM6NHB4O2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLHZhcigtLWFjYyksdmFyKC0tZ3JuKSk7dHJhbnNpdGlvbjp3aWR0aCAuNnMgZWFzZX0KCi8qIOKUgOKUgCBDSEFSVCBDQU5WQVMg4pSA4pSAICovCi5jaGFydC13cmFwe3Bvc2l0aW9uOnJlbGF0aXZlO2hlaWdodDoxMjBweDttYXJnaW4tdG9wOjEwcHh9CgovKiDilIDilIAgU1RBVFVTIERPVCDilIDilIAgKi8KLnNkb3R7ZGlzcGxheTppbmxpbmUtZmxleDthbGlnbi1pdGVtczpjZW50ZXI7Z2FwOjVweDtmb250LXNpemU6MTFweDtmb250LXdlaWdodDo3MDB9Ci5zZG90OjpiZWZvcmV7Y29udGVudDonJzt3aWR0aDo3cHg7aGVpZ2h0OjdweDtib3JkZXItcmFkaXVzOjUwJTtiYWNrZ3JvdW5kOmN1cnJlbnRDb2xvcn0KLnNkb3QubGl2ZXtjb2xvcjp2YXIoLS1ncm4pO2FuaW1hdGlvbjpibGluayAycyBpbmZpbml0ZX0KQGtleWZyYW1lcyBibGlua3swJSwxMDAle29wYWNpdHk6MX01MCV7b3BhY2l0eTouNH19CgovKiDilIDilIAgVE9BU1Qg4pSA4pSAICovCiN0b2FzdHtwb3NpdGlvbjpmaXhlZDtib3R0b206MjJweDtyaWdodDoyMnB4O3otaW5kZXg6OTk5O2JhY2tncm91bmQ6dmFyKC0tczEpO2JvcmRlcjoxcHggc29saWQgdmFyKC0tYnIpO2JvcmRlci1yYWRpdXM6MTJweDtwYWRkaW5nOjEycHggMThweDtmb250LXNpemU6MTNweDtmb250LXdlaWdodDo2MDA7dHJhbnNmb3JtOnRyYW5zbGF0ZVkoODBweCk7b3BhY2l0eTowO3RyYW5zaXRpb246YWxsIC4zcyBjdWJpYy1iZXppZXIoLjM0LDEuNTYsLjY0LDEpO2JveC1zaGFkb3c6MCAxMnB4IDQwcHggcmdiYSgwLDAsMCwuNSk7bWluLXdpZHRoOjIyMHB4fQojdG9hc3Qub257dHJhbnNmb3JtOnRyYW5zbGF0ZVkoMCk7b3BhY2l0eToxfQojdG9hc3Qub2t7Ym9yZGVyLWNvbG9yOnZhcigtLWdybik7Y29sb3I6dmFyKC0tZ3JuKX0KI3RvYXN0LmVycntib3JkZXItY29sb3I6dmFyKC0tcmVkKTtjb2xvcjp2YXIoLS1yZWQpfQojdG9hc3QuaW5me2JvcmRlci1jb2xvcjp2YXIoLS1hY2MpO2NvbG9yOnZhcigtLWFjYyl9CgpAbWVkaWEobWF4LXdpZHRoOjgwMHB4KXsuc2J7ZGlzcGxheTpub25lfS5mZ3JpZHtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyfS5zZ3JpZHtncmlkLXRlbXBsYXRlLWNvbHVtbnM6cmVwZWF0KDIsMWZyKX19Cjwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+Cgo8IS0tIOKUgOKUgCBMT0dJTiDilIDilIAgLS0+CjxkaXYgaWQ9ImxvZ2luLXdyYXAiPgogIDxkaXYgY2xhc3M9Imxib3giPgogICAgPGRpdiBjbGFzcz0ibGxvZ28iPk15IDxzcGFuPkdhbGxlcnk8L3NwYW4+PC9kaXY+CiAgICA8cCBjbGFzcz0ibHN1YiI+Q2xpZW50IEFkbWluIFBhbmVsPC9wPgogICAgPGRpdiBjbGFzcz0ibGJhZGdlIj7wn5SQIENMSUVOVCBBQ0NFU1M8L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImxpbmZvIiBpZD0ibC1pbmZvIj5TaWduIGluIHdpdGggeW91ciBhdXRob3JpemVkIEdvb2dsZSBhY2NvdW50IHRvIGFjY2VzcyB5b3VyIGRhc2hib2FyZDwvZGl2PgogICAgPGJ1dHRvbiBjbGFzcz0iZ2J0biIgaWQ9ImctYnRuIj4KICAgICAgPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA0OCA0OCI+CiAgICAgICAgPHBhdGggZmlsbD0iI0VBNDMzNSIgZD0iTTI0IDkuNWMzLjU0IDAgNi43MSAxLjIyIDkuMjEgMy42bDYuODUtNi44NUMzNS45IDIuMzggMzAuNDcgMCAyNCAwIDE0LjYyIDAgNi41MSA1LjM4IDIuNTYgMTMuMjJsNy45OCA2LjE5QzEyLjQzIDEzLjA4IDE3Ljc0IDkuNSAyNCA5LjV6Ii8+CiAgICAgICAgPHBhdGggZmlsbD0iIzQyODVGNCIgZD0iTTQ2Ljk4IDI0LjU1YzAtMS41Ny0uMTUtMy4wOS0uMzgtNC41NUgyNHY5LjAyaDEyLjk0Yy0uNTggMi45Ni0yLjI2IDUuNDgtNC43OCA3LjE4bDcuNzMgNmM0LjUxLTQuMTggNy4wOS0xMC4zNiA3LjA5LTE3LjY1eiIvPgogICAgICAgIDxwYXRoIGZpbGw9IiNGQkJDMDUiIGQ9Ik0xMC41MyAyOC41OWMtLjQ4LTEuNDUtLjc2LTIuOTktLjc2LTQuNTlzLjI3LTMuMTQuNzYtNC41OWwtNy45OC02LjE5Qy45MiAxNi40NiAwIDIwLjEyIDAgMjRjMCAzLjg4LjkyIDcuNTQgMi41NiAxMC43OGw3Ljk3LTYuMTl6Ii8+CiAgICAgICAgPHBhdGggZmlsbD0iIzM0QTg1MyIgZD0iTTI0IDQ4YzYuNDggMCAxMS45My0yLjEzIDE1Ljg5LTUuODFsLTcuNzMtNmMtMi4xOCAxLjQ4LTQuOTcgMi4zMS04LjE2IDIuMzEtNi4yNiAwLTExLjU3LTMuNTktMTMuNDYtOC45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ii8+CiAgICAgIDwvc3ZnPgogICAgICBDb250aW51ZSB3aXRoIEdvb2dsZQogICAgPC9idXR0b24+CiAgICA8ZGl2IGNsYXNzPSJsZXJyIiBpZD0ibC1lcnIiPjwvZGl2PgogIDwvZGl2Pgo8L2Rpdj4KCjwhLS0g4pSA4pSAIEFQUCDilIDilIAgLS0+CjxkaXYgaWQ9ImFwcC13cmFwIj4KICA8ZGl2IGNsYXNzPSJ0b3BiYXIiPgogICAgPGRpdiBjbGFzcz0idGxvZ28iPgogICAgICA8c3BhbiBjbGFzcz0ic2l0ZS1uYW1lIiBpZD0ic2l0ZS10aXRsZSI+TXkgR2FsbGVyeTwvc3Bhbj4KICAgICAgPHNwYW4gY2xhc3M9InRiYWRnZSI+Q0xJRU5UIEFETUlOPC9zcGFuPgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJ0cmlnaHQiPgogICAgICA8c3BhbiBjbGFzcz0ic2RvdCBsaXZlIiBpZD0iZGItc3QiPkNvbm5lY3Rpbmc8L3NwYW4+CiAgICAgIDxidXR0b24gY2xhc3M9ImJ0biBidG4tcCBidG4tc20iIGlkPSJidG4tYWRkLWltZyI+KyBBZGQgSW1hZ2U8L2J1dHRvbj4KICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1nIGJ0bi1zbSIgaWQ9ImJ0bi1sb2dvdXQiPkxvZ291dDwvYnV0dG9uPgogICAgPC9kaXY+CiAgPC9kaXY+CgogIDxkaXYgY2xhc3M9ImJ3cmFwIj4KICAgIDxhc2lkZSBjbGFzcz0ic2IiPgogICAgICA8ZGl2IGNsYXNzPSJzYi1zZWMiPk15IFBhbmVsPC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InNiLWl0ZW0gb24iIGRhdGEtcGFnZT0iZGFzaGJvYXJkIj48c3BhbiBjbGFzcz0iaWMiPvCfk4o8L3NwYW4+RGFzaGJvYXJkPC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InNiLWl0ZW0iIGRhdGEtcGFnZT0iaW1hZ2VzIj48c3BhbiBjbGFzcz0iaWMiPvCflrzvuI88L3NwYW4+TXkgSW1hZ2VzPHNwYW4gY2xhc3M9InNibiIgaWQ9Im5iLWltZyI+MDwvc3Bhbj48L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0ic2ItaXRlbSIgZGF0YS1wYWdlPSJjYXRlZ29yaWVzIj48c3BhbiBjbGFzcz0iaWMiPvCfk4I8L3NwYW4+Q2F0ZWdvcmllczxzcGFuIGNsYXNzPSJzYm4iIGlkPSJuYi1jYXQiPjA8L3NwYW4+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InNiLWl0ZW0iIGRhdGEtcGFnZT0ic3RhdHMiPjxzcGFuIGNsYXNzPSJpYyI+8J+TiDwvc3Bhbj5NeSBTdGF0czwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJzYi1pdGVtIiBkYXRhLXBhZ2U9ImVhcm5pbmciPjxzcGFuIGNsYXNzPSJpYyI+8J+SsDwvc3Bhbj5NeSBFYXJuaW5nPC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InNiLWZvb3QiPgogICAgICAgIDxkaXYgY2xhc3M9InNiLXVzZXIiPjxzdHJvbmcgaWQ9ImNsLWVtYWlsIj7igJQ8L3N0cm9uZz5DbGllbnQgQWRtaW48L2Rpdj4KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWcgYnRuLXNtIiBpZD0iYnRuLWxvZ291dDIiIHN0eWxlPSJ3aWR0aDoxMDAlO2p1c3RpZnktY29udGVudDpjZW50ZXIiPlNpZ24gT3V0PC9idXR0b24+CiAgICAgIDwvZGl2PgogICAgPC9hc2lkZT4KCiAgICA8ZGl2IGNsYXNzPSJtYWluIj4KCiAgICAgIDwhLS0gREFTSEJPQVJEIC0tPgogICAgICA8ZGl2IGNsYXNzPSJwYWdlIG9uIiBpZD0icGFnZS1kYXNoYm9hcmQiPgogICAgICAgIDxkaXYgY2xhc3M9InBoZHIiPjxkaXYgY2xhc3M9InB0aXRsZSI+8J+TiiBNeSBEYXNoYm9hcmQ8L2Rpdj48L2Rpdj4KICAgICAgICA8ZGl2IGNsYXNzPSJzZ3JpZCI+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJzY2FyZCBnIj48ZGl2IGNsYXNzPSJzbGJsIj5NeSBFYXJuaW5nPC9kaXY+PGRpdiBjbGFzcz0ic3ZhbCIgaWQ9ImQtZWFybiI+4oK5MDwvZGl2PjxkaXYgY2xhc3M9InNzdWIiPlRvdGFsIGFsbCB0aW1lPC9kaXY+PC9kaXY+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJzY2FyZCBiIj48ZGl2IGNsYXNzPSJzbGJsIj5UaGlzIE1vbnRoPC9kaXY+PGRpdiBjbGFzcz0ic3ZhbCIgaWQ9ImQtbW9udGgiPuKCuTA8L2Rpdj48ZGl2IGNsYXNzPSJzc3ViIj5DdXJyZW50IG1vbnRoPC9kaXY+PC9kaXY+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJzY2FyZCB5Ij48ZGl2IGNsYXNzPSJzbGJsIj5Ub3RhbCBWaXNpdHM8L2Rpdj48ZGl2IGNsYXNzPSJzdmFsIiBpZD0iZC12aXNpdHMiPjA8L2Rpdj48ZGl2IGNsYXNzPSJzc3ViIj5NeSBzaXRlIHRyYWZmaWM8L2Rpdj48L2Rpdj4KICAgICAgICAgIDxkaXYgY2xhc3M9InNjYXJkIHIiPjxkaXYgY2xhc3M9InNsYmwiPlRvZGF5IFZpc2l0czwvZGl2PjxkaXYgY2xhc3M9InN2YWwiIGlkPSJkLXRvZGF5Ij4wPC9kaXY+PGRpdiBjbGFzcz0ic3N1YiI+TGl2ZSBjb3VudDwvZGl2PjwvZGl2PgogICAgICAgICAgPGRpdiBjbGFzcz0ic2NhcmQgcCI+PGRpdiBjbGFzcz0ic2xibCI+VG90YWwgSW1hZ2VzPC9kaXY+PGRpdiBjbGFzcz0ic3ZhbCIgaWQ9ImQtaW1hZ2VzIj4wPC9kaXY+PGRpdiBjbGFzcz0ic3N1YiI+T24gbXkgc2l0ZTwvZGl2PjwvZGl2PgogICAgICAgICAgPGRpdiBjbGFzcz0ic2NhcmQgYiI+PGRpdiBjbGFzcz0ic2xibCI+TXkgU2hhcmUgJTwvZGl2PjxkaXYgY2xhc3M9InN2YWwiIGlkPSJkLXBjdCI+4oCUPC9kaXY+PGRpdiBjbGFzcz0ic3N1YiI+T2YgYWQgcmV2ZW51ZTwvZGl2PjwvZGl2PgogICAgICAgIDwvZGl2PgoKICAgICAgICA8IS0tIEVhcm5pbmcgUHJvZ3Jlc3MgLS0+CiAgICAgICAgPGRpdiBjbGFzcz0iY2FyZCI+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJjaGRyIj48ZGl2IGNsYXNzPSJjdGl0bGUiPvCfkrAgRWFybmluZyBPdmVydmlldzwvZGl2PjwvZGl2PgogICAgICAgICAgPGRpdiBjbGFzcz0iY2JvZHkiPgogICAgICAgICAgICA8ZGl2IHN0eWxlPSJkaXNwbGF5OmZsZXg7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47Zm9udC1zaXplOjEycHg7Y29sb3I6dmFyKC0tbXUpO21hcmdpbi1ib3R0b206NHB4Ij4KICAgICAgICAgICAgICA8c3Bhbj5UaGlzIG1vbnRoIHByb2dyZXNzPC9zcGFuPjxzcGFuIGlkPSJlYXJuLXBjdC1sYmwiPjAlPC9zcGFuPgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iZWFybi1iYXIiPjxkaXYgY2xhc3M9ImVhcm4tZmlsbCIgaWQ9ImVhcm4tZmlsbCIgc3R5bGU9IndpZHRoOjAlIj48L2Rpdj48L2Rpdj4KICAgICAgICAgICAgPGRpdiBzdHlsZT0iZGlzcGxheTpmbGV4O2p1c3RpZnktY29udGVudDpzcGFjZS1iZXR3ZWVuO2ZvbnQtc2l6ZToxMXB4O2NvbG9yOnZhcigtLW11Mik7bWFyZ2luLXRvcDo0cHgiPgogICAgICAgICAgICAgIDxzcGFuPuKCuTA8L3NwYW4+PHNwYW4gaWQ9ImVhcm4tdGFyZ2V0LWxibCI+4oK5MTAwMCB0YXJnZXQ8L3NwYW4+CiAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgPC9kaXY+CiAgICAgICAgPC9kaXY+CgogICAgICAgIDwhLS0gUmVjZW50IGltYWdlcyAtLT4KICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkIj4KICAgICAgICAgIDxkaXYgY2xhc3M9ImNoZHIiPgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJjdGl0bGUiPvCfhpUgUmVjZW50IEltYWdlczwvZGl2PgogICAgICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWcgYnRuLXNtIiBkYXRhLWdvdG89ImltYWdlcyI+VmlldyBBbGwg4oaSPC9idXR0b24+CiAgICAgICAgICA8L2Rpdj4KICAgICAgICAgIDxkaXYgc3R5bGU9ImRpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6cmVwZWF0KGF1dG8tZmlsbCxtaW5tYXgoODBweCwxZnIpKTtnYXA6OHB4O3BhZGRpbmc6MTZweCIgaWQ9ImRhc2gtaW1ncyI+PC9kaXY+CiAgICAgICAgPC9kaXY+CiAgICAgIDwvZGl2PgoKICAgICAgPCEtLSBJTUFHRVMgLS0+CiAgICAgIDxkaXYgY2xhc3M9InBhZ2UiIGlkPSJwYWdlLWltYWdlcyI+CiAgICAgICAgPGRpdiBjbGFzcz0iY2FyZCI+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJjaGRyIj4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY3RpdGxlIj7wn5a877iPIE15IEltYWdlczwvZGl2PgogICAgICAgICAgICA8ZGl2IHN0eWxlPSJkaXNwbGF5OmZsZXg7Z2FwOjhweDtmbGV4LXdyYXA6d3JhcCI+CiAgICAgICAgICAgICAgPGlucHV0IHR5cGU9InNlYXJjaCIgaWQ9InEtaW1nIiBwbGFjZWhvbGRlcj0i8J+UjSBTZWFyY2guLi4iIHN0eWxlPSJwYWRkaW5nOjdweCAxMnB4O2JhY2tncm91bmQ6dmFyKC0tYmcpO2JvcmRlcjoxcHggc29saWQgdmFyKC0tYnIpO2JvcmRlci1yYWRpdXM6MTBweDtjb2xvcjp2YXIoLS10eCk7Zm9udC1zaXplOjEycHg7b3V0bGluZTpub25lO3dpZHRoOjE2MHB4Ii8+CiAgICAgICAgICAgICAgPHNlbGVjdCBpZD0iZi1jYXQiIHN0eWxlPSJwYWRkaW5nOjdweCAxMnB4O2JhY2tncm91bmQ6dmFyKC0tYmcpO2JvcmRlcjoxcHggc29saWQgdmFyKC0tYnIpO2JvcmRlci1yYWRpdXM6MTBweDtjb2xvcjp2YXIoLS10eCk7Zm9udC1zaXplOjEycHg7b3V0bGluZTpub25lIj4KICAgICAgICAgICAgICAgIDxvcHRpb24gdmFsdWU9IiI+QWxsIENhdGVnb3JpZXM8L29wdGlvbj4KICAgICAgICAgICAgICA8L3NlbGVjdD4KICAgICAgICAgICAgICA8c2VsZWN0IGlkPSJmLWZsYWciIHN0eWxlPSJwYWRkaW5nOjdweCAxMnB4O2JhY2tncm91bmQ6dmFyKC0tYmcpO2JvcmRlcjoxcHggc29saWQgdmFyKC0tYnIpO2JvcmRlci1yYWRpdXM6MTBweDtjb2xvcjp2YXIoLS10eCk7Zm9udC1zaXplOjEycHg7b3V0bGluZTpub25lIj4KICAgICAgICAgICAgICAgIDxvcHRpb24gdmFsdWU9IiI+QWxsIEZsYWdzPC9vcHRpb24+CiAgICAgICAgICAgICAgICA8b3B0aW9uIHZhbHVlPSJpc0ZlYXR1cmVkIj5GZWF0dXJlZDwvb3B0aW9uPgogICAgICAgICAgICAgICAgPG9wdGlvbiB2YWx1ZT0iaXNUcmVuZGluZyI+VHJlbmRpbmc8L29wdGlvbj4KICAgICAgICAgICAgICAgIDxvcHRpb24gdmFsdWU9ImlzUG9wdWxhciI+UG9wdWxhcjwvb3B0aW9uPgogICAgICAgICAgICAgICAgPG9wdGlvbiB2YWx1ZT0iaXNOZXciPk5ldzwvb3B0aW9uPgogICAgICAgICAgICAgIDwvc2VsZWN0PgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgIDwvZGl2PgogICAgICAgICAgPGRpdiBjbGFzcz0idHdyYXAiPgogICAgICAgICAgICA8dGFibGU+CiAgICAgICAgICAgICAgPHRoZWFkPjx0cj4KICAgICAgICAgICAgICAgIDx0aD5UaHVtYjwvdGg+PHRoPlRpdGxlIC8gSUQ8L3RoPjx0aD5DYXRlZ29yeTwvdGg+CiAgICAgICAgICAgICAgICA8dGg+RmxhZ3M8L3RoPjx0aD5TdGF0czwvdGg+PHRoPkFjdGlvbnM8L3RoPgogICAgICAgICAgICAgIDwvdHI+PC90aGVhZD4KICAgICAgICAgICAgICA8dGJvZHkgaWQ9ImltZy10Ym9keSI+PC90Ym9keT4KICAgICAgICAgICAgPC90YWJsZT4KICAgICAgICAgIDwvZGl2PgogICAgICAgICAgPGRpdiBjbGFzcz0idGZvb3QiIGlkPSJpbWctZm9vdCI+PC9kaXY+CiAgICAgICAgPC9kaXY+CiAgICAgIDwvZGl2PgoKICAgICAgPCEtLSBDQVRFR09SSUVTIC0tPgogICAgICA8ZGl2IGNsYXNzPSJwYWdlIiBpZD0icGFnZS1jYXRlZ29yaWVzIj4KICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkIj4KICAgICAgICAgIDxkaXYgY2xhc3M9ImNoZHIiPgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJjdGl0bGUiPvCfk4IgTXkgQ2F0ZWdvcmllczwvZGl2PgogICAgICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLXAgYnRuLXNtIiBpZD0iYnRuLWFkZC1jYXQiPisgQWRkIENhdGVnb3J5PC9idXR0b24+CiAgICAgICAgICA8L2Rpdj4KICAgICAgICAgIDxkaXYgY2xhc3M9InR3cmFwIj4KICAgICAgICAgICAgPHRhYmxlPgogICAgICAgICAgICAgIDx0aGVhZD48dHI+PHRoPklEPC90aD48dGg+TmFtZTwvdGg+PHRoPkRlc2NyaXB0aW9uPC90aD48dGg+SW1hZ2VzPC90aD48dGg+QWN0aW9uczwvdGg+PC90cj48L3RoZWFkPgogICAgICAgICAgICAgIDx0Ym9keSBpZD0iY2F0LXRib2R5Ij48L3Rib2R5PgogICAgICAgICAgICA8L3RhYmxlPgogICAgICAgICAgPC9kaXY+CiAgICAgICAgPC9kaXY+CiAgICAgIDwvZGl2PgoKICAgICAgPCEtLSBTVEFUUyAtLT4KICAgICAgPGRpdiBjbGFzcz0icGFnZSIgaWQ9InBhZ2Utc3RhdHMiPgogICAgICAgIDxkaXYgY2xhc3M9InBoZHIiPjxkaXYgY2xhc3M9InB0aXRsZSI+8J+TiCBNeSBTdGF0czwvZGl2PjwvZGl2PgogICAgICAgIDxkaXYgY2xhc3M9InNncmlkIj4KICAgICAgICAgIDxkaXYgY2xhc3M9InNjYXJkIGIiPjxkaXYgY2xhc3M9InNsYmwiPlRvdGFsIFZpc2l0czwvZGl2PjxkaXYgY2xhc3M9InN2YWwiIGlkPSJzdC12aXNpdHMiPjA8L2Rpdj48L2Rpdj4KICAgICAgICAgIDxkaXYgY2xhc3M9InNjYXJkIHkiPjxkaXYgY2xhc3M9InNsYmwiPlRvZGF5PC9kaXY+PGRpdiBjbGFzcz0ic3ZhbCIgaWQ9InN0LXRvZGF5Ij4wPC9kaXY+PC9kaXY+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJzY2FyZCBnIj48ZGl2IGNsYXNzPSJzbGJsIj5Ub3RhbCBWaWV3czwvZGl2PjxkaXYgY2xhc3M9InN2YWwiIGlkPSJzdC12aWV3cyI+MDwvZGl2PjwvZGl2PgogICAgICAgIDwvZGl2PgoKICAgICAgICA8IS0tIFRyYWZmaWMgY2hhcnQgLS0+CiAgICAgICAgPGRpdiBjbGFzcz0iY2FyZCI+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJjaGRyIj48ZGl2IGNsYXNzPSJjdGl0bGUiPvCfk4ogVHJhZmZpYyBDaGFydCAoTGFzdCA3IGRheXMpPC9kaXY+PC9kaXY+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJjYm9keSI+CiAgICAgICAgICAgIDxjYW52YXMgaWQ9InRyYWZmaWMtY2hhcnQiIGhlaWdodD0iMTIwIiBzdHlsZT0id2lkdGg6MTAwJSI+PC9jYW52YXM+CiAgICAgICAgICA8L2Rpdj4KICAgICAgICA8L2Rpdj4KCiAgICAgICAgPCEtLSBUb3AgaW1hZ2VzIC0tPgogICAgICAgIDxkaXYgY2xhc3M9ImNhcmQiPgogICAgICAgICAgPGRpdiBjbGFzcz0iY2hkciI+PGRpdiBjbGFzcz0iY3RpdGxlIj7wn5SlIFRvcCA1IE1vc3QgVmlld2VkIEltYWdlczwvZGl2PjwvZGl2PgogICAgICAgICAgPGRpdiBjbGFzcz0idHdyYXAiPgogICAgICAgICAgICA8dGFibGU+CiAgICAgICAgICAgICAgPHRoZWFkPjx0cj48dGg+VGh1bWI8L3RoPjx0aD5UaXRsZTwvdGg+PHRoPlZpZXdzPC90aD48dGg+TGlrZXM8L3RoPjwvdHI+PC90aGVhZD4KICAgICAgICAgICAgICA8dGJvZHkgaWQ9InRvcC10Ym9keSI+PC90Ym9keT4KICAgICAgICAgICAgPC90YWJsZT4KICAgICAgICAgIDwvZGl2PgogICAgICAgIDwvZGl2PgoKICAgICAgICA8IS0tIENhdGVnb3J5IGJyZWFrZG93biAtLT4KICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkIj4KICAgICAgICAgIDxkaXYgY2xhc3M9ImNoZHIiPjxkaXYgY2xhc3M9ImN0aXRsZSI+8J+TgiBJbWFnZXMgYnkgQ2F0ZWdvcnk8L2Rpdj48L2Rpdj4KICAgICAgICAgIDxkaXYgY2xhc3M9ImNib2R5Ij4KICAgICAgICAgICAgPGNhbnZhcyBpZD0iY2F0LWNoYXJ0IiBoZWlnaHQ9IjEwMCIgc3R5bGU9IndpZHRoOjEwMCUiPjwvY2FudmFzPgogICAgICAgICAgPC9kaXY+CiAgICAgICAgPC9kaXY+CiAgICAgIDwvZGl2PgoKICAgICAgPCEtLSBFQVJOSU5HIC0tPgogICAgICA8ZGl2IGNsYXNzPSJwYWdlIiBpZD0icGFnZS1lYXJuaW5nIj4KICAgICAgICA8ZGl2IGNsYXNzPSJwaGRyIj48ZGl2IGNsYXNzPSJwdGl0bGUiPvCfkrAgTXkgRWFybmluZzwvZGl2PjwvZGl2PgogICAgICAgIDxkaXYgY2xhc3M9InNncmlkIj4KICAgICAgICAgIDxkaXYgY2xhc3M9InNjYXJkIGciPjxkaXYgY2xhc3M9InNsYmwiPlRvdGFsIEVhcm5lZDwvZGl2PjxkaXYgY2xhc3M9InN2YWwiIGlkPSJlLXRvdGFsIj7igrkwPC9kaXY+PGRpdiBjbGFzcz0ic3N1YiI+QWxsIHRpbWU8L2Rpdj48L2Rpdj4KICAgICAgICAgIDxkaXYgY2xhc3M9InNjYXJkIGIiPjxkaXYgY2xhc3M9InNsYmwiPlRoaXMgTW9udGg8L2Rpdj48ZGl2IGNsYXNzPSJzdmFsIiBpZD0iZS1tb250aCI+4oK5MDwvZGl2PjxkaXYgY2xhc3M9InNzdWIiPkN1cnJlbnQgbW9udGg8L2Rpdj48L2Rpdj4KICAgICAgICAgIDxkaXYgY2xhc3M9InNjYXJkIHkiPjxkaXYgY2xhc3M9InNsYmwiPk15IFNoYXJlICU8L2Rpdj48ZGl2IGNsYXNzPSJzdmFsIiBpZD0iZS1wY3QiPuKAlDwvZGl2PjxkaXYgY2xhc3M9InNzdWIiPk9mIGFkIHJldmVudWU8L2Rpdj48L2Rpdj4KICAgICAgICA8L2Rpdj4KICAgICAgICA8ZGl2IGNsYXNzPSJjYXJkIj4KICAgICAgICAgIDxkaXYgY2xhc3M9ImNoZHIiPjxkaXYgY2xhc3M9ImN0aXRsZSI+8J+TiyBFYXJuaW5nIEhpc3Rvcnk8L2Rpdj48L2Rpdj4KICAgICAgICAgIDxkaXYgY2xhc3M9InR3cmFwIj4KICAgICAgICAgICAgPHRhYmxlPgogICAgICAgICAgICAgIDx0aGVhZD48dHI+PHRoPkRhdGU8L3RoPjx0aD5BbW91bnQ8L3RoPjx0aD5Ob3RlPC90aD48L3RyPjwvdGhlYWQ+CiAgICAgICAgICAgICAgPHRib2R5IGlkPSJlYXJuLXRib2R5Ij48L3Rib2R5PgogICAgICAgICAgICA8L3RhYmxlPgogICAgICAgICAgPC9kaXY+CiAgICAgICAgPC9kaXY+CiAgICAgIDwvZGl2PgoKICAgIDwvZGl2PgogIDwvZGl2Pgo8L2Rpdj4KCjwhLS0gSU1BR0UgTU9EQUwgLS0+CjxkaXYgY2xhc3M9Im92ZXJsYXkiIGlkPSJpbWctbW9kYWwiIHN0eWxlPSJkaXNwbGF5Om5vbmUiPgogIDxkaXYgY2xhc3M9Im1vZGFsIj4KICAgIDxoMiBpZD0iaW0tdGl0bGUiPuKelSBBZGQgSW1hZ2U8L2gyPgogICAgPGRpdiBjbGFzcz0iZmdyaWQiPgogICAgICA8ZGl2IGNsYXNzPSJmZyI+PGxhYmVsPkltYWdlIElEICo8L2xhYmVsPjxpbnB1dCBpZD0ibS1pZCIgcGxhY2Vob2xkZXI9ImltZy0wMDEiLz48L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iZmciPjxsYWJlbD5TbHVnICo8L2xhYmVsPjxpbnB1dCBpZD0ibS1zbHVnIiBwbGFjZWhvbGRlcj0ibXktc2x1ZyIvPjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJmZyBmdWxsIj48bGFiZWw+VGl0bGUgKjwvbGFiZWw+PGlucHV0IGlkPSJtLXRpdGxlIiBwbGFjZWhvbGRlcj0iQmVhdXRpZnVsIFBvcnRyYWl0Ii8+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9ImZnIGZ1bGwiPjxsYWJlbD5EZXNjcmlwdGlvbjwvbGFiZWw+PHRleHRhcmVhIGlkPSJtLWRlc2MiPjwvdGV4dGFyZWE+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9ImZnIj48bGFiZWw+Q2F0ZWdvcnkgKjwvbGFiZWw+PHNlbGVjdCBpZD0ibS1jYXQiPjxvcHRpb24gdmFsdWU9ImdlbmVyYWwiPkdlbmVyYWw8L29wdGlvbj48L3NlbGVjdD48L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iZmciPjxsYWJlbD5Bc3BlY3QgUmF0aW88L2xhYmVsPgogICAgICAgIDxzZWxlY3QgaWQ9Im0tYXNwZWN0Ij48b3B0aW9uIHZhbHVlPSJwb3J0cmFpdCI+UG9ydHJhaXQ8L29wdGlvbj48b3B0aW9uIHZhbHVlPSJsYW5kc2NhcGUiPkxhbmRzY2FwZTwvb3B0aW9uPjxvcHRpb24gdmFsdWU9InNxdWFyZSI+U3F1YXJlPC9vcHRpb24+PC9zZWxlY3Q+CiAgICAgIDwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJmZyBmdWxsIj48bGFiZWw+VGh1bWJuYWlsIFVSTCAqPC9sYWJlbD48aW5wdXQgaWQ9Im0tdGh1bWIiIHBsYWNlaG9sZGVyPSJodHRwczovLy4uLiIvPjxpbWcgY2xhc3M9InByZXYtaW1nIiBpZD0icC10aHVtYiIvPjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJmZyBmdWxsIj48bGFiZWw+SGlnaCBSZXMgVVJMICo8L2xhYmVsPjxpbnB1dCBpZD0ibS1oaXJlcyIgcGxhY2Vob2xkZXI9Imh0dHBzOi8vLi4uIi8+PGltZyBjbGFzcz0icHJldi1pbWciIGlkPSJwLWhpcmVzIi8+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9ImZnIGZ1bGwiPjxsYWJlbD5HYWxsZXJ5IEltYWdlcyAob25lIHBlciBsaW5lKTwvbGFiZWw+PHRleHRhcmVhIGlkPSJtLWdhbGxlcnkiIHN0eWxlPSJtaW4taGVpZ2h0OjcwcHgiPjwvdGV4dGFyZWE+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9ImZnIj48bGFiZWw+TW9kZWwgTmFtZTwvbGFiZWw+PGlucHV0IGlkPSJtLW1vZGVsIi8+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9ImZnIj48bGFiZWw+UmVzb2x1dGlvbjwvbGFiZWw+PGlucHV0IGlkPSJtLXJlcyIgcGxhY2Vob2xkZXI9IjM4NDB4NTEyMCIvPjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJmZyI+PGxhYmVsPkZvcm1hdDwvbGFiZWw+PHNlbGVjdCBpZD0ibS1mbXQiPjxvcHRpb24+V2ViUDwvb3B0aW9uPjxvcHRpb24+QVZJRjwvb3B0aW9uPjxvcHRpb24+SlBFRzwvb3B0aW9uPjwvc2VsZWN0PjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJmZyI+PGxhYmVsPkZpbGUgU2l6ZTwvbGFiZWw+PGlucHV0IGlkPSJtLXNpemUiIHBsYWNlaG9sZGVyPSIxLjggTUIiLz48L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iZmciPjxsYWJlbD5WaWV3czwvbGFiZWw+PGlucHV0IGlkPSJtLXZpZXdzIiB0eXBlPSJudW1iZXIiIHZhbHVlPSIwIi8+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9ImZnIj48bGFiZWw+TGlrZXM8L2xhYmVsPjxpbnB1dCBpZD0ibS1saWtlcyIgdHlwZT0ibnVtYmVyIiB2YWx1ZT0iMCIvPjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJmZyI+PGxhYmVsPlVwbG9hZGVkIEF0PC9sYWJlbD48aW5wdXQgaWQ9Im0tdXAiIHBsYWNlaG9sZGVyPSJKdXN0IG5vdyIvPjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJmZyI+PGxhYmVsPlRhZ3MgKGNvbW1hIHNlcCk8L2xhYmVsPjxpbnB1dCBpZD0ibS10YWdzIiBwbGFjZWhvbGRlcj0ibmVvbiwgbW9kZWwiLz48L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iZmcgZnVsbCI+PGxhYmVsPkZsYWdzPC9sYWJlbD4KICAgICAgICA8ZGl2IGNsYXNzPSJjaGVja3MiPgogICAgICAgICAgPGxhYmVsIGNsYXNzPSJjaGsiPjxpbnB1dCB0eXBlPSJjaGVja2JveCIgaWQ9Im0tZnQiLz4g4q2QIEZlYXR1cmVkPC9sYWJlbD4KICAgICAgICAgIDxsYWJlbCBjbGFzcz0iY2hrIj48aW5wdXQgdHlwZT0iY2hlY2tib3giIGlkPSJtLXRyIi8+IPCflKUgVHJlbmRpbmc8L2xhYmVsPgogICAgICAgICAgPGxhYmVsIGNsYXNzPSJjaGsiPjxpbnB1dCB0eXBlPSJjaGVja2JveCIgaWQ9Im0tcHAiLz4g4p2k77iPIFBvcHVsYXI8L2xhYmVsPgogICAgICAgICAgPGxhYmVsIGNsYXNzPSJjaGsiPjxpbnB1dCB0eXBlPSJjaGVja2JveCIgaWQ9Im0tbnciLz4g4pyoIE5ldzwvbGFiZWw+CiAgICAgICAgPC9kaXY+CiAgICAgIDwvZGl2PgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJtZm9vdCI+CiAgICAgIDxidXR0b24gY2xhc3M9ImJ0biBidG4tZyIgaWQ9ImltLWNhbmNlbCI+Q2FuY2VsPC9idXR0b24+CiAgICAgIDxidXR0b24gY2xhc3M9ImJ0biBidG4tcCIgaWQ9ImltLXNhdmUiPvCfkr4gU2F2ZSBJbWFnZTwvYnV0dG9uPgogICAgPC9kaXY+CiAgPC9kaXY+CjwvZGl2PgoKPCEtLSBDQVRFR09SWSBNT0RBTCAtLT4KPGRpdiBjbGFzcz0ib3ZlcmxheSIgaWQ9ImNhdC1tb2RhbCIgc3R5bGU9ImRpc3BsYXk6bm9uZSI+CiAgPGRpdiBjbGFzcz0ibW9kYWwiIHN0eWxlPSJtYXgtd2lkdGg6NDQwcHgiPgogICAgPGgyIGlkPSJjbS10aXRsZSI+8J+TgiBBZGQgQ2F0ZWdvcnk8L2gyPgogICAgPGRpdiBjbGFzcz0iZmciPjxsYWJlbD5DYXRlZ29yeSBJRCAqIChubyBzcGFjZXMpPC9sYWJlbD48aW5wdXQgaWQ9ImMtaWQiIHBsYWNlaG9sZGVyPSJlLmcuIGdsYW1vdXIiLz48L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImZnIj48bGFiZWw+RGlzcGxheSBOYW1lICo8L2xhYmVsPjxpbnB1dCBpZD0iYy1uYW1lIiBwbGFjZWhvbGRlcj0iZS5nLiBHbGFtb3VyIi8+PC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJmZyI+PGxhYmVsPkRlc2NyaXB0aW9uPC9sYWJlbD48dGV4dGFyZWEgaWQ9ImMtZGVzYyIgc3R5bGU9Im1pbi1oZWlnaHQ6NjBweCI+PC90ZXh0YXJlYT48L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImZnIj48bGFiZWw+RmVhdHVyZWQgSW1hZ2UgVVJMPC9sYWJlbD48aW5wdXQgaWQ9ImMtaW1nIiBwbGFjZWhvbGRlcj0iaHR0cHM6Ly8uLi4iLz48aW1nIGNsYXNzPSJwcmV2LWltZyIgaWQ9InAtY2ltZyIvPjwvZGl2PgogICAgPGRpdiBjbGFzcz0ibWZvb3QiPgogICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWciIGlkPSJjbS1jYW5jZWwiPkNhbmNlbDwvYnV0dG9uPgogICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLXAiIGlkPSJjbS1zYXZlIj7wn5K+IFNhdmUgQ2F0ZWdvcnk8L2J1dHRvbj4KICAgIDwvZGl2PgogIDwvZGl2Pgo8L2Rpdj4KCjxkaXYgaWQ9InRvYXN0Ij48L2Rpdj4KCjwhLS0g4pWQ4pWQIElNUE9SVEFOVDogU2V0IENMSUVOVF9JRCBiZWZvcmUgc2hhcmluZyB0aGlzIGZpbGUg4pWQ4pWQIC0tPgo8c2NyaXB0PgogIC8vIOKaoO+4jyBPV05FUjogQ2hhbmdlIHRoaXMgdG8gdGhlIGNsaWVudCdzIElEIGJlZm9yZSBzaGFyaW5nCiAgd2luZG93LkNMSUVOVF9JRCA9ICJjbGllbnRfMDAxIjsKPC9zY3JpcHQ+Cgo8c2NyaXB0IHR5cGU9Im1vZHVsZSI+CmltcG9ydCB7IGluaXRpYWxpemVBcHAgfSAgIGZyb20gImh0dHBzOi8vd3d3LmdzdGF0aWMuY29tL2ZpcmViYXNlanMvMTEuMC4yL2ZpcmViYXNlLWFwcC5qcyI7CmltcG9ydCB7IGdldEF1dGgsIEdvb2dsZUF1dGhQcm92aWRlciwgc2lnbkluV2l0aFBvcHVwLCBvbkF1dGhTdGF0ZUNoYW5nZWQsIHNpZ25PdXQgfQogICAgICAgICAgICAgICAgICAgICAgICAgICBmcm9tICJodHRwczovL3d3dy5nc3RhdGljLmNvbS9maXJlYmFzZWpzLzExLjAuMi9maXJlYmFzZS1hdXRoLmpzIjsKaW1wb3J0IHsgZ2V0RGF0YWJhc2UsIHJlZiwgb25WYWx1ZSwgc2V0LCByZW1vdmUsIHVwZGF0ZSwgZ2V0IH0KICAgICAgICAgICAgICAgICAgICAgICAgICAgZnJvbSAiaHR0cHM6Ly93d3cuZ3N0YXRpYy5jb20vZmlyZWJhc2Vqcy8xMS4wLjIvZmlyZWJhc2UtZGF0YWJhc2UuanMiOwoKY29uc3QgRkIgPSB7CiAgYXBpS2V5OiJBSXphU3lBQ1c4YUZRbWxhb2F4TnRFNTVtOFBjazZIOEJSbGZFYnMiLAogIGF1dGhEb21haW46Im1vb24tbmlnaHQteC5maXJlYmFzZWFwcC5jb20iLAogIGRhdGFiYXNlVVJMOiJodHRwczovL21vb24tbmlnaHQteC1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20iLAogIHByb2plY3RJZDoibW9vbi1uaWdodC14IiwKICBzdG9yYWdlQnVja2V0OiJtb29uLW5pZ2h0LXguZmlyZWJhc2VzdG9yYWdlLmFwcCIsCiAgbWVzc2FnaW5nU2VuZGVySWQ6Ijc3OTkzNDM4MTc4OCIsCiAgYXBwSWQ6IjE6Nzc5OTM0MzgxNzg4OndlYjoxNDI2ZmEwMzUxNzEwMTU2MzRhNjE5Igp9OwoKY29uc3QgQ0xJRU5UX0lEID0gd2luZG93LkNMSUVOVF9JRCB8fCAiY2xpZW50XzAwMSI7Cgpjb25zdCBmYkFwcCA9IGluaXRpYWxpemVBcHAoRkIpOwpjb25zdCBhdXRoICA9IGdldEF1dGgoZmJBcHApOwpjb25zdCBkYiAgICA9IGdldERhdGFiYXNlKGZiQXBwKTsKY29uc3QgZ3AgICAgPSBuZXcgR29vZ2xlQXV0aFByb3ZpZGVyKCk7CgpsZXQgaW1hZ2VzICAgICAgPSBbXTsKbGV0IGNhdHMgICAgICAgID0gW107CmxldCBjbGllbnREYXRhICA9IG51bGw7CmxldCBlZGl0SW1nSWQgICA9IG51bGw7CmxldCBlZGl0Q2F0SWQgICA9IG51bGw7CgovLyDilIDilIAgVE9BU1Qg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACmZ1bmN0aW9uIHRvYXN0KG1zZywgdHlwZT0nb2snKSB7CiAgY29uc3QgdCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0b2FzdCcpOwogIHQudGV4dENvbnRlbnQgPSBtc2c7IHQuY2xhc3NOYW1lID0gJ29uICcgKyB0eXBlOwogIGNsZWFyVGltZW91dCh0Ll90KTsgdC5fdCA9IHNldFRpbWVvdXQoKCkgPT4gdC5jbGFzc05hbWUgPSAnJywgMzAwMCk7Cn0KCi8vIOKUgOKUgCBOQVZJR0FUSU9OIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgApmdW5jdGlvbiBzaG93UGFnZShuYW1lKSB7CiAgZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbCgnLnBhZ2UnKS5mb3JFYWNoKHAgPT4gcC5jbGFzc0xpc3QucmVtb3ZlKCdvbicpKTsKICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcuc2ItaXRlbVtkYXRhLXBhZ2VdJykuZm9yRWFjaChpID0+IGkuY2xhc3NMaXN0LnJlbW92ZSgnb24nKSk7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3BhZ2UtJyArIG5hbWUpPy5jbGFzc0xpc3QuYWRkKCdvbicpOwogIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoYC5zYi1pdGVtW2RhdGEtcGFnZT0iJHtuYW1lfSJdYCk/LmNsYXNzTGlzdC5hZGQoJ29uJyk7CiAgaWYobmFtZSA9PT0gJ3N0YXRzJykgICByZW5kZXJTdGF0cygpOwogIGlmKG5hbWUgPT09ICdlYXJuaW5nJykgcmVuZGVyRWFybmluZygpOwogIGlmKG5hbWUgPT09ICdjYXRlZ29yaWVzJykgcmVuZGVyQ2F0VGFibGUoKTsKfQpkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcuc2ItaXRlbVtkYXRhLXBhZ2VdJykuZm9yRWFjaChlbCA9PgogIGVsLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywgKCkgPT4gc2hvd1BhZ2UoZWwuZGF0YXNldC5wYWdlKSkpOwpkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCdbZGF0YS1nb3RvXScpLmZvckVhY2goZWwgPT4KICBlbC5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsICgpID0+IHNob3dQYWdlKGVsLmRhdGFzZXQuZ290bykpKTsKCi8vIOKUgOKUgCBHT09HTEUgQVVUSCDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKY29uc3QgZ0J0biA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdnLWJ0bicpOwpjb25zdCBsRXJyID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2wtZXJyJyk7CmNvbnN0IEdfU1ZHID0gZ0J0bi5pbm5lckhUTUw7CgpmdW5jdGlvbiByZXNldEJ0bigpIHsgZ0J0bi5pbm5lckhUTUwgPSBHX1NWRzsgZ0J0bi5kaXNhYmxlZCA9IGZhbHNlOyB9CgpnQnRuLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywgYXN5bmMgKCkgPT4gewogIGdCdG4uaW5uZXJIVE1MID0gJ+KPsyBPcGVuaW5nIEdvb2dsZS4uLic7IGdCdG4uZGlzYWJsZWQgPSB0cnVlOwogIGxFcnIuc3R5bGUuZGlzcGxheSA9ICdub25lJzsKICB0cnkgewogICAgYXdhaXQgc2lnbkluV2l0aFBvcHVwKGF1dGgsIGdwKTsKICAgIC8vIG9uQXV0aFN0YXRlQ2hhbmdlZCBoYW5kbGVzIHRoZSByZXN0CiAgfSBjYXRjaChlKSB7CiAgICBjb25zdCBtc2dzID0gewogICAgICAnYXV0aC9wb3B1cC1jbG9zZWQtYnktdXNlcic6ICfinYwgUG9wdXAgY2xvc2VkLiBUcnkgYWdhaW4uJywKICAgICAgJ2F1dGgvcG9wdXAtYmxvY2tlZCc6ICfinYwgUG9wdXAgYmxvY2tlZCEgQWxsb3cgcG9wdXBzIGZvciB0aGlzIHNpdGUuJywKICAgICAgJ2F1dGgvdW5hdXRob3JpemVkLWRvbWFpbic6IGDinYwgRG9tYWluIG5vdCBhdXRob3JpemVkLiBDb250YWN0IHlvdXIgYWRtaW4uYCwKICAgICAgJ2F1dGgvb3BlcmF0aW9uLW5vdC1hbGxvd2VkJzogJ+KdjCBHb29nbGUgc2lnbi1pbiBub3QgZW5hYmxlZC4gQ29udGFjdCBhZG1pbi4nLAogICAgfTsKICAgIGxFcnIudGV4dENvbnRlbnQgPSBtc2dzW2UuY29kZV0gfHwgKCfinYwgJyArIGUuY29kZSk7CiAgICBsRXJyLnN0eWxlLmRpc3BsYXkgPSAnYmxvY2snOyByZXNldEJ0bigpOwogIH0KfSk7CgpvbkF1dGhTdGF0ZUNoYW5nZWQoYXV0aCwgYXN5bmMgdXNlciA9PiB7CiAgaWYodXNlcikgewogICAgLy8gVmVyaWZ5IHRoaXMgdXNlciBpcyBhdXRob3JpemVkIGZvciB0aGlzIENMSUVOVF9JRAogICAgY29uc3Qgc2FSZWYgPSBhd2FpdCBnZXQocmVmKGRiLCBgc3VwZXJBZG1pbi9jbGllbnRzLyR7Q0xJRU5UX0lEfWApKTsKICAgIGlmKCFzYVJlZi5leGlzdHMoKSkgewogICAgICBhd2FpdCBzaWduT3V0KGF1dGgpOwogICAgICBsRXJyLnRleHRDb250ZW50ID0gJ+KdjCBDbGllbnQgbm90IGZvdW5kLiBDb250YWN0IHlvdXIgYWRtaW4uJzsKICAgICAgbEVyci5zdHlsZS5kaXNwbGF5ID0gJ2Jsb2NrJzsgcmVzZXRCdG4oKTsgcmV0dXJuOwogICAgfQogICAgY29uc3QgY0RhdGEgPSBzYVJlZi52YWwoKTsKICAgIGlmKGNEYXRhLmdvb2dsZUVtYWlsLnRvTG93ZXJDYXNlKCkgIT09IHVzZXIuZW1haWwudG9Mb3dlckNhc2UoKSkgewogICAgICBhd2FpdCBzaWduT3V0KGF1dGgpOwogICAgICBsRXJyLmlubmVySFRNTCA9IGDinYwgQWNjZXNzIGRlbmllZC48YnI+PHNtYWxsPlRoaXMgcGFuZWwgaXMgZm9yIDxiPiR7Y0RhdGEuZ29vZ2xlRW1haWx9PC9iPjwvc21hbGw+YDsKICAgICAgbEVyci5zdHlsZS5kaXNwbGF5ID0gJ2Jsb2NrJzsgcmVzZXRCdG4oKTsgcmV0dXJuOwogICAgfQogICAgaWYoY0RhdGEuc3RhdHVzICE9PSAnYWN0aXZlJykgewogICAgICBhd2FpdCBzaWduT3V0KGF1dGgpOwogICAgICBsRXJyLnRleHRDb250ZW50ID0gJ+KdjCBZb3VyIGFjY291bnQgaXMgaW5hY3RpdmUuIENvbnRhY3QgYWRtaW4uJzsKICAgICAgbEVyci5zdHlsZS5kaXNwbGF5ID0gJ2Jsb2NrJzsgcmVzZXRCdG4oKTsgcmV0dXJuOwogICAgfQoKICAgIC8vIEFsbCBnb29kIOKAlCBzaG93IGFwcAogICAgY2xpZW50RGF0YSA9IGNEYXRhOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2xvZ2luLXdyYXAnKS5zdHlsZS5kaXNwbGF5ID0gJ25vbmUnOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2FwcC13cmFwJykuc3R5bGUuZGlzcGxheSAgID0gJ2ZsZXgnOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NsLWVtYWlsJykudGV4dENvbnRlbnQgICAgID0gdXNlci5lbWFpbDsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzaXRlLXRpdGxlJykudGV4dENvbnRlbnQgICA9IGNEYXRhLm5hbWUgfHwgJ015IEdhbGxlcnknOwogICAgZG9jdW1lbnQudGl0bGUgPSAoY0RhdGEubmFtZSB8fCAnTXkgR2FsbGVyeScpICsgJyDigJQgQWRtaW4nOwogICAgaW5pdERCKCk7CiAgfSBlbHNlIHsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdsb2dpbi13cmFwJykuc3R5bGUuZGlzcGxheSA9ICdmbGV4JzsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdhcHAtd3JhcCcpLnN0eWxlLmRpc3BsYXkgICA9ICdub25lJzsKICAgIHJlc2V0QnRuKCk7CiAgfQp9KTsKCmFzeW5jIGZ1bmN0aW9uIGRvTG9nb3V0KCkgeyBhd2FpdCBzaWduT3V0KGF1dGgpOyB9CmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdidG4tbG9nb3V0JykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCBkb0xvZ291dCk7CmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdidG4tbG9nb3V0MicpLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywgZG9Mb2dvdXQpOwoKLy8g4pSA4pSAIEZJUkVCQVNFIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgApmdW5jdGlvbiBpbml0REIoKSB7CiAgLy8gSW1hZ2VzCiAgb25WYWx1ZShyZWYoZGIsIGBjbGllbnRzLyR7Q0xJRU5UX0lEfS9pbWFnZXNgKSwgc25hcCA9PiB7CiAgICBpbWFnZXMgPSBzbmFwLmV4aXN0cygpID8gT2JqZWN0LnZhbHVlcyhzbmFwLnZhbCgpKSA6IFtdOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2RiLXN0JykudGV4dENvbnRlbnQgPSAnTGl2ZSc7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbmItaW1nJykudGV4dENvbnRlbnQgPSBpbWFnZXMubGVuZ3RoOwogICAgdXBkYXRlRGFzaCgpOyByZW5kZXJUYWJsZSgpOyByZW5kZXJEYXNoSW1ncygpOyBwb3B1bGF0ZUNhdEZpbHRlcigpOwogIH0pOwogIC8vIENhdGVnb3JpZXMKICBvblZhbHVlKHJlZihkYiwgYGNsaWVudHMvJHtDTElFTlRfSUR9L2NhdGVnb3JpZXNgKSwgc25hcCA9PiB7CiAgICBjYXRzID0gc25hcC5leGlzdHMoKSA/IE9iamVjdC52YWx1ZXMoc25hcC52YWwoKSkgOiBbXTsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCduYi1jYXQnKS50ZXh0Q29udGVudCA9IGNhdHMubGVuZ3RoOwogICAgcmVuZGVyQ2F0VGFibGUoKTsgcG9wdWxhdGVDYXREcm9wZG93bnMoKTsKICB9KTsKICAvLyBTdGF0cyDigJQgbGlzdGVuIHRvIHN1cGVyQWRtaW4gZm9yIHRyYWZmaWMKICBvblZhbHVlKHJlZihkYiwgYHN1cGVyQWRtaW4vY2xpZW50cy8ke0NMSUVOVF9JRH1gKSwgc25hcCA9PiB7CiAgICBpZighc25hcC5leGlzdHMoKSkgcmV0dXJuOwogICAgY29uc3QgZCA9IHNuYXAudmFsKCk7CiAgICBjbGllbnREYXRhID0gZDsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdkLXZpc2l0cycpLnRleHRDb250ZW50ID0gKGQudG90YWxWaXNpdHN8fDApLnRvTG9jYWxlU3RyaW5nKCk7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZC10b2RheScpLnRleHRDb250ZW50ICA9IChkLnRvZGF5VmlzaXRzfHwwKS50b0xvY2FsZVN0cmluZygpOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N0LXZpc2l0cycpLnRleHRDb250ZW50PSAoZC50b3RhbFZpc2l0c3x8MCkudG9Mb2NhbGVTdHJpbmcoKTsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzdC10b2RheScpLnRleHRDb250ZW50ID0gKGQudG9kYXlWaXNpdHN8fDApLnRvTG9jYWxlU3RyaW5nKCk7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc3Qtdmlld3MnKS50ZXh0Q29udGVudCA9IChkLnRvdGFsVmlld3N8fDApLnRvTG9jYWxlU3RyaW5nKCk7CgogICAgLy8gRWFybmluZwogICAgY29uc3QgdG90YWxFYXJuID0gZC50b3RhbEVhcm5pbmcgfHwgMDsKICAgIGNvbnN0IHBjdCAgICAgICA9IGQuZWFybmluZ1BlcmNlbnQgfHwgNDA7CiAgICBjb25zdCBteUVhcm4gICAgPSB0b3RhbEVhcm4gKiBwY3QgLyAxMDA7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZC1lYXJuJykudGV4dENvbnRlbnQgID0gJ+KCuScgKyBteUVhcm4udG9GaXhlZCgwKTsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdkLXBjdCcpLnRleHRDb250ZW50ICAgPSBwY3QgKyAnJSc7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZS10b3RhbCcpLnRleHRDb250ZW50ID0gJ+KCuScgKyBteUVhcm4udG9GaXhlZCgwKTsKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdlLXBjdCcpLnRleHRDb250ZW50ICAgPSBwY3QgKyAnJSc7CgogICAgLy8gRWFybmluZyBiYXIgKHRhcmdldCDigrkxMDAwKQogICAgY29uc3QgdGFyZ2V0ID0gMTAwMDsKICAgIGNvbnN0IHBjdEJhciA9IE1hdGgubWluKChteUVhcm4vdGFyZ2V0KSoxMDAsIDEwMCk7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZWFybi1maWxsJykuc3R5bGUud2lkdGggID0gcGN0QmFyICsgJyUnOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2Vhcm4tcGN0LWxibCcpLnRleHRDb250ZW50ID0gcGN0QmFyLnRvRml4ZWQoMCkgKyAnJSc7CgogICAgLy8gVGhpcyBtb250aCAoYXBwcm94aW1hdGUpCiAgICBjb25zdCBtb250aCA9IGQudGhpc01vbnRoRWFybmluZyB8fCAwOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2QtbW9udGgnKS50ZXh0Q29udGVudCAgPSAn4oK5JyArIChtb250aCpwY3QvMTAwKS50b0ZpeGVkKDApOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2UtbW9udGgnKS50ZXh0Q29udGVudCAgPSAn4oK5JyArIChtb250aCpwY3QvMTAwKS50b0ZpeGVkKDApOwogIH0pOwp9CgovLyDilIDilIAgREFTSEJPQVJEIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgApmdW5jdGlvbiB1cGRhdGVEYXNoKCkgewogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdkLWltYWdlcycpLnRleHRDb250ZW50ID0gaW1hZ2VzLmxlbmd0aDsKfQoKZnVuY3Rpb24gcmVuZGVyRGFzaEltZ3MoKSB7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2Rhc2gtaW1ncycpLmlubmVySFRNTCA9IGltYWdlcy5zbGljZSgwLDEyKS5tYXAoaW1nPT5gCiAgICA8ZGl2IHN0eWxlPSJjdXJzb3I6cG9pbnRlciIgZGF0YS1lZGl0PSIke2ltZy5pZH0iIHRpdGxlPSIke2ltZy50aXRsZXx8Jyd9Ij4KICAgICAgPGltZyBzcmM9IiR7aW1nLnRodW1ibmFpbFVybHx8Jyd9IiBvbmVycm9yPSJ0aGlzLnNyYz0nJyIgYWx0PSIiCiAgICAgICAgc3R5bGU9IndpZHRoOjEwMCU7YXNwZWN0LXJhdGlvOjMvNDtvYmplY3QtZml0OmNvdmVyO2JvcmRlci1yYWRpdXM6N3B4O2JvcmRlcjoxcHggc29saWQgdmFyKC0tYnIpIi8+CiAgICA8L2Rpdj5gKS5qb2luKCcnKSB8fCAnPGRpdiBzdHlsZT0iY29sb3I6dmFyKC0tbXUpO2ZvbnQtc2l6ZToxMnB4Ij5ObyBpbWFnZXMgeWV0PC9kaXY+JzsKICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcjZGFzaC1pbWdzIFtkYXRhLWVkaXRdJykuZm9yRWFjaChlbCA9PgogICAgZWwuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCAoKSA9PiBvcGVuRWRpdEltZyhlbC5kYXRhc2V0LmVkaXQpKSk7Cn0KCi8vIOKUgOKUgCBJTUFHRVMgVEFCTEUg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACmZ1bmN0aW9uIHBvcHVsYXRlQ2F0RmlsdGVyKCkgewogIGNvbnN0IHNlbCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdmLWNhdCcpOwogIGNvbnN0IGN1ciA9IHNlbC52YWx1ZTsKICBzZWwuaW5uZXJIVE1MID0gJzxvcHRpb24gdmFsdWU9IiI+QWxsIENhdGVnb3JpZXM8L29wdGlvbj4nOwogIFsuLi5uZXcgU2V0KGltYWdlcy5tYXAoaT0+aS5jYXRlZ29yeSkuZmlsdGVyKEJvb2xlYW4pKV0uc29ydCgpLmZvckVhY2goYyA9PiB7CiAgICBjb25zdCBvID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnb3B0aW9uJyk7CiAgICBvLnZhbHVlPWM7IG8udGV4dENvbnRlbnQ9YzsgaWYoYz09PWN1cikgby5zZWxlY3RlZD10cnVlOyBzZWwuYXBwZW5kQ2hpbGQobyk7CiAgfSk7Cn0KCmZ1bmN0aW9uIHJlbmRlclRhYmxlKCkgewogIGNvbnN0IHEgICAgPSAoZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3EtaW1nJyk/LnZhbHVlfHwnJykudG9Mb3dlckNhc2UoKTsKICBjb25zdCBmY2F0ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2YtY2F0Jyk/LnZhbHVlfHwnJzsKICBjb25zdCBmZmxhZz0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2YtZmxhZycpPy52YWx1ZXx8Jyc7CiAgbGV0IGxpc3QgPSBpbWFnZXMuZmlsdGVyKGltZyA9PiB7CiAgICBjb25zdCBtcSA9ICFxIHx8IFtpbWcudGl0bGUsaW1nLmlkLGltZy5tb2RlbE5hbWVdLnNvbWUocz0+KHN8fCcnKS50b0xvd2VyQ2FzZSgpLmluY2x1ZGVzKHEpKTsKICAgIHJldHVybiBtcSAmJiAoIWZjYXR8fGltZy5jYXRlZ29yeT09PWZjYXQpICYmICghZmZsYWd8fGltZ1tmZmxhZ10pOwogIH0pOwoKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW1nLWZvb3QnKS50ZXh0Q29udGVudCA9IGBTaG93aW5nICR7bGlzdC5sZW5ndGh9IG9mICR7aW1hZ2VzLmxlbmd0aH0gaW1hZ2VzYDsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW1nLXRib2R5JykuaW5uZXJIVE1MID0gbGlzdC5sZW5ndGggPyBsaXN0Lm1hcChpbWc9PmAKICAgIDx0cj4KICAgICAgPHRkPjxpbWcgY2xhc3M9InRodW1iIiBzcmM9IiR7aW1nLnRodW1ibmFpbFVybHx8Jyd9IiBvbmVycm9yPSJ0aGlzLnNyYz0nJyIgYWx0PSIiLz48L3RkPgogICAgICA8dGQ+CiAgICAgICAgPGRpdiBzdHlsZT0iZm9udC13ZWlnaHQ6NzAwO21heC13aWR0aDoxNTBweDtvdmVyZmxvdzpoaWRkZW47dGV4dC1vdmVyZmxvdzplbGxpcHNpczt3aGl0ZS1zcGFjZTpub3dyYXAiPiR7aW1nLnRpdGxlfHwn4oCUJ308L2Rpdj4KICAgICAgICA8ZGl2IHN0eWxlPSJmb250LXNpemU6MTBweDtjb2xvcjp2YXIoLS1tdSk7Zm9udC1mYW1pbHk6bW9ub3NwYWNlIj4ke2ltZy5pZH08L2Rpdj4KICAgICAgPC90ZD4KICAgICAgPHRkPjxzcGFuIGNsYXNzPSJ0YWcgY2F0Ij4ke2ltZy5jYXRlZ29yeXx8J+KAlCd9PC9zcGFuPjwvdGQ+CiAgICAgIDx0ZD4KICAgICAgICAke2ltZy5pc0ZlYXR1cmVkPyc8c3BhbiBjbGFzcz0idGFnIGZ0Ij7irZA8L3NwYW4+JzonJ30KICAgICAgICAke2ltZy5pc1RyZW5kaW5nPyc8c3BhbiBjbGFzcz0idGFnIHRyIj7wn5SlPC9zcGFuPic6Jyd9CiAgICAgICAgJHtpbWcuaXNOZXc/JzxzcGFuIGNsYXNzPSJ0YWcgbnciPuKcqDwvc3Bhbj4nOicnfQogICAgICA8L3RkPgogICAgICA8dGQ+CiAgICAgICAgPGRpdiBzdHlsZT0iZm9udC1zaXplOjEwcHg7Y29sb3I6dmFyKC0tbXUpIj7wn5GBICR7KGltZy52aWV3c3x8MCkudG9Mb2NhbGVTdHJpbmcoKX08L2Rpdj4KICAgICAgICA8ZGl2IHN0eWxlPSJmb250LXNpemU6MTBweDtjb2xvcjp2YXIoLS1tdSkiPuKdpO+4jyAkeyhpbWcubGlrZXN8fDApLnRvTG9jYWxlU3RyaW5nKCl9PC9kaXY+CiAgICAgIDwvdGQ+CiAgICAgIDx0ZD48ZGl2IGNsYXNzPSJhcm93Ij4KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWcgYnRuLXhzIiBkYXRhLWVkaXQ9IiR7aW1nLmlkfSI+4pyP77iPPC9idXR0b24+CiAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1kIGJ0bi14cyIgZGF0YS1kZWw9IiR7aW1nLmlkfSIgZGF0YS1kdGl0bGU9IiR7KGltZy50aXRsZXx8JycpLnJlcGxhY2UoLyIvZywnJnF1b3Q7Jyl9Ij7wn5eRPC9idXR0b24+CiAgICAgIDwvZGl2PjwvdGQ+CiAgICA8L3RyPmApLmpvaW4oJycpCiAgICA6ICc8dHI+PHRkIGNvbHNwYW49IjYiPjxkaXYgY2xhc3M9ImVtcHR5Ij48ZGl2IGNsYXNzPSJlaWMiPvCflrzvuI88L2Rpdj5ObyBpbWFnZXMgZm91bmQ8L2Rpdj48L3RkPjwvdHI+JzsKCiAgZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbCgnW2RhdGEtZWRpdF0nKS5mb3JFYWNoKGJ0biA9PgogICAgYnRuLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywgKCkgPT4gb3BlbkVkaXRJbWcoYnRuLmRhdGFzZXQuZWRpdCkpKTsKICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCdbZGF0YS1kZWxdJykuZm9yRWFjaChidG4gPT4KICAgIGJ0bi5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsICgpID0+IGRlbGV0ZUltZyhidG4uZGF0YXNldC5kZWwsIGJ0bi5kYXRhc2V0LmR0aXRsZSkpKTsKfQpbJ3EtaW1nJywnZi1jYXQnLCdmLWZsYWcnXS5mb3JFYWNoKGlkID0+IHsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCk/LmFkZEV2ZW50TGlzdGVuZXIoJ2lucHV0JywgcmVuZGVyVGFibGUpOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKGlkKT8uYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJywgcmVuZGVyVGFibGUpOwp9KTsKCi8vIOKUgOKUgCBJTUFHRSBNT0RBTCDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKZnVuY3Rpb24gcG9wdWxhdGVDYXREcm9wZG93bnMoKSB7CiAgY29uc3QgbWNhdCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLWNhdCcpOwogIGNvbnN0IGN1ciAgPSBtY2F0LnZhbHVlOwogIG1jYXQuaW5uZXJIVE1MID0gJzxvcHRpb24gdmFsdWU9ImdlbmVyYWwiPkdlbmVyYWw8L29wdGlvbj4nOwogIGNhdHMuZm9yRWFjaChjID0+IHsKICAgIGNvbnN0IG8gPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCdvcHRpb24nKTsKICAgIG8udmFsdWU9Yy5pZDsgby50ZXh0Q29udGVudD1jLm5hbWU7IGlmKGMuaWQ9PT1jdXIpIG8uc2VsZWN0ZWQ9dHJ1ZTsgbWNhdC5hcHBlbmRDaGlsZChvKTsKICB9KTsKfQoKZnVuY3Rpb24gb3BlbkFkZEltZygpIHsKICBlZGl0SW1nSWQgPSBudWxsOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbS10aXRsZScpLnRleHRDb250ZW50ID0gJ+KelSBBZGQgTmV3IEltYWdlJzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW0tc2F2ZScpLnRleHRDb250ZW50ICA9ICfwn5K+IFNhdmUgSW1hZ2UnOwogIFsnbS1pZCcsJ20tc2x1ZycsJ20tdGl0bGUnLCdtLWRlc2MnLCdtLXRodW1iJywnbS1oaXJlcycsJ20tZ2FsbGVyeScsJ20tbW9kZWwnLCdtLXJlcycsJ20tc2l6ZScsJ20tdGFncycsJ20tdXAnXS5mb3JFYWNoKGlkPT5kb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCkudmFsdWU9JycpOwogIFsnbS12aWV3cycsJ20tbGlrZXMnXS5mb3JFYWNoKGlkPT5kb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCkudmFsdWU9JzAnKTsKICBbJ20tZnQnLCdtLXRyJywnbS1wcCcsJ20tbncnXS5mb3JFYWNoKGlkPT5kb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCkuY2hlY2tlZD1mYWxzZSk7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tYXNwZWN0JykudmFsdWU9J3BvcnRyYWl0JzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS1mbXQnKS52YWx1ZT0nV2ViUCc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3AtdGh1bWInKS5zdHlsZS5kaXNwbGF5PSdub25lJzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncC1oaXJlcycpLnN0eWxlLmRpc3BsYXk9J25vbmUnOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLWlkJykuZGlzYWJsZWQ9ZmFsc2U7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2ltZy1tb2RhbCcpLnN0eWxlLmRpc3BsYXk9J2ZsZXgnOwp9CmZ1bmN0aW9uIG9wZW5FZGl0SW1nKGlkKSB7CiAgY29uc3QgaW1nID0gaW1hZ2VzLmZpbmQoaT0+aS5pZD09PWlkKTsgaWYoIWltZykgcmV0dXJuOwogIGVkaXRJbWdJZCA9IGlkOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbS10aXRsZScpLnRleHRDb250ZW50ID0gJ+Kcj++4jyBFZGl0IEltYWdlJzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW0tc2F2ZScpLnRleHRDb250ZW50ICA9ICfwn5K+IFVwZGF0ZSBJbWFnZSc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20taWQnKS52YWx1ZSAgICAgID0gaW1nLmlkfHwnJzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS1zbHVnJykudmFsdWUgICAgPSBpbWcuc2x1Z3x8Jyc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tdGl0bGUnKS52YWx1ZSAgID0gaW1nLnRpdGxlfHwnJzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS1kZXNjJykudmFsdWUgICAgPSBpbWcuZGVzY3JpcHRpb258fCcnOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLWNhdCcpLnZhbHVlICAgICA9IGltZy5jYXRlZ29yeXx8J2dlbmVyYWwnOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLWFzcGVjdCcpLnZhbHVlICA9IGltZy5hc3BlY3RSYXRpb3x8J3BvcnRyYWl0JzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS10aHVtYicpLnZhbHVlICAgPSBpbWcudGh1bWJuYWlsVXJsfHwnJzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS1oaXJlcycpLnZhbHVlICAgPSBpbWcuaGlnaFJlc1VybHx8Jyc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tZ2FsbGVyeScpLnZhbHVlID0gKGltZy5nYWxsZXJ5SW1hZ2VzfHxbXSkuam9pbignXG4nKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS1tb2RlbCcpLnZhbHVlICAgPSBpbWcubW9kZWxOYW1lfHwnJzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS1yZXMnKS52YWx1ZSAgICAgPSBpbWcucmVzb2x1dGlvbnx8Jyc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tZm10JykudmFsdWUgICAgID0gaW1nLmZvcm1hdHx8J1dlYlAnOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLXNpemUnKS52YWx1ZSAgICA9IGltZy5maWxlU2l6ZXx8Jyc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tdmlld3MnKS52YWx1ZSAgID0gaW1nLnZpZXdzfHwwOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLWxpa2VzJykudmFsdWUgICA9IGltZy5saWtlc3x8MDsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS11cCcpLnZhbHVlICAgICAgPSBpbWcudXBsb2FkZWRBdHx8Jyc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tdGFncycpLnZhbHVlICAgID0gKGltZy50YWdzfHxbXSkuam9pbignLCAnKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS1mdCcpLmNoZWNrZWQgICAgPSAhIWltZy5pc0ZlYXR1cmVkOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLXRyJykuY2hlY2tlZCAgICA9ICEhaW1nLmlzVHJlbmRpbmc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tcHAnKS5jaGVja2VkICAgID0gISFpbWcuaXNQb3B1bGFyOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLW53JykuY2hlY2tlZCAgICA9ICEhaW1nLmlzTmV3OwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLWlkJykuZGlzYWJsZWQgICA9IHRydWU7CiAgcHJldkltZygnbS10aHVtYicsJ3AtdGh1bWInKTsgcHJldkltZygnbS1oaXJlcycsJ3AtaGlyZXMnKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW1nLW1vZGFsJykuc3R5bGUuZGlzcGxheT0nZmxleCc7Cn0KCmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdidG4tYWRkLWltZycpLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywgb3BlbkFkZEltZyk7CmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbS1jYW5jZWwnKS5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsICgpPT5kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW1nLW1vZGFsJykuc3R5bGUuZGlzcGxheT0nbm9uZScpOwoKZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2ltLXNhdmUnKS5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsIGFzeW5jICgpPT57CiAgY29uc3QgaWQgICAgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS1pZCcpLnZhbHVlLnRyaW0oKTsKICBjb25zdCB0aXRsZSA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLXRpdGxlJykudmFsdWUudHJpbSgpOwogIGNvbnN0IHRodW1iID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tdGh1bWInKS52YWx1ZS50cmltKCk7CiAgY29uc3QgaGlyZXMgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS1oaXJlcycpLnZhbHVlLnRyaW0oKTsKICBjb25zdCBzbHVnICA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLXNsdWcnKS52YWx1ZS50cmltKCk7CiAgaWYoIWlkfHwhdGl0bGV8fCF0aHVtYnx8IWhpcmVzfHwhc2x1Zyl7IHRvYXN0KCfinYwgSUQsIFNsdWcsIFRpdGxlLCBUaHVtYiAmIEhpUmVzIHJlcXVpcmVkIScsJ2VycicpOyByZXR1cm47IH0KCiAgY29uc3QgZGF0YSA9IHsKICAgIGlkLCBzbHVnLCB0aXRsZSwKICAgIGRlc2NyaXB0aW9uOiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tZGVzYycpLnZhbHVlLnRyaW0oKSwKICAgIGNhdGVnb3J5OiAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tY2F0JykudmFsdWUsCiAgICBhc3BlY3RSYXRpbzogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLWFzcGVjdCcpLnZhbHVlLAogICAgdGh1bWJuYWlsVXJsOiB0aHVtYiwgaGlnaFJlc1VybDogaGlyZXMsCiAgICBnYWxsZXJ5SW1hZ2VzOmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLWdhbGxlcnknKS52YWx1ZS50cmltKCkuc3BsaXQoJ1xuJykubWFwKHM9PnMudHJpbSgpKS5maWx0ZXIoQm9vbGVhbiksCiAgICBtb2RlbE5hbWU6ICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLW1vZGVsJykudmFsdWUudHJpbSgpLAogICAgcmVzb2x1dGlvbjogICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS1yZXMnKS52YWx1ZS50cmltKCksCiAgICBmb3JtYXQ6ICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLWZtdCcpLnZhbHVlLAogICAgZmlsZVNpemU6ICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS1zaXplJykudmFsdWUudHJpbSgpLAogICAgdmlld3M6ICBwYXJzZUludChkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS12aWV3cycpLnZhbHVlKXx8MCwKICAgIGxpa2VzOiAgcGFyc2VJbnQoZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tbGlrZXMnKS52YWx1ZSl8fDAsCiAgICB1cGxvYWRlZEF0OiBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbS11cCcpLnZhbHVlLnRyaW0oKXx8J0p1c3Qgbm93JywKICAgIHRhZ3M6IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtLXRhZ3MnKS52YWx1ZS5zcGxpdCgnLCcpLm1hcChzPT5zLnRyaW0oKSkuZmlsdGVyKEJvb2xlYW4pLAogICAgaXNGZWF0dXJlZDogZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tZnQnKS5jaGVja2VkLAogICAgaXNUcmVuZGluZzogZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tdHInKS5jaGVja2VkLAogICAgaXNQb3B1bGFyOiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tcHAnKS5jaGVja2VkLAogICAgaXNOZXc6ICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ20tbncnKS5jaGVja2VkLAogICAgd2lkdGg6IDAsIGhlaWdodDogMCwKICB9OwoKICBjb25zdCBidG4gPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW0tc2F2ZScpOwogIGJ0bi50ZXh0Q29udGVudD0n4o+zIFNhdmluZy4uLic7IGJ0bi5kaXNhYmxlZD10cnVlOwogIHRyeSB7CiAgICBhd2FpdCBzZXQocmVmKGRiLCBgY2xpZW50cy8ke0NMSUVOVF9JRH0vaW1hZ2VzLyR7aWR9YCksIGRhdGEpOwogICAgdG9hc3QoYOKchSBJbWFnZSAke2VkaXRJbWdJZD8ndXBkYXRlZCc6J3NhdmVkJ30hYCk7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW1nLW1vZGFsJykuc3R5bGUuZGlzcGxheT0nbm9uZSc7CiAgfSBjYXRjaChlKXsgdG9hc3QoJ+KdjCAnK2UubWVzc2FnZSwnZXJyJyk7IH0KICBmaW5hbGx5eyBidG4udGV4dENvbnRlbnQ9J/Cfkr4gU2F2ZSBJbWFnZSc7IGJ0bi5kaXNhYmxlZD1mYWxzZTsgfQp9KTsKCmFzeW5jIGZ1bmN0aW9uIGRlbGV0ZUltZyhpZCwgdGl0bGUpIHsKICBpZighY29uZmlybShgRGVsZXRlICIke3RpdGxlfSI/YCkpIHJldHVybjsKICB0cnkgewogICAgYXdhaXQgcmVtb3ZlKHJlZihkYiwgYGNsaWVudHMvJHtDTElFTlRfSUR9L2ltYWdlcy8ke2lkfWApKTsKICAgIHRvYXN0KCfwn5eR77iPIEltYWdlIGRlbGV0ZWQnKTsKICB9IGNhdGNoKGUpeyB0b2FzdCgn4p2MICcrZS5tZXNzYWdlLCdlcnInKTsgfQp9CgovLyBQcmV2aWV3CmZ1bmN0aW9uIHByZXZJbWcoaW5JZCwgcHJldklkKSB7CiAgY29uc3QgdXJsID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoaW5JZCk/LnZhbHVlLnRyaW0oKTsKICBjb25zdCBpbWcgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZChwcmV2SWQpOwogIGlmKCFpbWcpIHJldHVybjsKICBpZih1cmwpeyBpbWcuc3JjPXVybDsgaW1nLnN0eWxlLmRpc3BsYXk9J2Jsb2NrJzsgaW1nLm9uZXJyb3I9KCk9PmltZy5zdHlsZS5kaXNwbGF5PSdub25lJzsgfQogIGVsc2UgaW1nLnN0eWxlLmRpc3BsYXk9J25vbmUnOwp9ClsnbS10aHVtYicsJ20taGlyZXMnXS5mb3JFYWNoKGlkPT5kb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCkuYWRkRXZlbnRMaXN0ZW5lcignaW5wdXQnLCgpPT57CiAgcHJldkltZygnbS10aHVtYicsJ3AtdGh1bWInKTsgcHJldkltZygnbS1oaXJlcycsJ3AtaGlyZXMnKTsKfSkpOwpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYy1pbWcnKS5hZGRFdmVudExpc3RlbmVyKCdpbnB1dCcsKCk9PnByZXZJbWcoJ2MtaW1nJywncC1jaW1nJykpOwoKLy8g4pSA4pSAIENBVEVHT1JJRVMg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACmZ1bmN0aW9uIHJlbmRlckNhdFRhYmxlKCkgewogIGNvbnN0IHRib2R5ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NhdC10Ym9keScpOyBpZighdGJvZHkpIHJldHVybjsKICB0Ym9keS5pbm5lckhUTUwgPSBjYXRzLmxlbmd0aCA/IGNhdHMubWFwKGNhdD0+ewogICAgY29uc3QgY250ID0gaW1hZ2VzLmZpbHRlcihpPT5pLmNhdGVnb3J5PT09Y2F0LmlkKS5sZW5ndGg7CiAgICByZXR1cm4gYDx0cj4KICAgICAgPHRkPjxjb2RlIHN0eWxlPSJmb250LWZhbWlseTptb25vc3BhY2U7Zm9udC1zaXplOjExcHg7YmFja2dyb3VuZDp2YXIoLS1zMik7cGFkZGluZzoycHggNnB4O2JvcmRlci1yYWRpdXM6NHB4Ij4ke2NhdC5pZH08L2NvZGU+PC90ZD4KICAgICAgPHRkIHN0eWxlPSJmb250LXdlaWdodDo3MDAiPiR7Y2F0Lm5hbWV9PC90ZD4KICAgICAgPHRkIHN0eWxlPSJmb250LXNpemU6MTFweDtjb2xvcjp2YXIoLS1tdSkiPiR7Y2F0LmRlc2NyaXB0aW9ufHwn4oCUJ308L3RkPgogICAgICA8dGQ+PHNwYW4gY2xhc3M9InRhZyBjYXQiPiR7Y250fTwvc3Bhbj48L3RkPgogICAgICA8dGQ+PGRpdiBjbGFzcz0iYXJvdyI+CiAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuIGJ0bi1nIGJ0bi14cyIgZGF0YS1lZGl0LWNhdD0iJHtjYXQuaWR9Ij7inI/vuI88L2J1dHRvbj4KICAgICAgICA8YnV0dG9uIGNsYXNzPSJidG4gYnRuLWQgYnRuLXhzIiBkYXRhLWRlbC1jYXQ9IiR7Y2F0LmlkfSIgZGF0YS1jbmFtZT0iJHtjYXQubmFtZX0iPvCfl5E8L2J1dHRvbj4KICAgICAgPC9kaXY+PC90ZD4KICAgIDwvdHI+YDsKICB9KS5qb2luKCcnKQogIDogJzx0cj48dGQgY29sc3Bhbj0iNSI+PGRpdiBjbGFzcz0iZW1wdHkiPjxkaXYgY2xhc3M9ImVpYyI+8J+TgjwvZGl2Pk5vIGNhdGVnb3JpZXMgeWV0PC9kaXY+PC90ZD48L3RyPic7CgogIHRib2R5LnF1ZXJ5U2VsZWN0b3JBbGwoJ1tkYXRhLWVkaXQtY2F0XScpLmZvckVhY2goYnRuPT5idG4uYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCgpPT5vcGVuRWRpdENhdChidG4uZGF0YXNldC5lZGl0Q2F0KSkpOwogIHRib2R5LnF1ZXJ5U2VsZWN0b3JBbGwoJ1tkYXRhLWRlbC1jYXRdJykuZm9yRWFjaChidG49PmJ0bi5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsKCk9PmRlbGV0ZUNhdChidG4uZGF0YXNldC5kZWxDYXQsYnRuLmRhdGFzZXQuY25hbWUpKSk7Cn0KCmZ1bmN0aW9uIG9wZW5BZGRDYXQoKSB7CiAgZWRpdENhdElkID0gbnVsbDsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY20tdGl0bGUnKS50ZXh0Q29udGVudD0n8J+TgiBBZGQgQ2F0ZWdvcnknOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjbS1zYXZlJykudGV4dENvbnRlbnQ9J/Cfkr4gU2F2ZSBDYXRlZ29yeSc7CiAgWydjLWlkJywnYy1uYW1lJywnYy1kZXNjJywnYy1pbWcnXS5mb3JFYWNoKGlkPT5kb2N1bWVudC5nZXRFbGVtZW50QnlJZChpZCkudmFsdWU9JycpOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjLWlkJykuZGlzYWJsZWQ9ZmFsc2U7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3AtY2ltZycpLnN0eWxlLmRpc3BsYXk9J25vbmUnOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjYXQtbW9kYWwnKS5zdHlsZS5kaXNwbGF5PSdmbGV4JzsKfQpmdW5jdGlvbiBvcGVuRWRpdENhdChpZCkgewogIGNvbnN0IGNhdD1jYXRzLmZpbmQoYz0+Yy5pZD09PWlkKTsgaWYoIWNhdCkgcmV0dXJuOwogIGVkaXRDYXRJZD1pZDsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY20tdGl0bGUnKS50ZXh0Q29udGVudD0n4pyP77iPIEVkaXQgQ2F0ZWdvcnknOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjbS1zYXZlJykudGV4dENvbnRlbnQ9J/Cfkr4gVXBkYXRlIENhdGVnb3J5JzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYy1pZCcpLnZhbHVlPWNhdC5pZDsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYy1uYW1lJykudmFsdWU9Y2F0Lm5hbWV8fCcnOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjLWRlc2MnKS52YWx1ZT1jYXQuZGVzY3JpcHRpb258fCcnOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjLWltZycpLnZhbHVlPWNhdC5mZWF0dXJlZEltYWdlVXJsfHwnJzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYy1pZCcpLmRpc2FibGVkPXRydWU7CiAgcHJldkltZygnYy1pbWcnLCdwLWNpbWcnKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2F0LW1vZGFsJykuc3R5bGUuZGlzcGxheT0nZmxleCc7Cn0KCmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdidG4tYWRkLWNhdCcpLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJyxvcGVuQWRkQ2F0KTsKZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NtLWNhbmNlbCcpLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywoKT0+ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NhdC1tb2RhbCcpLnN0eWxlLmRpc3BsYXk9J25vbmUnKTsKCmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjbS1zYXZlJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLGFzeW5jKCk9PnsKICBjb25zdCBpZCAgPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjLWlkJykudmFsdWUudHJpbSgpLnRvTG93ZXJDYXNlKCkucmVwbGFjZSgvXHMrL2csJy0nKTsKICBjb25zdCBuYW1lPWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjLW5hbWUnKS52YWx1ZS50cmltKCk7CiAgaWYoIWlkfHwhbmFtZSl7dG9hc3QoJ+KdjCBJRCBhbmQgTmFtZSByZXF1aXJlZCEnLCdlcnInKTtyZXR1cm47fQogIGNvbnN0IGRhdGE9e2lkLG5hbWUsZGVzY3JpcHRpb246ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2MtZGVzYycpLnZhbHVlLnRyaW0oKSxmZWF0dXJlZEltYWdlVXJsOmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjLWltZycpLnZhbHVlLnRyaW0oKSxpY29uTmFtZTonR3JpZCcsc2x1ZzppZCx0YWdzOltdLGNvdW50OjB9OwogIGNvbnN0IGJ0bj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY20tc2F2ZScpOwogIGJ0bi50ZXh0Q29udGVudD0n4o+zIFNhdmluZy4uLic7YnRuLmRpc2FibGVkPXRydWU7CiAgdHJ5ewogICAgYXdhaXQgc2V0KHJlZihkYixgY2xpZW50cy8ke0NMSUVOVF9JRH0vY2F0ZWdvcmllcy8ke2lkfWApLGRhdGEpOwogICAgdG9hc3QoYOKchSBDYXRlZ29yeSAiJHtuYW1lfSIgc2F2ZWQhYCk7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2F0LW1vZGFsJykuc3R5bGUuZGlzcGxheT0nbm9uZSc7CiAgfWNhdGNoKGUpe3RvYXN0KCfinYwgJytlLm1lc3NhZ2UsJ2VycicpO30KICBmaW5hbGx5e2J0bi50ZXh0Q29udGVudD0n8J+SviBTYXZlIENhdGVnb3J5JztidG4uZGlzYWJsZWQ9ZmFsc2U7fQp9KTsKCmFzeW5jIGZ1bmN0aW9uIGRlbGV0ZUNhdChpZCxuYW1lKXsKICBpZighY29uZmlybShgRGVsZXRlIGNhdGVnb3J5ICIke25hbWV9Ij9gKSlyZXR1cm47CiAgdHJ5ewogICAgYXdhaXQgcmVtb3ZlKHJlZihkYixgY2xpZW50cy8ke0NMSUVOVF9JRH0vY2F0ZWdvcmllcy8ke2lkfWApKTsKICAgIHRvYXN0KCfwn5eR77iPIENhdGVnb3J5IGRlbGV0ZWQnKTsKICB9Y2F0Y2goZSl7dG9hc3QoJ+KdjCAnK2UubWVzc2FnZSwnZXJyJyk7fQp9CgovLyDilIDilIAgU1RBVFMg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACmZ1bmN0aW9uIHJlbmRlclN0YXRzKCkgewogIC8vIFRvcCA1IGltYWdlcwogIGNvbnN0IHRvcDUgPSBbLi4uaW1hZ2VzXS5zb3J0KChhLGIpPT4oYi52aWV3c3x8MCktKGEudmlld3N8fDApKS5zbGljZSgwLDUpOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0b3AtdGJvZHknKS5pbm5lckhUTUwgPSB0b3A1Lm1hcChpbWc9PmAKICAgIDx0cj4KICAgICAgPHRkPjxpbWcgY2xhc3M9InRodW1iIiBzcmM9IiR7aW1nLnRodW1ibmFpbFVybHx8Jyd9IiBvbmVycm9yPSJ0aGlzLnNyYz0nJyIgYWx0PSIiLz48L3RkPgogICAgICA8dGQgc3R5bGU9ImZvbnQtd2VpZ2h0OjcwMDttYXgtd2lkdGg6MTYwcHgiPiR7aW1nLnRpdGxlfHwn4oCUJ308L3RkPgogICAgICA8dGQgc3R5bGU9ImNvbG9yOnZhcigtLWFjYyk7Zm9udC13ZWlnaHQ6NzAwIj4keyhpbWcudmlld3N8fDApLnRvTG9jYWxlU3RyaW5nKCl9PC90ZD4KICAgICAgPHRkIHN0eWxlPSJjb2xvcjp2YXIoLS1ncm4pIj4keyhpbWcubGlrZXN8fDApLnRvTG9jYWxlU3RyaW5nKCl9PC90ZD4KICAgIDwvdHI+YCkuam9pbignJykgfHwgJzx0cj48dGQgY29sc3Bhbj0iNCI+PGRpdiBjbGFzcz0iZW1wdHkiPjxkaXYgY2xhc3M9ImVpYyI+8J+TijwvZGl2Pk5vIGRhdGE8L2Rpdj48L3RkPjwvdHI+JzsKCiAgLy8gQ2F0ZWdvcnkgY2hhcnQKICBjb25zdCBjYXRNYXAgPSB7fTsKICBpbWFnZXMuZm9yRWFjaChpPT5jYXRNYXBbaS5jYXRlZ29yeV09KGNhdE1hcFtpLmNhdGVnb3J5XXx8MCkrMSk7CiAgY29uc3QgY3YgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2F0LWNoYXJ0Jyk7CiAgY29uc3QgY3R4ID0gY3YuZ2V0Q29udGV4dCgnMmQnKTsKICBjdi53aWR0aCAgPSBjdi5wYXJlbnRFbGVtZW50Lm9mZnNldFdpZHRoIC0gMzY7CiAgY3R4LmNsZWFyUmVjdCgwLDAsY3Yud2lkdGgsY3YuaGVpZ2h0KTsKICBjb25zdCBlbnRyaWVzID0gT2JqZWN0LmVudHJpZXMoY2F0TWFwKTsKICBpZighZW50cmllcy5sZW5ndGgpeyBjdHguZmlsbFN0eWxlPScjNTU1JzsgY3R4LmZvbnQ9JzEycHggc2Fucy1zZXJpZic7IGN0eC5maWxsVGV4dCgnTm8gZGF0YScsMTAsNjApOyByZXR1cm47IH0KICBjb25zdCBtYXggPSBNYXRoLm1heCguLi5lbnRyaWVzLm1hcChlPT5lWzFdKSwxKTsKICBjb25zdCBidyAgPSAoY3Yud2lkdGggLSAoZW50cmllcy5sZW5ndGgtMSkqNikgLyBlbnRyaWVzLmxlbmd0aDsKICBjb25zdCBDT0xPUlM9WycjM2I4MmY2JywnIzIyYzU1ZScsJyNmNTllMGInLCcjYTg1NWY3JywnI0UwMjQyNCcsJyMwNmI2ZDQnLCcjZWM0ODk5J107CiAgZW50cmllcy5mb3JFYWNoKChbY2F0LGNudF0saSk9PnsKICAgIGNvbnN0IGggPSAoY250L21heCkqKGN2LmhlaWdodC0zMCk7CiAgICBjb25zdCB4ID0gaSooYncrNik7CiAgICBjdHguZmlsbFN0eWxlPUNPTE9SU1tpJUNPTE9SUy5sZW5ndGhdOwogICAgY3R4LmZpbGxSZWN0KHgsIGN2LmhlaWdodC1oLTIwLCBidywgaCk7CiAgICBjdHguZmlsbFN0eWxlPScjODg4JzsgY3R4LmZvbnQ9JzlweCBzYW5zLXNlcmlmJzsgY3R4LnRleHRBbGlnbj0nY2VudGVyJzsKICAgIGN0eC5maWxsVGV4dChjYXQuc2xpY2UoMCw4KSwgeCtidy8yLCBjdi5oZWlnaHQtNSk7CiAgICBjdHguZmlsbFN0eWxlPScjZmZmJzsgY3R4LmZvbnQ9J2JvbGQgMTBweCBzYW5zLXNlcmlmJzsKICAgIGN0eC5maWxsVGV4dChjbnQsIHgrYncvMiwgY3YuaGVpZ2h0LWgtMjUpOwogIH0pOwoKICAvLyBUcmFmZmljIGNoYXJ0IChtb2NrIGxhc3QgNyBkYXlzIGZyb20gdG90YWwpCiAgY29uc3QgdGMgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndHJhZmZpYy1jaGFydCcpOwogIGNvbnN0IHRjdHggPSB0Yy5nZXRDb250ZXh0KCcyZCcpOwogIHRjLndpZHRoID0gdGMucGFyZW50RWxlbWVudC5vZmZzZXRXaWR0aCAtIDM2OwogIHRjdHguY2xlYXJSZWN0KDAsMCx0Yy53aWR0aCx0Yy5oZWlnaHQpOwogIGNvbnN0IHRvdGFsViA9IGNsaWVudERhdGE/LnRvdGFsVmlzaXRzIHx8IDA7CiAgY29uc3QgZGF5cyAgID0gWydNb24nLCdUdWUnLCdXZWQnLCdUaHUnLCdGcmknLCdTYXQnLCdTdW4nXTsKICBjb25zdCB2YWxzICAgPSBkYXlzLm1hcCgoXyxpKT0+IE1hdGguZmxvb3IoTWF0aC5yYW5kb20oKSp0b3RhbFYvNyAqICgwLjYrTWF0aC5yYW5kb20oKSowLjgpKSk7CiAgY29uc3QgbWF4ViAgID0gTWF0aC5tYXgoLi4udmFscywgMSk7CiAgY29uc3QgYndUICAgID0gKHRjLndpZHRoIC0gKGRheXMubGVuZ3RoLTEpKjgpIC8gZGF5cy5sZW5ndGg7CiAgdmFscy5mb3JFYWNoKCh2LGkpPT57CiAgICBjb25zdCBoID0gKHYvbWF4VikqKHRjLmhlaWdodC0zMCk7CiAgICBjb25zdCB4ID0gaSooYndUKzgpOwogICAgY29uc3QgZ3JhZCA9IHRjdHguY3JlYXRlTGluZWFyR3JhZGllbnQoMCwwLDAsdGMuaGVpZ2h0KTsKICAgIGdyYWQuYWRkQ29sb3JTdG9wKDAsJyMzYjgyZjYnKTsgZ3JhZC5hZGRDb2xvclN0b3AoMSwncmdiYSg1OSwxMzAsMjQ2LC4yKScpOwogICAgdGN0eC5maWxsU3R5bGU9Z3JhZDsKICAgIHRjdHguYmVnaW5QYXRoKCk7CiAgICB0Y3R4LnJvdW5kUmVjdD90Y3R4LnJvdW5kUmVjdCh4LHRjLmhlaWdodC1oLTIwLGJ3VCxoLDMpOnRjdHgucmVjdCh4LHRjLmhlaWdodC1oLTIwLGJ3VCxoKTsKICAgIHRjdHguZmlsbCgpOwogICAgdGN0eC5maWxsU3R5bGU9JyM4ODgnOyB0Y3R4LmZvbnQ9JzlweCBzYW5zLXNlcmlmJzsgdGN0eC50ZXh0QWxpZ249J2NlbnRlcic7CiAgICB0Y3R4LmZpbGxUZXh0KGRheXNbaV0sIHgrYndULzIsIHRjLmhlaWdodC01KTsKICAgIHRjdHguZmlsbFN0eWxlPScjZmZmJzsgdGN0eC5mb250PSdib2xkIDlweCBzYW5zLXNlcmlmJzsKICAgIHRjdHguZmlsbFRleHQodiwgeCtid1QvMiwgdGMuaGVpZ2h0LWgtMjUpOwogIH0pOwp9CgovLyDilIDilIAgRUFSTklORyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKZnVuY3Rpb24gcmVuZGVyRWFybmluZygpIHsKICBpZighY2xpZW50RGF0YSkgcmV0dXJuOwogIGNvbnN0IGhpc3QgPSBjbGllbnREYXRhLmVhcm5pbmdIaXN0b3J5IHx8IHt9OwogIGNvbnN0IHBjdCAgPSBjbGllbnREYXRhLmVhcm5pbmdQZXJjZW50IHx8IDQwOwogIGNvbnN0IHJvd3MgPSBPYmplY3QudmFsdWVzKGhpc3QpLnJldmVyc2UoKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZWFybi10Ym9keScpLmlubmVySFRNTCA9IHJvd3MubGVuZ3RoID8gcm93cy5tYXAocj0+YAogICAgPHRyPgogICAgICA8dGQgc3R5bGU9ImZvbnQtc2l6ZToxMXB4O2ZvbnQtZmFtaWx5Om1vbm9zcGFjZSI+JHtuZXcgRGF0ZShyLnQpLnRvTG9jYWxlRGF0ZVN0cmluZygpfTwvdGQ+CiAgICAgIDx0ZCBzdHlsZT0iY29sb3I6dmFyKC0tZ3JuKTtmb250LXdlaWdodDo3MDAiPuKCuSR7KChyLmFtb3VudHx8MCkqcGN0LzEwMCkudG9GaXhlZCgwKX08L3RkPgogICAgICA8dGQgc3R5bGU9ImZvbnQtc2l6ZToxMXB4O2NvbG9yOnZhcigtLW11KSI+JHtyLm5vdGV8fCfigJQnfTwvdGQ+CiAgICA8L3RyPmApLmpvaW4oJycpCiAgOiAnPHRyPjx0ZCBjb2xzcGFuPSIzIj48ZGl2IGNsYXNzPSJlbXB0eSI+PGRpdiBjbGFzcz0iZWljIj7wn5KwPC9kaXY+Tm8gZWFybmluZyBoaXN0b3J5IHlldDwvZGl2PjwvdGQ+PC90cj4nOwp9Cjwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4K";
+// ══════════════════════════════════════════════════════════════════════
+// ── CLIENT ADMIN ───────────────────────────────────════════════════════
+// ══════════════════════════════════════════════════════════════════════
 
-function generateClientAdmin(clientId, clientName) {
-  const client = clients.find(c => c.id === clientId);
-  if(!client) { toast('❌ Client not found', 'err'); return; }
+function clShowPage(name) {
+  document.querySelectorAll('#view-client .page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('[data-cl-page]').forEach(i => i.classList.remove('on'));
+  document.getElementById('cl-page-'+name)?.classList.add('on');
+  document.querySelector(`[data-cl-page="${name}"]`)?.classList.add('on');
+  if(name==='earning') clRenderEarning();
+}
+document.querySelectorAll('[data-cl-page]').forEach(el => el.addEventListener('click', () => clShowPage(el.dataset.clPage)));
+document.querySelectorAll('[data-cl-goto]').forEach(el  => el.addEventListener('click', () => clShowPage(el.dataset.clGoto)));
 
-  // Base64 decode the template
-  const templateHTML = atob(CLIENT_TEMPLATE_B64);
-
-  // Replace CLIENT_ID in the template
-  const customHTML = templateHTML.replace(
-    'window.CLIENT_ID = "client_001";',
-    `window.CLIENT_ID = "${clientId}"; // Client: ${client.name}`
-  );
-
-  // Update the page title
-  const finalHTML = customHTML.replace(
-    '<title>My Gallery — Admin</title>',
-    `<title>${client.name} — Admin</title>`
-  );
-
-  // Create download
-  const blob = new Blob([finalHTML], { type: 'text/html;charset=utf-8' });
-  const dlUrl = URL.createObjectURL(blob);
-  const a     = document.createElement('a');
-  a.href      = dlUrl;
-  a.download  = `admin-${clientId}.html`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(dlUrl);
-
-  addLog('add', `Generated admin panel for "${client.name}" (ID: ${clientId})`);
-
-  // Show 2 URLs share modal
-  showShareModal(client);
+function clInitDB(clientId) {
+  onValue(ref(db,`clients/${clientId}/images`), snap => {
+    clImages = snap.exists() ? Object.values(snap.val()) : [];
+    document.getElementById('cl-db-st').textContent  = 'Live';
+    document.getElementById('cl-nb-img').textContent = clImages.length;
+    document.getElementById('cl-d-images').textContent = clImages.length;
+    clRenderTable(); clRenderDashImgs(); clPopulateCatFilter();
+  });
+  onValue(ref(db,`clients/${clientId}/categories`), snap => {
+    clCats = snap.exists() ? Object.values(snap.val()) : [];
+    document.getElementById('cl-nb-cat').textContent = clCats.length;
+    clRenderCatTable(); clPopulateCatDropdowns();
+  });
+  onValue(ref(db,`superAdmin/clients/${clientId}`), snap => {
+    if(!snap.exists()) return;
+    clClientData = snap.val();
+    const d=clClientData, pct=d.earningPercent||40, earn=(d.totalEarning||0)*pct/100;
+    document.getElementById('cl-d-visits').textContent = (d.totalVisits||0).toLocaleString();
+    document.getElementById('cl-d-today').textContent  = (d.todayVisits||0).toLocaleString();
+    document.getElementById('cl-d-earn').textContent   = '₹'+earn.toFixed(0);
+    document.getElementById('cl-d-pct').textContent    = pct+'%';
+    document.getElementById('cl-e-total').textContent  = '₹'+earn.toFixed(0);
+    document.getElementById('cl-e-pct').textContent    = pct+'%';
+    const month = (d.thisMonthEarning||0)*pct/100;
+    document.getElementById('cl-d-month').textContent  = '₹'+month.toFixed(0);
+    const pctBar = Math.min((earn/1000)*100,100);
+    document.getElementById('cl-earn-fill').style.width   = pctBar+'%';
+    document.getElementById('cl-earn-pct-lbl').textContent= pctBar.toFixed(0)+'%';
+  });
 }
 
-function showShareModal(client) {
-  // Remove old modal if exists
-  const old = document.getElementById('share-modal');
-  if(old) old.remove();
-
-  const adminUrl = client.adminUrl || '(Upload admin file first, then add URL in client settings)';
-  const siteUrl  = client.siteUrl  || '(Real site coming soon — add URL in client settings)';
-
-  const modal = document.createElement('div');
-  modal.id = 'share-modal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px';
-  modal.innerHTML = `
-    <div style="background:#111;border:1px solid #2a2a2a;border-radius:20px;padding:32px;width:100%;max-width:520px;box-shadow:0 30px 80px rgba(0,0,0,.6)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-        <div style="font-size:16px;font-weight:800">📤 Share with Client</div>
-        <button onclick="document.getElementById('share-modal').remove()" style="background:transparent;border:none;color:#888;font-size:20px;cursor:pointer;line-height:1">✕</button>
-      </div>
-      <div style="font-size:13px;color:#888;margin-bottom:20px">
-        Share these 2 links with <strong style="color:#fff">${client.name}</strong>:
-      </div>
-
-      <!-- Admin Panel URL -->
-      <div style="margin-bottom:16px">
-        <div style="font-size:10px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">
-          ⚙️ Admin Panel URL
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div style="flex:1;padding:10px 14px;background:#050505;border:1px solid #0d4015;border-radius:10px;font-size:12px;color:#22c55e;font-family:monospace;word-break:break-all">
-            ${adminUrl}
-          </div>
-          <button onclick="navigator.clipboard.writeText('${adminUrl}');this.textContent='✅';setTimeout(()=>this.textContent='📋',1500)"
-            style="padding:10px 12px;background:#051808;border:1px solid #0d4015;border-radius:10px;color:#22c55e;font-size:13px;cursor:pointer;font-weight:700;white-space:nowrap">📋</button>
-        </div>
-        <div style="font-size:10px;color:#555;margin-top:4px">Client is apne Gmail se login karega</div>
-      </div>
-
-      <!-- Real Site URL -->
-      <div style="margin-bottom:24px">
-        <div style="font-size:10px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">
-          🌐 Real Site URL
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div style="flex:1;padding:10px 14px;background:#050505;border:1px solid #1a3060;border-radius:10px;font-size:12px;color:#3b82f6;font-family:monospace;word-break:break-all">
-            ${siteUrl}
-          </div>
-          <button onclick="navigator.clipboard.writeText('${siteUrl}');this.textContent='✅';setTimeout(()=>this.textContent='📋',1500)"
-            style="padding:10px 12px;background:#0a1225;border:1px solid #1a3060;border-radius:10px;color:#3b82f6;font-size:13px;cursor:pointer;font-weight:700;white-space:nowrap">📋</button>
-        </div>
-        <div style="font-size:10px;color:#555;margin-top:4px">Client ki real gallery website</div>
-      </div>
-
-      <!-- Copy both together -->
-      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:14px;margin-bottom:20px">
-        <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:8px">📋 Copy both together:</div>
-        <div style="font-size:11px;color:#666;font-family:monospace;line-height:1.8">
-          ⚙️ Admin: ${adminUrl}<br>
-          🌐 Site: ${siteUrl}
-        </div>
-        <button onclick="
-          navigator.clipboard.writeText('⚙️ Admin Panel: ${adminUrl}\n🌐 Real Site: ${siteUrl}');
-          this.textContent='✅ Copied!';
-          setTimeout(()=>this.textContent='📋 Copy Both',1500)"
-          style="margin-top:10px;padding:8px 16px;background:#222;border:1px solid #333;border-radius:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;width:100%">
-          📋 Copy Both
-        </button>
-      </div>
-
-      <button onclick="document.getElementById('share-modal').remove()"
-        style="width:100%;padding:12px;background:#E02424;border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">
-        Done ✓
-      </button>
-    </div>
-  `;
-  document.body.appendChild(modal);
+function clRenderDashImgs() {
+  document.getElementById('cl-dash-imgs').innerHTML = clImages.slice(0,12).map(img=>`
+    <div style="cursor:pointer" data-edit-img="${img.id}" title="${img.title||''}">
+      <img src="${img.thumbnailUrl||''}" onerror="this.src=''" alt=""
+        style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:7px;border:1px solid var(--br)"/>
+    </div>`).join('') || '<div style="color:var(--mu);font-size:12px">No images yet</div>';
+  document.querySelectorAll('[data-edit-img]').forEach(el => el.addEventListener('click', () => clOpenEditImg(el.dataset.editImg)));
 }
 
-// Show generate button when editing existing client
-document.getElementById('cm-gen').addEventListener('click', () => {
-  if(editClientId) generateClientAdmin(editClientId, document.getElementById('cm-name').value);
+function clPopulateCatFilter() {
+  const sel = document.getElementById('cl-f-cat'), cur = sel.value;
+  sel.innerHTML = '<option value="">All Categories</option>';
+  [...new Set(clImages.map(i=>i.category).filter(Boolean))].sort().forEach(c => {
+    const o=document.createElement('option'); o.value=c; o.textContent=c; if(c===cur) o.selected=true; sel.appendChild(o);
+  });
+}
+
+function clRenderTable() {
+  const q    = (document.getElementById('cl-q-img')?.value||'').toLowerCase();
+  const fcat = document.getElementById('cl-f-cat')?.value||'';
+  const list = clImages.filter(img => {
+    const mq = !q||[img.title,img.id,img.modelName].some(s=>(s||'').toLowerCase().includes(q));
+    return mq && (!fcat||img.category===fcat);
+  });
+  document.getElementById('cl-img-foot').textContent = `${list.length} of ${clImages.length} images`;
+  document.getElementById('cl-img-tbody').innerHTML = list.length ? list.map(img=>`
+    <tr>
+      <td><img class="thumb" src="${img.thumbnailUrl||''}" onerror="this.src=''" alt=""/></td>
+      <td><div style="font-weight:700;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${img.title||'—'}</div>
+          <div style="font-size:10px;color:var(--mu);font-family:monospace">${img.id}</div></td>
+      <td><span class="tag cat">${img.category||'—'}</span></td>
+      <td>
+        ${img.isFeatured?'<span class="tag ft">⭐</span>':''}
+        ${img.isTrending?'<span class="tag grn">🔥</span>':''}
+        ${img.isNew?'<span class="tag ylw">✨</span>':''}
+      </td>
+      <td><div style="font-size:10px;color:var(--mu)">👁 ${(img.views||0).toLocaleString()}</div>
+          <div style="font-size:10px;color:var(--mu)">❤️ ${(img.likes||0).toLocaleString()}</div></td>
+      <td><div class="arow">
+        <button class="btn btn-g btn-xs" data-edit-img="${img.id}">✏️</button>
+        <button class="btn btn-d btn-xs" data-del-img="${img.id}" data-dtitle="${(img.title||'').replace(/"/g,'&quot;')}">🗑</button>
+      </div></td>
+    </tr>`).join('')
+  : '<tr><td colspan="6"><div class="empty"><div class="eic">🖼️</div>No images found</div></td></tr>';
+  document.querySelectorAll('[data-edit-img]').forEach(btn => btn.addEventListener('click', () => clOpenEditImg(btn.dataset.editImg)));
+  document.querySelectorAll('[data-del-img]').forEach(btn  => btn.addEventListener('click', () => clDeleteImg(btn.dataset.delImg, btn.dataset.dtitle)));
+}
+['cl-q-img','cl-f-cat'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', clRenderTable);
+  document.getElementById(id)?.addEventListener('change', clRenderTable);
 });
 
-// ── INIT ──────────────────────────────────────────────────────────────
-document.getElementById('nb-log').textContent = actLog.length;
-renderLog();
+// IMAGE MODAL
+function clPopulateCatDropdowns() {
+  const sel=document.getElementById('cl-m-cat'), cur=sel.value;
+  sel.innerHTML='<option value="general">General</option>';
+  clCats.forEach(c => { const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; if(c.id===cur) o.selected=true; sel.appendChild(o); });
+}
+
+function clClearImgForm() {
+  ['cl-m-id','cl-m-slug','cl-m-title','cl-m-desc','cl-m-thumb','cl-m-hires','cl-m-gallery','cl-m-model','cl-m-res','cl-m-size','cl-m-tags','cl-m-up'].forEach(id=>document.getElementById(id).value='');
+  ['cl-m-views','cl-m-likes'].forEach(id=>document.getElementById(id).value='0');
+  ['cl-m-ft','cl-m-tr','cl-m-pp','cl-m-nw'].forEach(id=>document.getElementById(id).checked=false);
+  document.getElementById('cl-m-aspect').value='portrait';
+  document.getElementById('cl-m-fmt').value='WebP';
+  document.getElementById('cl-p-thumb').style.display='none';
+  document.getElementById('cl-p-hires').style.display='none';
+}
+
+function clOpenAddImg() {
+  clEditImgId=null;
+  document.getElementById('cl-im-title').textContent='➕ Add Image';
+  document.getElementById('cl-im-save').textContent='💾 Save Image';
+  clClearImgForm();
+  document.getElementById('cl-m-id').disabled=false;
+  document.getElementById('cl-img-modal').style.display='flex';
+}
+function clOpenEditImg(id) {
+  const img=clImages.find(i=>i.id===id); if(!img) return;
+  clEditImgId=id;
+  document.getElementById('cl-im-title').textContent='✏️ Edit Image';
+  document.getElementById('cl-im-save').textContent='💾 Update';
+  document.getElementById('cl-m-id').value=img.id||''; document.getElementById('cl-m-id').disabled=true;
+  document.getElementById('cl-m-slug').value=img.slug||'';
+  document.getElementById('cl-m-title').value=img.title||'';
+  document.getElementById('cl-m-desc').value=img.description||'';
+  document.getElementById('cl-m-cat').value=img.category||'general';
+  document.getElementById('cl-m-aspect').value=img.aspectRatio||'portrait';
+  document.getElementById('cl-m-thumb').value=img.thumbnailUrl||'';
+  document.getElementById('cl-m-hires').value=img.highResUrl||'';
+  document.getElementById('cl-m-gallery').value=(img.galleryImages||[]).join('\n');
+  document.getElementById('cl-m-model').value=img.modelName||'';
+  document.getElementById('cl-m-res').value=img.resolution||'';
+  document.getElementById('cl-m-fmt').value=img.format||'WebP';
+  document.getElementById('cl-m-size').value=img.fileSize||'';
+  document.getElementById('cl-m-views').value=img.views||0;
+  document.getElementById('cl-m-likes').value=img.likes||0;
+  document.getElementById('cl-m-up').value=img.uploadedAt||'';
+  document.getElementById('cl-m-tags').value=(img.tags||[]).join(', ');
+  document.getElementById('cl-m-ft').checked=!!img.isFeatured;
+  document.getElementById('cl-m-tr').checked=!!img.isTrending;
+  document.getElementById('cl-m-pp').checked=!!img.isPopular;
+  document.getElementById('cl-m-nw').checked=!!img.isNew;
+  clPrevImg('cl-m-thumb','cl-p-thumb'); clPrevImg('cl-m-hires','cl-p-hires');
+  document.getElementById('cl-img-modal').style.display='flex';
+}
+
+document.getElementById('cl-btn-add-img').addEventListener('click', clOpenAddImg);
+document.getElementById('cl-im-cancel').addEventListener('click', ()=>document.getElementById('cl-img-modal').style.display='none');
+['cl-m-thumb','cl-m-hires'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{ clPrevImg('cl-m-thumb','cl-p-thumb'); clPrevImg('cl-m-hires','cl-p-hires'); }));
+
+document.getElementById('cl-im-save').addEventListener('click', async ()=>{
+  const clientId = clClientData?.id; if(!clientId) return;
+  const id=document.getElementById('cl-m-id').value.trim(), title=document.getElementById('cl-m-title').value.trim();
+  const thumb=document.getElementById('cl-m-thumb').value.trim(), hires=document.getElementById('cl-m-hires').value.trim();
+  const slug=document.getElementById('cl-m-slug').value.trim();
+  if(!id||!title||!thumb||!hires||!slug){toast('❌ ID, Slug, Title, Thumb & HiRes required!','err');return;}
+  const data={
+    id,slug,title,description:document.getElementById('cl-m-desc').value.trim(),
+    category:document.getElementById('cl-m-cat').value,aspectRatio:document.getElementById('cl-m-aspect').value,
+    thumbnailUrl:thumb,highResUrl:hires,
+    galleryImages:document.getElementById('cl-m-gallery').value.trim().split('\n').map(s=>s.trim()).filter(Boolean),
+    modelName:document.getElementById('cl-m-model').value.trim(),resolution:document.getElementById('cl-m-res').value.trim(),
+    format:document.getElementById('cl-m-fmt').value,fileSize:document.getElementById('cl-m-size').value.trim(),
+    views:parseInt(document.getElementById('cl-m-views').value)||0,likes:parseInt(document.getElementById('cl-m-likes').value)||0,
+    uploadedAt:document.getElementById('cl-m-up').value.trim()||'Just now',
+    tags:document.getElementById('cl-m-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    isFeatured:document.getElementById('cl-m-ft').checked,isTrending:document.getElementById('cl-m-tr').checked,
+    isPopular:document.getElementById('cl-m-pp').checked,isNew:document.getElementById('cl-m-nw').checked,
+    width:0,height:0,
+  };
+  const btn=document.getElementById('cl-im-save'); btn.textContent='⏳...'; btn.disabled=true;
+  try{
+    await set(ref(db,`clients/${clientId}/images/${id}`),data);
+    toast(`✅ Image ${clEditImgId?'updated':'saved'}!`);
+    document.getElementById('cl-img-modal').style.display='none';
+  }catch(e){toast('❌ '+e.message,'err');}
+  finally{btn.textContent='💾 Save Image';btn.disabled=false;}
+});
+
+async function clDeleteImg(id,title){
+  if(!confirm(`Delete "${title}"?`)) return;
+  try{ await remove(ref(db,`clients/${clClientData?.id}/images/${id}`)); toast('🗑️ Deleted'); }
+  catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+function clPrevImg(inId,prevId){
+  const url=document.getElementById(inId)?.value.trim(), img=document.getElementById(prevId);
+  if(!img) return;
+  if(url){img.src=url;img.style.display='block';img.onerror=()=>img.style.display='none';}
+  else img.style.display='none';
+}
+
+// CATEGORIES
+function clRenderCatTable(){
+  document.getElementById('cl-cat-tbody').innerHTML = clCats.length ? clCats.map(cat=>{
+    const cnt=clImages.filter(i=>i.category===cat.id).length;
+    return `<tr>
+      <td><code style="font-size:11px;background:var(--s2);padding:2px 6px;border-radius:4px">${cat.id}</code></td>
+      <td style="font-weight:700">${cat.name}</td>
+      <td><span class="tag cat">${cnt}</span></td>
+      <td><div class="arow">
+        <button class="btn btn-g btn-xs" data-ecat="${cat.id}">✏️</button>
+        <button class="btn btn-d btn-xs" data-dcat="${cat.id}" data-dcname="${cat.name}">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('')
+  : '<tr><td colspan="4"><div class="empty"><div class="eic">📂</div>No categories</div></td></tr>';
+  document.querySelectorAll('[data-ecat]').forEach(btn=>btn.addEventListener('click',()=>clOpenEditCat(btn.dataset.ecat)));
+  document.querySelectorAll('[data-dcat]').forEach(btn=>btn.addEventListener('click',()=>clDeleteCat(btn.dataset.dcat,btn.dataset.dcname)));
+}
+
+function clOpenAddCat(){
+  clEditCatId=null;
+  document.getElementById('cl-cm-title').textContent='📂 Add Category';
+  document.getElementById('cl-cm-save').textContent='💾 Save';
+  ['cl-c-id','cl-c-name','cl-c-desc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cl-c-id').disabled=false;
+  document.getElementById('cl-cat-modal').style.display='flex';
+}
+function clOpenEditCat(id){
+  const cat=clCats.find(c=>c.id===id); if(!cat) return;
+  clEditCatId=id;
+  document.getElementById('cl-cm-title').textContent='✏️ Edit Category';
+  document.getElementById('cl-cm-save').textContent='💾 Update';
+  document.getElementById('cl-c-id').value=cat.id; document.getElementById('cl-c-id').disabled=true;
+  document.getElementById('cl-c-name').value=cat.name||'';
+  document.getElementById('cl-c-desc').value=cat.description||'';
+  document.getElementById('cl-cat-modal').style.display='flex';
+}
+document.getElementById('cl-btn-add-cat').addEventListener('click',clOpenAddCat);
+document.getElementById('cl-cm-cancel').addEventListener('click',()=>document.getElementById('cl-cat-modal').style.display='none');
+document.getElementById('cl-cm-save').addEventListener('click',async()=>{
+  const clientId=clClientData?.id; if(!clientId) return;
+  const id=document.getElementById('cl-c-id').value.trim().toLowerCase().replace(/\s+/g,'-');
+  const name=document.getElementById('cl-c-name').value.trim();
+  if(!id||!name){toast('❌ ID and Name required!','err');return;}
+  const data={id,name,description:document.getElementById('cl-c-desc').value.trim(),iconName:'Grid',slug:id,tags:[],count:0};
+  const btn=document.getElementById('cl-cm-save'); btn.textContent='⏳...'; btn.disabled=true;
+  try{
+    await set(ref(db,`clients/${clientId}/categories/${id}`),data);
+    toast(`✅ Category "${name}" saved!`);
+    document.getElementById('cl-cat-modal').style.display='none';
+  }catch(e){toast('❌ '+e.message,'err');}
+  finally{btn.textContent='💾 Save';btn.disabled=false;}
+});
+async function clDeleteCat(id,name){
+  if(!confirm(`Delete "${name}"?`)) return;
+  try{ await remove(ref(db,`clients/${clClientData?.id}/categories/${id}`)); toast('🗑️ Category deleted'); }
+  catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+// EARNING
+function clRenderEarning(){
+  if(!clClientData) return;
+  const pct=clClientData.earningPercent||40;
+  const hist=clClientData.earningHistory||{};
+  document.getElementById('cl-earn-tbody').innerHTML = Object.values(hist).reverse().map(r=>`
+    <tr>
+      <td style="font-size:11px;font-family:monospace">${new Date(r.t).toLocaleDateString()}</td>
+      <td style="color:var(--grn)">₹${(r.amount||0).toFixed(0)}</td>
+      <td style="color:var(--blu);font-weight:700">₹${((r.amount||0)*pct/100).toFixed(0)}</td>
+      <td style="font-size:11px;color:var(--mu)">${r.note||'—'}</td>
+    </tr>`).join('')
+  || '<tr><td colspan="4"><div class="empty"><div class="eic">💰</div>No earning history yet</div></td></tr>';
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────
+document.getElementById('sa-nb-log').textContent = saActLog.length;
+saRenderLog();
+
+// Set base URL default
+if(!localStorage.getItem('mnx_base_url')) {
+  localStorage.setItem('mnx_base_url', window.location.origin);
+}
 </script>
 </body>
 </html>

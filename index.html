@@ -583,7 +583,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 
 <script type="module">
 import { initializeApp }   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut }
                            from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getDatabase, ref, onValue, set, remove, update, get }
                            from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
@@ -654,9 +654,33 @@ function getBase() {
 // ── AUTH STATE ─────────────────────────────────────────────────────────
 const G_SVG = document.getElementById('g-btn').innerHTML;
 function resetGBtn() {
-  document.getElementById('g-btn').innerHTML = G_SVG;
-  document.getElementById('g-btn').disabled = false;
+  const btn = document.getElementById('g-btn');
+  if(btn) { btn.innerHTML = G_SVG; btn.disabled = false; }
 }
+
+// Handle redirect result when page loads back after Google sign-in
+(async () => {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result?.user) {
+      // Successfully signed in via redirect - onAuthStateChanged will handle it
+      console.log('Redirect sign-in success:', result.user.email);
+    }
+  } catch(e) {
+    console.error('Redirect result error:', e.code, e.message);
+    const msgs = {
+      'auth/unauthorized-domain':   `❌ Add "${location.hostname}" to Firebase Console → Authentication → Settings → Authorized domains.`,
+      'auth/operation-not-allowed': '❌ Enable Google sign-in in Firebase Console → Authentication → Sign-in method → Google.',
+      'auth/account-exists-with-different-credential': '❌ Account exists with different method.',
+    };
+    const msg = msgs[e.code] || ('❌ Sign-in failed: ' + (e.code || e.message));
+    // Show error on login screen
+    setTimeout(() => {
+      showErr(msg);
+      resetGBtn();
+    }, 500);
+  }
+})();
 
 onAuthStateChanged(auth, async user => {
   const route = parseRoute(getRoute());
@@ -796,18 +820,20 @@ function showErr(msg) {
 // ── GOOGLE LOGIN ────────────────────────────────────────────────────────
 document.getElementById('g-btn').addEventListener('click', async () => {
   const btn = document.getElementById('g-btn');
-  btn.innerHTML = '⏳ Opening Google...'; btn.disabled = true;
+  btn.innerHTML = '⏳ Redirecting to Google...';
+  btn.disabled  = true;
   document.getElementById('l-err').style.display = 'none';
   try {
-    await signInWithPopup(auth, gp);
+    // Redirect method - works on all browsers and all domains
+    await signInWithRedirect(auth, gp);
+    // Page will redirect to Google then come back
   } catch(e) {
     const msgs = {
-      'auth/popup-closed-by-user':  '❌ Popup closed. Try again.',
-      'auth/popup-blocked':         '❌ Popup blocked! Allow popups for this site.',
-      'auth/unauthorized-domain':   `❌ Add "${location.hostname}" to Firebase Console → Authentication → Authorized domains.`,
+      'auth/unauthorized-domain':   `❌ Add "${location.hostname}" to Firebase → Authentication → Authorized domains.`,
       'auth/operation-not-allowed': '❌ Enable Google sign-in in Firebase Console.',
+      'auth/network-request-failed':'❌ Network error. Check connection.',
     };
-    showErr(msgs[e.code] || ('❌ ' + e.code));
+    showErr(msgs[e.code] || ('❌ ' + (e.code || e.message)));
     resetGBtn();
   }
 });

@@ -187,7 +187,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </div>
 
 <!-- ══ SUPER ADMIN VIEW ══════════════════════════════════════════════════ -->
-<div id="view-super">
+<div id="view-super" style="display:none">
   <div class="topbar">
     <div class="tlogo">Moon <span>Night X</span><span class="tbadge owner">SUPER ADMIN</span></div>
     <div class="tright">
@@ -358,7 +358,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </div>
 
 <!-- ══ CLIENT ADMIN VIEW ═════════════════════════════════════════════════ -->
-<div id="view-client">
+<div id="view-client" style="display:none">
   <div class="topbar">
     <div class="tlogo-client"><span id="cl-site-name">My Gallery</span><span class="tbadge client">ADMIN</span></div>
     <div class="tright">
@@ -603,7 +603,7 @@ const fbApp = initializeApp(FB);
 const auth  = getAuth(fbApp);
 const db    = getDatabase(fbApp);
 const gp    = new GoogleAuthProvider();
-gp.setCustomParameters({ login_hint: OWNER });
+// All Google accounts can attempt login — email verified after sign-in
 
 // ── STATE ──────────────────────────────────────────────────────────────
 let saClients   = [];
@@ -727,17 +727,41 @@ onAuthStateChanged(auth, async user => {
 });
 
 window.addEventListener('hashchange', () => {
-  // Re-trigger auth check on route change
-  onAuthStateChanged(auth, () => {});
-  window.location.reload(); // Simple: reload on hash change
+  // On hash change, re-evaluate the route without reloading
+  const route = parseRoute(getRoute());
+  const user   = auth.currentUser;
+  if (!user) {
+    showView('login');
+    setupLoginUI(route);
+    return;
+  }
+  const email = user.email.toLowerCase();
+  if (route.type === 'super' && email === OWNER) {
+    showView('super');
+  } else if (route.type === 'client' && route.username) {
+    // Just show login for client routes - onAuthStateChanged will verify
+    showView('login');
+    setupLoginUI(route);
+  }
 });
 
 function showView(name) {
   ['login','super','client'].forEach(v => {
     const el = document.getElementById('view-' + v);
-    el.style.display = v === name ? (v === 'login' ? 'flex' : 'flex') : 'none';
-    if (v !== 'login') el.style.flexDirection = 'column';
+    if (v === name) {
+      el.style.display     = 'flex';
+      el.style.flexDirection = 'column';
+      el.style.height      = '100vh';
+    } else {
+      el.style.display = 'none';
+    }
   });
+  // Login is centered
+  if (name === 'login') {
+    const lw = document.getElementById('view-login');
+    lw.style.alignItems     = 'center';
+    lw.style.justifyContent = 'center';
+  }
 }
 
 function setupLoginUI(route) {
@@ -791,8 +815,7 @@ document.getElementById('g-btn').addEventListener('click', async () => {
 async function doLogout() {
   saAddLog('login', '🚪 Signed out');
   await signOut(auth);
-  navigate('/');
-  window.location.reload();
+  window.location.hash = '#/';
 }
 document.getElementById('sa-btn-logout').addEventListener('click', doLogout);
 document.getElementById('sa-btn-logout2').addEventListener('click', doLogout);

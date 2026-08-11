@@ -583,7 +583,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 
 <script type="module">
 import { initializeApp }   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut }
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut }
                            from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getDatabase, ref, onValue, set, remove, update, get }
                            from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
@@ -695,6 +695,62 @@ onAuthStateChanged(auth, async user => {
 
   const email = user.email.toLowerCase();
 
+  // If user is authenticated and lands on the login page/route, automatically redirect based on identity
+  if (route.type === 'login') {
+    if (email === OWNER) {
+      navigate('super');
+      return;
+    }
+
+    showView('login');
+    document.getElementById('l-sub').textContent   = 'Verifying access...';
+    document.getElementById('g-btn').style.display = 'none';
+
+    try {
+      const snap = await get(ref(db, 'superAdmin/clients'));
+      if (!snap.exists()) {
+        await signOut(auth);
+        showErr('❌ No clients found.');
+        resetGBtn();
+        document.getElementById('g-btn').style.display = 'flex';
+        setupLoginUI(route);
+        return;
+      }
+      const allClients = Object.values(snap.val());
+      const client = allClients.find(c => c.googleEmail.toLowerCase() === email);
+
+      if (!client) {
+        await signOut(auth);
+        showErr(`❌ Access denied. Account "${email}" is not registered.`);
+        resetGBtn();
+        document.getElementById('g-btn').style.display = 'flex';
+        setupLoginUI(route);
+        return;
+      }
+      if (client.status !== 'active') {
+        await signOut(auth);
+        showErr('❌ Your account is inactive. Contact admin.');
+        resetGBtn();
+        document.getElementById('g-btn').style.display = 'flex';
+        setupLoginUI(route);
+        return;
+      }
+
+      // Valid client found - redirect to their admin dashboard
+      clClientData = client;
+      navigate(`admin/${client.username}`);
+      return;
+    } catch (err) {
+      console.error('Error during automatic login redirect:', err);
+      await signOut(auth);
+      showErr('❌ Verification failed. Please try again.');
+      resetGBtn();
+      document.getElementById('g-btn').style.display = 'flex';
+      setupLoginUI(route);
+      return;
+    }
+  }
+
   if (route.type === 'super') {
     // Super admin route
     if (email !== OWNER) {
@@ -741,12 +797,6 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('cl-site-name').textContent = client.name || 'My Gallery';
     document.title = (client.name || 'My Gallery') + ' — Admin';
     clInitDB(client.id);
-
-  } else {
-    // Default — show login
-    showView('login');
-    setupLoginUI(route);
-    resetGBtn();
   }
 });
 
@@ -820,21 +870,33 @@ function showErr(msg) {
 // ── GOOGLE LOGIN ────────────────────────────────────────────────────────
 document.getElementById('g-btn').addEventListener('click', async () => {
   const btn = document.getElementById('g-btn');
-  btn.innerHTML = '⏳ Redirecting to Google...';
+  btn.innerHTML = '⏳ Signing in with Google...';
   btn.disabled  = true;
   document.getElementById('l-err').style.display = 'none';
   try {
-    // Redirect method - works on all browsers and all domains
-    await signInWithRedirect(auth, gp);
-    // Page will redirect to Google then come back
+    // Attempt popup login first
+    await signInWithPopup(auth, gp);
   } catch(e) {
-    const msgs = {
-      'auth/unauthorized-domain':   `❌ Add "${location.hostname}" to Firebase → Authentication → Authorized domains.`,
-      'auth/operation-not-allowed': '❌ Enable Google sign-in in Firebase Console.',
-      'auth/network-request-failed':'❌ Network error. Check connection.',
-    };
-    showErr(msgs[e.code] || ('❌ ' + (e.code || e.message)));
-    resetGBtn();
+    console.warn('Popup sign-in failed/blocked:', e.code, e.message);
+    if (e.code === 'auth/popup-closed-by-user') {
+      // User manually closed the popup, do not redirect
+      resetGBtn();
+      return;
+    }
+
+    // Automatic fallback to redirect method
+    try {
+      btn.innerHTML = '⏳ Redirecting to Google...';
+      await signInWithRedirect(auth, gp);
+    } catch(err2) {
+      const msgs = {
+        'auth/unauthorized-domain':   `❌ Add "${location.hostname}" to Firebase → Authentication → Authorized domains.`,
+        'auth/operation-not-allowed': '❌ Enable Google sign-in in Firebase Console.',
+        'auth/network-request-failed':'❌ Network error. Check connection.',
+      };
+      showErr(msgs[err2.code] || ('❌ ' + (err2.code || err2.message)));
+      resetGBtn();
+    }
   }
 });
 

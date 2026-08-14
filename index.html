@@ -623,6 +623,45 @@ function toast(msg, type='ok') {
   clearTimeout(t._t); t._t = setTimeout(() => t.className = '', 3000);
 }
 
+// ── AUTH CHECK ─────────────────────────────────────────────────────────
+function checkAuth() {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error("AUTH_REQUIRED: User is not logged in. Please sign in with Google.");
+  }
+  const email = (user.email || '').toLowerCase();
+  if (email !== OWNER) {
+    throw new Error(`UNAUTHORIZED: Access denied. User "${email}" is not authorized as Super Admin.`);
+  }
+  return user;
+}
+
+// ── SAVE CLIENT WITH TIMEOUT ───────────────────────────────────────────
+async function saveClient(data) {
+  const dbRef = ref(db, 'superAdmin/clients/' + data.id);
+  let timeoutId;
+
+  // Create a 6-second timeout promise to catch silent failures
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error("TIMEOUT_ERROR: Firebase Realtime Database write timed out. This usually happens when you are offline, have security rule issues, or have a misconfigured database URL/project."));
+    }, 6000);
+  });
+
+  // Combine write with timeout promise
+  try {
+    await Promise.race([
+      set(dbRef, data).then(res => { clearTimeout(timeoutId); return res; }),
+      timeoutPromise
+    ]);
+    return { success: true };
+  } catch (error) {
+    clearTimeout(timeoutId);
+    console.error("saveClient Error details:", error);
+    throw error;
+  }
+}
+
 // ── ROUTER ─────────────────────────────────────────────────────────────
 // Routes:
 //   #/           → login
@@ -1151,6 +1190,15 @@ document.getElementById('sa-cm-save').addEventListener('click', async () => {
     if(exists) { toast('❌ Username "'+username+'" already taken! Choose another.','err'); return; }
   }
 
+  // 1. Verify User Authentication and Authorization first
+  try {
+    checkAuth();
+  } catch (authError) {
+    console.error("Auth check failed:", authError);
+    toast("❌ " + authError.message, "err");
+    return;
+  }
+
   const id       = saEditId || ('cl_' + username + '_' + Date.now());
   const existing = saEditId ? saClients.find(c => c.id === id) : null;
   const base     = getBase();
@@ -1182,7 +1230,8 @@ document.getElementById('sa-cm-save').addEventListener('click', async () => {
     console.log('Saving client to Firebase path: superAdmin/clients/' + id);
     console.log('Data:', JSON.stringify(data));
 
-    await set(ref(db, 'superAdmin/clients/' + id), data);
+    // 2. Perform write using the timeout wrapper saveClient(data)
+    await saveClient(data);
 
     console.log('✅ Client saved successfully');
     toast('✅ Client "' + name + '" ' + (saEditId ? 'updated' : 'created') + '!');
@@ -1202,7 +1251,7 @@ document.getElementById('sa-cm-save').addEventListener('click', async () => {
   } catch(e) {
     console.error('Client save error:', e);
     let msg = e.message || 'Unknown error';
-    if(e.code === 'PERMISSION_DENIED' || msg.includes('permission') || msg.includes('Permission')) {
+    if(e.code === 'PERMISSION_DENIED' || msg.includes('permission') || msg.includes('Permission') || msg.includes('PERMISSION_DENIED')) {
       msg = 'Firebase permission denied! Database Rules mein superAdmin path allow karo.';
     } else if(msg.includes('network') || msg.includes('Network')) {
       msg = 'Network error! Internet connection check karo.';

@@ -91,7 +91,7 @@ input,select,textarea,button{font-family:inherit}
 .twrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse}
 thead tr{background:var(--s2)}
-th{padding:9px 13px;text-align:left;font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--br);white-space:nowrap}
+th{position:sticky;top:0;background:var(--s2);z-index:1;padding:9px 13px;text-align:left;font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--br);white-space:nowrap}
 td{padding:10px 13px;font-size:12px;border-bottom:1px solid var(--br);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(255,255,255,.015)}
@@ -222,7 +222,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="scard g"><div class="slbl">Platform Revenue</div><div class="sval" id="sa-d-rev">₹0</div><div class="ssub">All time</div></div>
           <div class="scard b"><div class="slbl">My Earnings</div><div class="sval" id="sa-d-mine">₹0</div><div class="ssub">After client share</div></div>
           <div class="scard y"><div class="slbl">Total Traffic</div><div class="sval" id="sa-d-traffic">0</div><div class="ssub">All clients</div></div>
-          <div class="scard p"><div class="slbl">Active</div><div class="sval" id="sa-d-active">—</div><div class="ssub">Running sites</div></div>
+          <div class="scard p"><div class="slbl">Active Sites</div><div class="sval" id="sa-d-active">—</div><div class="ssub">Running sites</div></div>
           <div class="scard r"><div class="slbl">Today Visits</div><div class="sval" id="sa-d-today">0</div><div class="ssub">Live</div></div>
         </div>
         <div class="card">
@@ -275,17 +275,6 @@ tr:hover td{background:rgba(255,255,255,.015)}
             <thead><tr><th>Client</th><th>Total</th><th>Share %</th><th>Client Gets</th><th>You Keep</th><th>Actions</th></tr></thead>
             <tbody id="sa-rev-tbody"></tbody>
           </table></div>
-        </div>
-        <div class="card">
-          <div class="chdr"><div class="ctitle">➕ Add Earning Manually</div></div>
-          <div class="cbody">
-            <div class="fgrid">
-              <div class="fg"><label>Select Client</label><select id="sa-earn-client"><option value="">Choose...</option></select></div>
-              <div class="fg"><label>Amount (₹)</label><input type="number" id="sa-earn-amount" placeholder="500"/></div>
-              <div class="fg"><label>Note</label><input id="sa-earn-note" placeholder="Adsterra earnings Oct"/></div>
-              <div class="fg" style="justify-content:flex-end;padding-top:18px"><button class="btn btn-grn" id="sa-btn-earn">+ Add Earning</button></div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -345,6 +334,17 @@ tr:hover td{background:rgba(255,255,255,.015)}
           </div>
         </div>
         <div class="card">
+          <div class="chdr"><div class="ctitle">➕ Add Earning Manually</div></div>
+          <div class="cbody">
+            <div class="fgrid">
+              <div class="fg"><label>Select Client</label><select id="sa-earn-client"><option value="">Choose...</option></select></div>
+              <div class="fg"><label>Amount (₹)</label><input type="number" id="sa-earn-amount" placeholder="500"/></div>
+              <div class="fg"><label>Note</label><input id="sa-earn-note" placeholder="Adsterra earnings Oct"/></div>
+              <div class="fg" style="justify-content:flex-end;padding-top:18px"><button class="btn btn-grn" id="sa-btn-earn">+ Add Earning</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
           <div class="chdr"><div class="ctitle">🔐 Account</div></div>
           <div class="cbody" style="font-size:12px;color:var(--mu);line-height:2">
             <strong style="color:var(--tx)">Signed in:</strong> <span id="sa-set-email" style="color:var(--grn)">—</span><br>
@@ -360,7 +360,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 <!-- ══ CLIENT ADMIN VIEW ═════════════════════════════════════════════════ -->
 <div id="view-client" style="display:none">
   <div class="topbar">
-    <div class="tlogo-client"><span id="cl-site-name">My Gallery</span><span class="tbadge client">ADMIN</span></div>
+    <div class="tlogo-client"><span id="cl-site-name">My Gallery</span><span class="tbadge client">CLIENT ADMIN</span></div>
     <div class="tright">
       <span class="sdot live" id="cl-db-st">Connecting</span>
       <button class="btn btn-b btn-sm" id="cl-btn-add-img">+ Add Image</button>
@@ -412,11 +412,12 @@ tr:hover td{background:rgba(255,255,255,.015)}
         <div class="card">
           <div class="chdr">
             <div class="ctitle">🖼️ My Images</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
               <input type="search" id="cl-q-img" placeholder="🔍 Search..." style="padding:7px 12px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;width:150px"/>
               <select id="cl-f-cat" style="padding:7px 12px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none">
                 <option value="">All Categories</option>
               </select>
+              <button class="btn btn-b btn-sm" id="cl-btn-add-img-page">+ Add Image</button>
             </div>
           </div>
           <div class="twrap"><table>
@@ -615,6 +616,8 @@ let clEditImgId = null;
 let clEditCatId = null;
 let currentRoute= '';
 let saActLog    = JSON.parse(localStorage.getItem('sa_log') || '[]');
+let trafficSortField = 'totalVisits';
+let trafficSortAsc   = false;
 
 // ── TOAST ──────────────────────────────────────────────────────────────
 function toast(msg, type='ok') {
@@ -687,7 +690,9 @@ function navigate(path) {
 }
 
 function getBase() {
-  return (localStorage.getItem('mnx_base_url') || window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '')).replace(/\/+$/, '');
+  const stored = localStorage.getItem('mnx_base_url');
+  if (stored) return stored.replace(/\/+$/, '');
+  return (window.location.origin + window.location.pathname).replace(/\/+$/, '');
 }
 
 // ── AUTH STATE ─────────────────────────────────────────────────────────
@@ -1117,9 +1122,16 @@ function saShowShareModal(clientId) {
     setTimeout(() => document.getElementById('sm-copy-both').textContent = '📋 Copy Both Links', 2000);
   };
 
-  // Save URLs to Firebase
-  update(ref(db, `superAdmin/clients/${clientId}`), { adminUrl, generatedAt: new Date().toISOString() });
-  saAddLog('add', `Generated URLs for "${c.name}" — admin: ${adminUrl}`);
+  // Save URLs to Firebase with robust try/catch and toast error messages
+  (async () => {
+    try {
+      await update(ref(db, `superAdmin/clients/${clientId}`), { adminUrl, generatedAt: new Date().toISOString() });
+      saAddLog('add', `Generated URLs for "${c.name}" — admin: ${adminUrl}`);
+    } catch (err) {
+      console.error('Error saving URLs to Firebase:', err);
+      toast('❌ Failed to save URLs to database: ' + err.message, 'err');
+    }
+  })();
 
   document.getElementById('share-modal').style.display = 'flex';
 }
@@ -1132,7 +1144,8 @@ document.getElementById('sa-cm-pct').addEventListener('input', () => {
   document.getElementById('sa-keep-val').textContent = 100 - v;
 });
 document.getElementById('sa-cm-username').addEventListener('input', () => {
-  const u    = document.getElementById('sa-cm-username').value;
+  let u = document.getElementById('sa-cm-username').value.toLowerCase().replace(/[^a-z0-9-]/g,'');
+  document.getElementById('sa-cm-username').value = u;
   const base = getBase();
   document.getElementById('sa-username-preview').innerHTML =
     u ? `Admin: <span style="color:var(--grn)">${base}/#/admin/${u}</span> &nbsp;|&nbsp; Site: <span style="color:var(--blu)">${base}/#/${u}</span>`
@@ -1178,11 +1191,11 @@ document.getElementById('sa-cm-cancel').addEventListener('click', () => document
 document.getElementById('sa-cm-save').addEventListener('click', async () => {
   const name     = document.getElementById('sa-cm-name').value.trim();
   const email    = document.getElementById('sa-cm-email').value.trim().toLowerCase();
-  const username = document.getElementById('sa-cm-username').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');
+  const username = document.getElementById('sa-cm-username').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'');
 
   if(!name)     { toast('❌ Name required!','err'); return; }
   if(!email)    { toast('❌ Email required!','err'); return; }
-  if(!username) { toast('❌ Username required (only a-z, 0-9, _ allowed)!','err'); return; }
+  if(!username) { toast('❌ Username required (only a-z, 0-9, - allowed)!','err'); return; }
 
   // Check username unique (for new clients only)
   if(!saEditId) {
@@ -1285,28 +1298,74 @@ function saRenderRevenue() {
       <td style="font-weight:700">${c.name}</td>
       <td style="color:var(--grn)">₹${t.toFixed(0)}</td>
       <td>
-        <input type="range" min="0" max="100" value="${p}" data-cid="${c.id}" class="pct-sl" style="width:80px;accent-color:var(--red)"/>
+        <input type="range" min="0" max="100" value="${p}" data-cid="${c.id}" data-tot="${t}" class="pct-sl" style="width:80px;accent-color:var(--red)"/>
         <span id="psl-${c.id}" style="font-size:11px;font-weight:700;color:var(--red);margin-left:4px">${p}%</span>
       </td>
-      <td style="color:var(--ylw)">₹${(t*p/100).toFixed(0)}</td>
-      <td style="color:var(--blu)">₹${(t*(100-p)/100).toFixed(0)}</td>
+      <td style="color:var(--ylw)" id="cget-${c.id}">₹${(t*p/100).toFixed(0)}</td>
+      <td style="color:var(--blu)" id="ykeep-${c.id}">₹${(t*(100-p)/100).toFixed(0)}</td>
       <td><button class="btn btn-grn btn-xs" data-sp="${c.id}">💾</button></td>
     </tr>`;
   }).join('') || '<tr><td colspan="6"><div class="empty"><div class="eic">💰</div>No clients</div></td></tr>';
 
-  document.querySelectorAll('.pct-sl').forEach(sl => sl.addEventListener('input', () =>
-    document.getElementById('psl-'+sl.dataset.cid).textContent = sl.value+'%'));
+  document.querySelectorAll('.pct-sl').forEach(sl => sl.addEventListener('input', () => {
+    const cid = sl.dataset.cid;
+    const val = parseInt(sl.value) || 0;
+    const tot = parseFloat(sl.dataset.tot) || 0;
+    document.getElementById('psl-'+cid).textContent = val+'%';
+    document.getElementById('cget-'+cid).textContent = '₹' + (tot * val / 100).toFixed(0);
+    document.getElementById('ykeep-'+cid).textContent = '₹' + (tot * (100 - val) / 100).toFixed(0);
+  }));
   document.querySelectorAll('[data-sp]').forEach(btn => btn.addEventListener('click', async () => {
     const sl = document.querySelector(`.pct-sl[data-cid="${btn.dataset.sp}"]`);
     try { await update(ref(db,`superAdmin/clients/${btn.dataset.sp}`),{earningPercent:parseInt(sl.value)}); toast('✅ % updated'); } catch(e){ toast('❌ '+e.message,'err'); }
   }));
 }
 
+function setTrafficSort(field) {
+  if (trafficSortField === field) {
+    trafficSortAsc = !trafficSortAsc;
+  } else {
+    trafficSortField = field;
+    trafficSortAsc = false;
+  }
+  saRenderTraffic();
+}
+
 function saRenderTraffic() {
   document.getElementById('sa-t-total').textContent = saClients.reduce((a,c)=>a+(c.totalVisits||0),0).toLocaleString();
   document.getElementById('sa-t-today').textContent = saClients.reduce((a,c)=>a+(c.todayVisits||0),0).toLocaleString();
   document.getElementById('sa-t-views').textContent = saClients.reduce((a,c)=>a+(c.totalViews||0),0).toLocaleString();
-  document.getElementById('sa-traffic-tbody').innerHTML = [...saClients].sort((a,b)=>(b.totalVisits||0)-(a.totalVisits||0)).map(c=>`
+
+  // Sort clients
+  const sortedClients = [...saClients].sort((a, b) => {
+    let valA = a[trafficSortField];
+    let valB = b[trafficSortField];
+    if (typeof valA === 'string') valA = valA.toLowerCase();
+    if (typeof valB === 'string') valB = valB.toLowerCase();
+    if (valA === undefined || valA === null) valA = '';
+    if (valB === undefined || valB === null) valB = '';
+
+    if (valA < valB) return trafficSortAsc ? -1 : 1;
+    if (valA > valB) return trafficSortAsc ? 1 : -1;
+    return 0;
+  });
+
+  const headers = [
+    { label: 'Client', field: 'name' },
+    { label: 'Site URL', field: 'siteUrl' },
+    { label: 'Today', field: 'todayVisits' },
+    { label: 'Total Visits', field: 'totalVisits' },
+    { label: 'Views', field: 'totalViews' },
+    { label: 'Status', field: 'status' }
+  ];
+
+  const theadHTML = `<tr>${headers.map(h => {
+    const isSorted = trafficSortField === h.field;
+    const arrow = isSorted ? (trafficSortAsc ? ' ▲' : ' ▼') : '';
+    return `<th style="cursor:pointer;user-select:none" id="th-traffic-${h.field}">${h.label}${arrow}</th>`;
+  }).join('')}</tr>`;
+
+  const tbodyHTML = sortedClients.map(c=>`
     <tr>
       <td style="font-weight:700">${c.name}</td>
       <td><a href="${c.siteUrl||'#'}" target="_blank" style="color:var(--blu);font-size:11px">${c.siteUrl||'—'}</a></td>
@@ -1315,6 +1374,14 @@ function saRenderTraffic() {
       <td>${(c.totalViews||0).toLocaleString()}</td>
       <td><span class="tag ${c.status==='active'?'grn':'mu'}">${c.status}</span></td>
     </tr>`).join('') || '<tr><td colspan="6"><div class="empty"><div class="eic">📈</div>No data</div></td></tr>';
+
+  const tableContainer = document.getElementById('sa-traffic-tbody').parentElement;
+  tableContainer.querySelector('thead').innerHTML = theadHTML;
+  document.getElementById('sa-traffic-tbody').innerHTML = tbodyHTML;
+
+  headers.forEach(h => {
+    document.getElementById(`th-traffic-${h.field}`).addEventListener('click', () => setTrafficSort(h.field));
+  });
 }
 
 // EARN ADD
@@ -1487,6 +1554,7 @@ function clOpenAddImg() {
   document.getElementById('cl-im-title').textContent='➕ Add Image';
   document.getElementById('cl-im-save').textContent='💾 Save Image';
   clClearImgForm();
+  clPopulateCatDropdowns();
   document.getElementById('cl-m-id').disabled=false;
   document.getElementById('cl-img-modal').style.display='flex';
 }
@@ -1495,6 +1563,7 @@ function clOpenEditImg(id) {
   clEditImgId=id;
   document.getElementById('cl-im-title').textContent='✏️ Edit Image';
   document.getElementById('cl-im-save').textContent='💾 Update';
+  clPopulateCatDropdowns();
   document.getElementById('cl-m-id').value=img.id||''; document.getElementById('cl-m-id').disabled=true;
   document.getElementById('cl-m-slug').value=img.slug||'';
   document.getElementById('cl-m-title').value=img.title||'';
@@ -1521,6 +1590,7 @@ function clOpenEditImg(id) {
 }
 
 document.getElementById('cl-btn-add-img').addEventListener('click', clOpenAddImg);
+document.getElementById('cl-btn-add-img-page').addEventListener('click', clOpenAddImg);
 document.getElementById('cl-im-cancel').addEventListener('click', ()=>document.getElementById('cl-img-modal').style.display='none');
 ['cl-m-thumb','cl-m-hires'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{ clPrevImg('cl-m-thumb','cl-p-thumb'); clPrevImg('cl-m-hires','cl-p-hires'); }));
 
@@ -1645,8 +1715,8 @@ document.getElementById('sa-nb-log').textContent = saActLog.length;
 saRenderLog();
 
 // Set base URL default
-if(!localStorage.getItem('mnx_base_url')) {
-  localStorage.setItem('mnx_base_url', window.location.origin);
+if (!localStorage.getItem('mnx_base_url')) {
+  localStorage.setItem('mnx_base_url', window.location.origin + window.location.pathname);
 }
 </script>
 </body>

@@ -581,37 +581,6 @@ tr:hover td{background:rgba(255,255,255,.015)}
 
 <div id="toast"></div>
 
-<!-- ══ PUBLIC SITE VIEW ═════════════════════════════════════════════════ -->
-<div id="view-site" style="display:none;flex-direction:column;height:100vh;overflow-y:auto;background:#050505;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
-  <!-- Site Header -->
-  <div id="site-header" style="padding:20px 24px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#050505;z-index:10">
-    <div>
-      <div id="site-name" style="font-size:20px;font-weight:900"></div>
-      <div id="site-desc" style="font-size:11px;color:#888;margin-top:2px"></div>
-    </div>
-    <div id="site-cats" style="display:flex;gap:8px;flex-wrap:wrap"></div>
-  </div>
-  <!-- Image Grid -->
-  <div id="site-grid" style="padding:16px;columns:2 160px;column-gap:10px"></div>
-  <!-- Lightbox -->
-  <div id="site-lb" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:100;flex-direction:column;align-items:center;justify-content:center" onclick="closeLB()">
-    <img id="site-lb-img" src="" alt="" style="max-width:94vw;max-height:86vh;object-fit:contain;border-radius:8px" onclick="event.stopPropagation()"/>
-    <div id="site-lb-info" style="margin-top:12px;text-align:center;color:#ccc;font-size:13px"></div>
-    <button onclick="closeLB();event.stopPropagation()" style="position:absolute;top:16px;right:20px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1">✕</button>
-  </div>
-  <!-- Loading -->
-  <div id="site-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;color:#555">
-    <div style="font-size:32px;margin-bottom:10px">🌙</div>
-    <div style="font-size:13px">Loading gallery...</div>
-  </div>
-  <!-- Not found -->
-  <div id="site-404" style="display:none;flex-direction:column;align-items:center;justify-content:center;height:80vh;color:#555">
-    <div style="font-size:48px;margin-bottom:12px">404</div>
-    <div style="font-size:14px;margin-bottom:8px">Gallery not found</div>
-    <div style="font-size:12px;color:#444">This gallery does not exist or has been deactivated.</div>
-  </div>
-</div>
-
 <script type="module">
 import { initializeApp }   from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut }
@@ -668,10 +637,9 @@ function getRoute() {
 
 function parseRoute(path) {
   const parts = path.split('/').filter(Boolean);
-  if (!parts.length)                              return { type: 'login' };
-  if (parts[0] === 'super')                       return { type: 'super' };
-  if (parts[0] === 'admin' && parts[1])           return { type: 'client', username: parts[1] };
-  if (parts[0] && parts[0] !== 'admin')           return { type: 'site', username: parts[0] };
+  if (!parts.length)          return { type: 'login' };
+  if (parts[0] === 'super')   return { type: 'super' };
+  if (parts[0] === 'admin' && parts[1]) return { type: 'client', username: parts[1] };
   return { type: 'login' };
 }
 
@@ -680,15 +648,7 @@ function navigate(path) {
 }
 
 function getBase() {
-  // Use saved base URL if set in settings
-  const saved = localStorage.getItem('mnx_base_url');
-  if(saved) return saved.replace(/\/+$/, '');
-  // Auto-detect for GitHub Pages (e.g. pikavika77.github.io/Admin-)
-  // pathname will be like /Admin-/ or /Admin-/index.html
-  const path = window.location.pathname;
-  // Remove trailing index.html if present
-  const cleanPath = path.replace(/\/index\.html$/, '').replace(/\/+$/, '');
-  return window.location.origin + cleanPath;
+  return (localStorage.getItem('mnx_base_url') || window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '')).replace(/\/+$/, '');
 }
 
 // ── AUTH STATE ─────────────────────────────────────────────────────────
@@ -726,11 +686,6 @@ onAuthStateChanged(auth, async user => {
   const route = parseRoute(getRoute());
 
   if (!user) {
-    // Public site route — no login needed
-    if (route.type === 'site') {
-      showPublicSite(route.username);
-      return;
-    }
     // Not logged in — show login
     showView('login');
     setupLoginUI(route);
@@ -810,11 +765,6 @@ onAuthStateChanged(auth, async user => {
     saAddLog('login', `✅ Super Admin signed in: ${user.email}`);
     saInitDB();
 
-  } else if (route.type === 'site') {
-    // Public gallery — no login needed, show site directly
-    showPublicSite(route.username);
-    return;
-
   } else if (route.type === 'client') {
     // Client admin route
     const username = route.username;
@@ -851,13 +801,9 @@ onAuthStateChanged(auth, async user => {
 });
 
 window.addEventListener('hashchange', () => {
+  // On hash change, re-evaluate the route without reloading
   const route = parseRoute(getRoute());
   const user   = auth.currentUser;
-  // Public site — no auth needed
-  if (route.type === 'site') {
-    showPublicSite(route.username);
-    return;
-  }
   if (!user) {
     showView('login');
     setupLoginUI(route);
@@ -867,23 +813,24 @@ window.addEventListener('hashchange', () => {
   if (route.type === 'super' && email === OWNER) {
     showView('super');
   } else if (route.type === 'client' && route.username) {
+    // Just show login for client routes - onAuthStateChanged will verify
     showView('login');
     setupLoginUI(route);
   }
 });
 
 function showView(name) {
-  ['login','super','client','site'].forEach(v => {
+  ['login','super','client'].forEach(v => {
     const el = document.getElementById('view-' + v);
-    if(!el) return;
     if (v === name) {
-      el.style.display       = 'flex';
+      el.style.display     = 'flex';
       el.style.flexDirection = 'column';
-      el.style.height        = '100vh';
+      el.style.height      = '100vh';
     } else {
       el.style.display = 'none';
     }
   });
+  // Login is centered
   if (name === 'login') {
     const lw = document.getElementById('view-login');
     lw.style.alignItems     = 'center';
@@ -1191,40 +1138,80 @@ document.getElementById('sa-cm-cancel').addEventListener('click', () => document
 
 document.getElementById('sa-cm-save').addEventListener('click', async () => {
   const name     = document.getElementById('sa-cm-name').value.trim();
-  const email    = document.getElementById('sa-cm-email').value.trim();
-  const username = document.getElementById('sa-cm-username').value.trim();
-  if(!name||!email||!username) { toast('❌ Name, Email & Username required!','err'); return; }
+  const email    = document.getElementById('sa-cm-email').value.trim().toLowerCase();
+  const username = document.getElementById('sa-cm-username').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');
 
-  const id   = saEditId || ('cl_' + username + '_' + Date.now());
-  const base = getBase();
+  if(!name)     { toast('❌ Name required!','err'); return; }
+  if(!email)    { toast('❌ Email required!','err'); return; }
+  if(!username) { toast('❌ Username required (only a-z, 0-9, _ allowed)!','err'); return; }
+
+  // Check username unique (for new clients only)
+  if(!saEditId) {
+    const exists = saClients.find(c => c.username === username);
+    if(exists) { toast('❌ Username "'+username+'" already taken! Choose another.','err'); return; }
+  }
+
+  const id       = saEditId || ('cl_' + username + '_' + Date.now());
+  const existing = saEditId ? saClients.find(c => c.id === id) : null;
+  const base     = getBase();
+
   const data = {
-    id, name, username,
+    id,
+    name,
+    username,
     googleEmail:    email,
-    earningPercent: parseInt(document.getElementById('sa-cm-pct').value),
-    status:         document.getElementById('sa-cm-status').value,
+    earningPercent: parseInt(document.getElementById('sa-cm-pct').value) || 40,
+    status:         document.getElementById('sa-cm-status').value || 'active',
     adsterraSiteId: document.getElementById('sa-cm-adsterra').value.trim(),
     notes:          document.getElementById('sa-cm-notes').value.trim(),
-    createdAt:      saEditId ? (saClients.find(c=>c.id===id)?.createdAt||new Date().toISOString()) : new Date().toISOString(),
-    totalEarning:   saEditId ? (saClients.find(c=>c.id===id)?.totalEarning||0) : 0,
-    totalVisits:    saEditId ? (saClients.find(c=>c.id===id)?.totalVisits||0) : 0,
-    todayVisits:    saEditId ? (saClients.find(c=>c.id===id)?.todayVisits||0) : 0,
-    adminUrl:       `${base}/#/admin/${username}`,
-    siteUrl:        saEditId ? (saClients.find(c=>c.id===id)?.siteUrl||`${base}/#/${username}`) : `${base}/#/${username}`,
+    createdAt:      existing ? (existing.createdAt || new Date().toISOString()) : new Date().toISOString(),
+    updatedAt:      new Date().toISOString(),
+    totalEarning:   existing ? (existing.totalEarning  || 0) : 0,
+    totalVisits:    existing ? (existing.totalVisits   || 0) : 0,
+    todayVisits:    existing ? (existing.todayVisits   || 0) : 0,
+    totalViews:     existing ? (existing.totalViews    || 0) : 0,
+    adminUrl:       base + '/#/admin/' + username,
+    siteUrl:        existing ? (existing.siteUrl || base+'/#/'+username) : base+'/#/'+username,
   };
 
   const btn = document.getElementById('sa-cm-save');
-  btn.textContent = '⏳ Saving...'; btn.disabled = true;
+  btn.textContent = '⏳ Saving...';
+  btn.disabled    = true;
+
   try {
-    await set(ref(db, `superAdmin/clients/${id}`), data);
-    saAddLog(saEditId?'edit':'add', `${saEditId?'Updated':'Created'} client: "${name}" (@${username})`);
-    toast(`✅ Client "${name}" ${saEditId?'updated':'created'}!`);
+    console.log('Saving client to Firebase path: superAdmin/clients/' + id);
+    console.log('Data:', JSON.stringify(data));
+
+    await set(ref(db, 'superAdmin/clients/' + id), data);
+
+    console.log('✅ Client saved successfully');
+    toast('✅ Client "' + name + '" ' + (saEditId ? 'updated' : 'created') + '!');
     document.getElementById('sa-client-modal').style.display = 'none';
+
+    // Log action
+    try {
+      saAddLog(saEditId ? 'edit' : 'add',
+        (saEditId ? 'Updated' : 'Created') + ' client: "' + name + '" (@' + username + ')');
+    } catch(logErr) { console.warn('Log failed:', logErr); }
+
     // Auto show share modal for new clients
     if(!saEditId) {
-      setTimeout(() => saShowShareModal(id), 400);
+      setTimeout(() => saShowShareModal(id), 500);
     }
-  } catch(e) { toast('❌ '+e.message,'err'); }
-  finally { btn.textContent='💾 Save & Generate URLs'; btn.disabled=false; }
+
+  } catch(e) {
+    console.error('Client save error:', e);
+    let msg = e.message || 'Unknown error';
+    if(e.code === 'PERMISSION_DENIED' || msg.includes('permission') || msg.includes('Permission')) {
+      msg = 'Firebase permission denied! Database Rules mein superAdmin path allow karo.';
+    } else if(msg.includes('network') || msg.includes('Network')) {
+      msg = 'Network error! Internet connection check karo.';
+    }
+    toast('❌ ' + msg, 'err');
+  } finally {
+    btn.textContent = saEditId ? '💾 Update Client' : '💾 Save & Generate URLs';
+    btn.disabled    = false;
+  }
 });
 
 async function saDeleteClient(id, name) {
@@ -1612,143 +1599,6 @@ saRenderLog();
 if(!localStorage.getItem('mnx_base_url')) {
   localStorage.setItem('mnx_base_url', window.location.origin);
 }
-
-// ══════════════════════════════════════════════════════════════════════
-// ── PUBLIC SITE / GALLERY ─────────────────────────────────────────────
-// ══════════════════════════════════════════════════════════════════════
-
-let siteImages = [];
-let siteCats   = [];
-let siteFilter = '';
-
-async function showPublicSite(username) {
-  showView('site');
-  document.getElementById('site-loading').style.display = 'flex';
-  document.getElementById('site-grid').style.display    = 'none';
-  document.getElementById('site-404').style.display     = 'none';
-  document.getElementById('site-header').style.display  = 'none';
-
-  try {
-    // Find client by username
-    const snap = await get(ref(db, 'superAdmin/clients'));
-    if(!snap.exists()) { showSite404(); return; }
-
-    const allClients = Object.values(snap.val());
-    const client = allClients.find(c => c.username === username);
-
-    if(!client || client.status !== 'active') { showSite404(); return; }
-
-    // Set title
-    document.title = (client.name || username) + ' — Gallery';
-    document.getElementById('site-name').textContent = client.name || username;
-    document.getElementById('site-desc').textContent = client.description || '';
-    document.getElementById('site-header').style.display = 'flex';
-
-    // Track visit (fire & forget)
-    try {
-      const visits = (client.totalVisits||0) + 1;
-      const today  = new Date().toISOString().split('T')[0];
-      const todayV = (client.todayDate === today) ? (client.todayVisits||0)+1 : 1;
-      update(ref(db, 'superAdmin/clients/' + client.id), {
-        totalVisits: visits, todayVisits: todayV, todayDate: today
-      });
-    } catch(e) {}
-
-    // Load images and categories
-    const [imgSnap, catSnap] = await Promise.all([
-      get(ref(db, 'clients/' + client.id + '/images')),
-      get(ref(db, 'clients/' + client.id + '/categories'))
-    ]);
-
-    siteImages = imgSnap.exists()  ? Object.values(imgSnap.val())  : [];
-    siteCats   = catSnap.exists()  ? Object.values(catSnap.val())  : [];
-    siteFilter = '';
-
-    renderSiteCats();
-    renderSiteGrid();
-
-    document.getElementById('site-loading').style.display = 'none';
-    document.getElementById('site-grid').style.display    = 'block';
-
-  } catch(err) {
-    console.error('Public site error:', err);
-    showSite404();
-  }
-}
-
-function showSite404() {
-  document.getElementById('site-loading').style.display = 'none';
-  document.getElementById('site-404').style.display     = 'flex';
-}
-
-function renderSiteCats() {
-  const wrap = document.getElementById('site-cats');
-  wrap.innerHTML = '';
-  // "All" pill
-  const all = document.createElement('button');
-  all.textContent = 'All';
-  all.style.cssText = catPillStyle(!siteFilter);
-  all.onclick = () => { siteFilter=''; renderSiteGrid(); renderSiteCats(); };
-  wrap.appendChild(all);
-  // Category pills
-  siteCats.forEach(cat => {
-    const btn = document.createElement('button');
-    btn.textContent = cat.name || cat.id;
-    btn.style.cssText = catPillStyle(siteFilter === cat.id);
-    btn.onclick = () => { siteFilter=cat.id; renderSiteGrid(); renderSiteCats(); };
-    wrap.appendChild(btn);
-  });
-}
-
-function catPillStyle(active) {
-  return `padding:5px 14px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:none;
-    background:${active?'#E02424':'#1a1a1a'};color:${active?'#fff':'#888'};
-    transition:all .15s;margin:2px`;
-}
-
-function renderSiteGrid() {
-  const grid = document.getElementById('site-grid');
-  const list = siteFilter
-    ? siteImages.filter(i => i.category === siteFilter)
-    : siteImages;
-
-  if(!list.length) {
-    grid.innerHTML = '<div style="color:#555;font-size:13px;padding:40px;text-align:center">No images in this category</div>';
-    return;
-  }
-
-  grid.innerHTML = list.map((img, idx) => `
-    <div onclick="openLB(${idx},'${siteFilter}')"
-      style="break-inside:avoid;margin-bottom:10px;cursor:pointer;border-radius:10px;overflow:hidden;border:1px solid #1a1a1a;background:#111;transition:transform .15s"
-      onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform=''">
-      <img src="${img.thumbnailUrl || img.url || ''}" alt="${img.title||''}"
-        style="width:100%;display:block;aspect-ratio:3/4;object-fit:cover"
-        loading="lazy" onerror="this.parentElement.style.display='none'"/>
-      ${img.title ? `<div style="padding:7px 10px;font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${img.title}</div>` : ''}
-    </div>`).join('');
-}
-
-function openLB(idx, filter) {
-  const list = filter ? siteImages.filter(i=>i.category===filter) : siteImages;
-  const img  = list[idx];
-  if(!img) return;
-  document.getElementById('site-lb-img').src = img.url || img.thumbnailUrl || '';
-  document.getElementById('site-lb-info').textContent = [img.title, img.category].filter(Boolean).join(' · ');
-  const lb = document.getElementById('site-lb');
-  lb.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-
-function closeLB() {
-  document.getElementById('site-lb').style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-// Keyboard close
-document.addEventListener('keydown', e => {
-  if(e.key === 'Escape') closeLB();
-});
-
 </script>
 </body>
 </html>

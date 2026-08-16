@@ -116,10 +116,34 @@ function navigate(path) {
   window.location.hash = '#' + cleanPath;
 }
 
+function getDefaultBase() {
+  let path = window.location.pathname || '';
+  path = path.replace(/\/index\.(html?|php)$/i, '');
+  path = path.replace(/\/+$/, '');
+  return (window.location.origin + path).replace(/\/+$/, '');
+}
+
 function getBase() {
+  const defaultBase = getDefaultBase();
   const stored = localStorage.getItem('mnx_base_url');
-  if (stored) return stored.replace(/\/+$/, '');
-  return (window.location.origin + window.location.pathname).replace(/\/+$/, '');
+  if (stored) {
+    let clean = stored.trim().replace(/\/index\.(html?|php)$/i, '').replace(/\/+$/, '');
+    if (clean === window.location.origin && defaultBase !== window.location.origin) {
+      clean = defaultBase;
+      localStorage.setItem('mnx_base_url', clean);
+    }
+    return clean;
+  }
+  localStorage.setItem('mnx_base_url', defaultBase);
+  return defaultBase;
+}
+
+function getClientSiteUrl(c, base) {
+  if (!c) return '';
+  if (!c.siteUrl || c.siteUrl.includes('/#/' + c.username) || c.siteUrl.startsWith(window.location.origin + '/#/')) {
+    return `${base}/#/${c.username}`;
+  }
+  return c.siteUrl;
 }
 
 // ── AUTH STATE & ROUTE HANDLING ────────────────────────────────────────
@@ -480,7 +504,7 @@ function saUpdateDash() {
   const base = getBase();
   document.getElementById('sa-dash-clients').innerHTML = saClients.map(c => {
     const adminUrl = `${base}/#/admin/${c.username}`;
-    const siteUrl  = c.siteUrl || `${base}/#/${c.username}`;
+    const siteUrl  = getClientSiteUrl(c, base);
     return `
     <tr>
       <td style="font-weight:700">${escapeHTML(c.name||'—')}</td>
@@ -509,7 +533,7 @@ function saRenderClients() {
   document.getElementById('sa-clients-foot').textContent = `${list.length} of ${saClients.length} clients`;
   document.getElementById('sa-clients-tbody').innerHTML = list.length ? list.map(c => {
     const adminUrl = `${base}/#/admin/${c.username}`;
-    const siteUrl  = c.siteUrl || `${base}/#/${c.username}`;
+    const siteUrl  = getClientSiteUrl(c, base);
     return `<tr>
       <td><div style="font-weight:700">${escapeHTML(c.name||'—')}</div><div style="font-size:10px;color:var(--mu);font-family:monospace">${escapeHTML(c.id)}</div></td>
       <td>
@@ -543,7 +567,7 @@ function saShowShareModal(clientId) {
   const c    = saClients.find(x => x.id === clientId); if(!c) return;
   const base = getBase();
   const adminUrl = `${base}/#/admin/${c.username}`;
-  const siteUrl  = c.siteUrl || `${base}/#/${c.username}`;
+  const siteUrl  = getClientSiteUrl(c, base);
 
   document.getElementById('sm-name').textContent       = c.name;
   document.getElementById('sm-admin-url').textContent  = adminUrl;
@@ -675,7 +699,7 @@ document.getElementById('sa-cm-save').addEventListener('click', async () => {
     todayVisits:    existing ? (existing.todayVisits   || 0) : 0,
     totalViews:     existing ? (existing.totalViews    || 0) : 0,
     adminUrl:       base + '/#/admin/' + username,
-    siteUrl:        existing ? (existing.siteUrl || base+'/#/'+username) : base+'/#/'+username,
+    siteUrl:        existing ? getClientSiteUrl(existing, base) : base+'/#/'+username,
   };
 
   const btn = document.getElementById('sa-cm-save');
@@ -867,18 +891,21 @@ document.getElementById('sa-btn-earn').addEventListener('click', async () => {
 // SETTINGS
 function saLoadSettings() {
   const base = getBase();
-  document.getElementById('sa-base-url').value = localStorage.getItem('mnx_base_url') || window.location.origin;
+  document.getElementById('sa-base-url').value = base;
   document.getElementById('sa-url-preview').textContent  = base + '/#/admin/username';
   document.getElementById('sa-site-preview').textContent = base + '/#/username';
 }
 document.getElementById('sa-base-url').addEventListener('input', () => {
-  const v = document.getElementById('sa-base-url').value.trim();
-  document.getElementById('sa-url-preview').textContent  = v + '/#/admin/username';
-  document.getElementById('sa-site-preview').textContent = v + '/#/username';
+  let v = document.getElementById('sa-base-url').value.trim().replace(/\/index\.(html?|php)$/i, '').replace(/\/+$/, '');
+  const displayBase = v || getBase();
+  document.getElementById('sa-url-preview').textContent  = displayBase + '/#/admin/username';
+  document.getElementById('sa-site-preview').textContent = displayBase + '/#/username';
 });
 document.getElementById('sa-save-base').addEventListener('click', () => {
-  const url = document.getElementById('sa-base-url').value.trim().replace(/\/+$/,'');
+  let url = document.getElementById('sa-base-url').value.trim().replace(/\/index\.(html?|php)$/i, '').replace(/\/+$/, '');
+  if (!url) url = getDefaultBase();
   localStorage.setItem('mnx_base_url', url);
+  document.getElementById('sa-base-url').value = url;
   toast('✅ Base URL saved!');
   saAddLog('edit','Updated base URL: '+url);
 });
@@ -1193,6 +1220,4 @@ function clRenderEarning(){
 document.getElementById('sa-nb-log').textContent = saActLog.length;
 saRenderLog();
 
-if (!localStorage.getItem('mnx_base_url')) {
-  localStorage.setItem('mnx_base_url', window.location.origin + window.location.pathname);
-}
+getBase();

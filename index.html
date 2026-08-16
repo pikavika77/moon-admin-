@@ -232,7 +232,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
         <div class="card">
           <div class="chdr"><div class="ctitle">👥 Clients Overview</div><button class="btn btn-g btn-sm" data-sa-goto="clients">View All →</button></div>
           <div class="twrap"><table>
-            <thead><tr><th>Client</th><th>Username</th><th>Status</th><th>Traffic</th><th>Revenue</th><th>Share</th></tr></thead>
+            <thead><tr><th>Client</th><th>Username / Links</th><th>Status</th><th>Traffic</th><th>Revenue</th><th>Share</th></tr></thead>
             <tbody id="sa-dash-clients"></tbody>
           </table></div>
         </div>
@@ -1041,15 +1041,26 @@ function saUpdateDash() {
         </div>`).join('')
     : '<div style="color:var(--mu);font-size:12px;margin:auto">No clients yet</div>';
 
-  document.getElementById('sa-dash-clients').innerHTML = saClients.map(c => `
+  const base = getBase();
+  document.getElementById('sa-dash-clients').innerHTML = saClients.map(c => {
+    const adminUrl = `${base}/#/admin/${c.username}`;
+    const siteUrl  = c.siteUrl || `${base}/#/${c.username}`;
+    return `
     <tr>
       <td style="font-weight:700">${c.name||'—'}</td>
-      <td style="font-family:monospace;font-size:11px;color:var(--mu)">${c.username||'—'}</td>
+      <td>
+        <div style="font-family:monospace;font-size:11px;color:var(--mu)">${c.username||'—'}</div>
+        <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+          <a href="${adminUrl}" target="_blank" class="tag grn" style="text-decoration:none">⚙️ Admin</a>
+          <a href="${siteUrl}" target="_blank" class="tag blu" style="text-decoration:none">🌐 Site</a>
+        </div>
+      </td>
       <td><span class="tag ${c.status==='active'?'grn':'mu'}">${c.status||'inactive'}</span></td>
       <td style="font-size:11px">${(c.totalVisits||0).toLocaleString()}</td>
       <td style="color:var(--grn);font-weight:700">₹${(c.totalEarning||0).toFixed(0)}</td>
       <td>${c.earningPercent||40}%</td>
-    </tr>`).join('') || '<tr><td colspan="6"><div class="empty"><div class="eic">👥</div>No clients</div></td></tr>';
+    </tr>`;
+  }).join('') || '<tr><td colspan="6"><div class="empty"><div class="eic">👥</div>No clients</div></td></tr>';
 
   saRenderDashLog();
 }
@@ -1066,11 +1077,10 @@ function saRenderClients() {
     return `<tr>
       <td><div style="font-weight:700">${c.name||'—'}</div><div style="font-size:10px;color:var(--mu);font-family:monospace">${c.id}</div></td>
       <td>
-        <div style="font-size:11px;font-family:monospace;color:var(--mu)">${c.username||'—'}</div>
-        <div style="display:flex;gap:4px;margin-top:4px">
-          <a href="${adminUrl}" target="_blank" style="font-size:10px;color:var(--grn);text-decoration:none">⚙️ Admin</a>
-          <span style="color:var(--mu)">·</span>
-          <a href="${siteUrl}" target="_blank" style="font-size:10px;color:var(--blu);text-decoration:none">🌐 Site</a>
+        <div style="font-size:11px;font-family:monospace;color:var(--mu);font-weight:700">${c.username||'—'}</div>
+        <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+          <a href="${adminUrl}" target="_blank" class="tag grn" style="text-decoration:none">⚙️ Admin Panel</a>
+          <a href="${siteUrl}" target="_blank" class="tag blu" style="text-decoration:none">🌐 Real Site</a>
         </div>
       </td>
       <td style="font-size:11px">${c.googleEmail||'—'}</td>

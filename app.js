@@ -19,7 +19,25 @@ const fbApp = initializeApp(FB);
 const auth  = getAuth(fbApp);
 const db    = getDatabase(fbApp);
 const gp    = new GoogleAuthProvider();
-// All Google accounts can attempt login — email verified after sign-in
+
+// ── UTILS ──────────────────────────────────────────────────────────────
+function escapeHTML(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function snapToArray(snap) {
+  if (!snap || !snap.exists()) return [];
+  const val = snap.val();
+  if (Array.isArray(val)) return val.filter(Boolean);
+  if (typeof val === 'object') return Object.values(val).filter(Boolean);
+  return [];
+}
 
 // ── STATE ──────────────────────────────────────────────────────────────
 let saClients   = [];
@@ -29,7 +47,6 @@ let clClientData= null;
 let saEditId    = null;
 let clEditImgId = null;
 let clEditCatId = null;
-let currentRoute= '';
 let saActLog    = JSON.parse(localStorage.getItem('sa_log') || '[]');
 let trafficSortField = 'totalVisits';
 let trafficSortAsc   = false;
@@ -59,14 +76,12 @@ async function saveClient(data) {
   const dbRef = ref(db, 'superAdmin/clients/' + data.id);
   let timeoutId;
 
-  // Create a 6-second timeout promise to catch silent failures
   const timeoutPromise = new Promise((_, reject) => {
     timeoutId = setTimeout(() => {
-      reject(new Error("TIMEOUT_ERROR: Firebase Realtime Database write timed out. This usually happens when you are offline, have security rule issues, or have a misconfigured database URL/project."));
+      reject(new Error("TIMEOUT_ERROR: Firebase Realtime Database write timed out. Check connection or security rules."));
     }, 6000);
   });
 
-  // Combine write with timeout promise
   try {
     await Promise.race([
       set(dbRef, data).then(res => { clearTimeout(timeoutId); return res; }),
@@ -81,33 +96,22 @@ async function saveClient(data) {
 }
 
 // ── ROUTER ─────────────────────────────────────────────────────────────
-// Routes:
-//   #/           → login
-//   #/super      → super admin (owner only)
-//   #/admin/username → client admin panel
-//   #/username   → (future: real site)
-
 function getRoute() {
-  // FIX: properly parse hash — remove only the '#' prefix
   const hash = window.location.hash || '#/';
   return hash.startsWith('#') ? hash.slice(1) : hash;
 }
 
 function parseRoute(path) {
-  // FIX: path like '/super', '/admin/username', '/username' — filter empty parts
   const parts = path.split('/').filter(Boolean);
   if (!parts.length)                             return { type: 'login' };
   if (parts[0] === 'super')                      return { type: 'super' };
   if (parts[0] === 'admin' && parts[1])          return { type: 'client', username: parts[1] };
-  // FIX: '#/username' was returning type:'login' causing 404-like behaviour
-  // Now correctly identified as a site-viewer route
   if (parts.length === 1 && parts[0] !== 'super' && parts[0] !== 'admin')
                                                  return { type: 'site', username: parts[0] };
   return { type: 'login' };
 }
 
 function navigate(path) {
-  // FIX: ensure path always starts with '/' so hash is '#/path' not '#path'
   const cleanPath = path.startsWith('/') ? path : '/' + path;
   window.location.hash = '#' + cleanPath;
 }
@@ -118,19 +122,17 @@ function getBase() {
   return (window.location.origin + window.location.pathname).replace(/\/+$/, '');
 }
 
-// ── AUTH STATE ─────────────────────────────────────────────────────────
-const G_SVG = document.getElementById('g-btn').innerHTML;
+// ── AUTH STATE & ROUTE HANDLING ────────────────────────────────────────
+const G_SVG = document.getElementById('g-btn') ? document.getElementById('g-btn').innerHTML : '';
 function resetGBtn() {
   const btn = document.getElementById('g-btn');
   if(btn) { btn.innerHTML = G_SVG; btn.disabled = false; }
 }
 
-// Handle redirect result when page loads back after Google sign-in
 (async () => {
   try {
     const result = await getRedirectResult(auth);
     if (result?.user) {
-      // Successfully signed in via redirect - onAuthStateChanged will handle it
       console.log('Redirect sign-in success:', result.user.email);
     }
   } catch(e) {
@@ -141,7 +143,6 @@ function resetGBtn() {
       'auth/account-exists-with-different-credential': '❌ Account exists with different method.',
     };
     const msg = msgs[e.code] || ('❌ Sign-in failed: ' + (e.code || e.message));
-    // Show error on login screen
     setTimeout(() => {
       showErr(msg);
       resetGBtn();
@@ -149,20 +150,18 @@ function resetGBtn() {
   }
 })();
 
-onAuthStateChanged(auth, async user => {
+async function handleRoute(user) {
   const route = parseRoute(getRoute());
 
   if (!user) {
-    // Not logged in — show login
     showView('login');
     setupLoginUI(route);
     resetGBtn();
     return;
   }
 
-  const email = user.email.toLowerCase();
+  const email = (user.email || '').toLowerCase();
 
-  // If user is authenticated and lands on the login page/route, automatically redirect based on identity
   if (route.type === 'login') {
     if (email === OWNER) {
       navigate('super');
@@ -174,17 +173,15 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('g-btn').style.display = 'none';
 
     try {
-      const snap = await get(ref(db, 'superAdmin/clients'));
-      if (!snap.exists()) {
-        await signOut(auth);
-        showErr('❌ No clients found.');
-        resetGBtn();
-        document.getElementById('g-btn').style.display = 'flex';
-        setupLoginUI(route);
-        return;
+      let allClients = [];
+      try {
+        const snap = await get(ref(db, 'superAdmin/clients'));
+        allClients = snapToArray(snap);
+      } catch (err) {
+        console.warn("Could not read superAdmin/clients during login check:", err);
       }
-      const allClients = Object.values(snap.val());
-      const client = allClients.find(c => c.googleEmail.toLowerCase() === email);
+
+      const client = allClients.find(c => c.googleEmail && c.googleEmail.toLowerCase() === email);
 
       if (!client) {
         await signOut(auth);
@@ -203,7 +200,6 @@ onAuthStateChanged(auth, async user => {
         return;
       }
 
-      // Valid client found - redirect to their admin dashboard
       clClientData = client;
       navigate(`admin/${client.username}`);
       return;
@@ -219,7 +215,6 @@ onAuthStateChanged(auth, async user => {
   }
 
   if (route.type === 'super') {
-    // Super admin route
     if (email !== OWNER) {
       await signOut(auth);
       showView('login');
@@ -233,63 +228,72 @@ onAuthStateChanged(auth, async user => {
     saInitDB();
 
   } else if (route.type === 'client') {
-    // Client admin route
     const username = route.username;
-    showView('login');
-    document.getElementById('l-sub').textContent   = 'Verifying access...';
-    document.getElementById('g-btn').style.display = 'none';
 
-    // Find client by username
-    const snap = await get(ref(db, 'superAdmin/clients'));
-    if (!snap.exists()) {
-      await signOut(auth); showErr('❌ No clients found.'); resetGBtn(); document.getElementById('g-btn').style.display='flex'; return;
+    let client = null;
+    try {
+      const snap = await get(ref(db, 'superAdmin/clients'));
+      const allClients = snapToArray(snap);
+      client = allClients.find(c => c.username === username);
+    } catch (err) {
+      console.warn("Could not fetch superAdmin/clients snapshot:", err);
     }
-    const allClients = Object.values(snap.val());
-    const client = allClients.find(c => c.username === username);
 
     if (!client) {
-      await signOut(auth); showErr(`❌ Username "${username}" not found.`); resetGBtn(); document.getElementById('g-btn').style.display='flex'; return;
-    }
-    if (client.googleEmail.toLowerCase() !== email) {
-      await signOut(auth); showErr(`❌ Access denied. This panel is for ${client.googleEmail}`); resetGBtn(); document.getElementById('g-btn').style.display='flex'; return;
-    }
-    if (client.status !== 'active') {
-      await signOut(auth); showErr('❌ Your account is inactive. Contact admin.'); resetGBtn(); document.getElementById('g-btn').style.display='flex'; return;
+      try {
+        const snap = await get(ref(db, `clients/${username}/info`));
+        if (snap.exists()) client = snap.val();
+      } catch (err) {
+        console.warn("Could not fetch client info directly:", err);
+      }
     }
 
-    // Valid client
+    if (!client) {
+      if (email === OWNER) {
+        client = { id: username, name: username, username, googleEmail: email, status: 'active', earningPercent: 40 };
+      } else {
+        await signOut(auth);
+        showView('login');
+        showErr(`❌ Username "${username}" not found.`);
+        resetGBtn();
+        document.getElementById('g-btn').style.display = 'flex';
+        return;
+      }
+    }
+
+    if (email !== OWNER && client.googleEmail && client.googleEmail.toLowerCase() !== email) {
+      await signOut(auth);
+      showView('login');
+      showErr(`❌ Access denied. This panel is for ${client.googleEmail}`);
+      resetGBtn();
+      document.getElementById('g-btn').style.display = 'flex';
+      return;
+    }
+
+    if (email !== OWNER && client.status !== 'active') {
+      await signOut(auth);
+      showView('login');
+      showErr('❌ Your account is inactive. Contact admin.');
+      resetGBtn();
+      document.getElementById('g-btn').style.display = 'flex';
+      return;
+    }
+
     clClientData = client;
     showView('client');
-    document.getElementById('cl-email').textContent    = user.email;
+    document.getElementById('cl-email').textContent     = user.email;
     document.getElementById('cl-site-name').textContent = client.name || 'My Gallery';
     document.title = (client.name || 'My Gallery') + ' — Admin';
     clInitDB(client.id);
-  }
-});
 
-window.addEventListener('hashchange', () => {
-  // On hash change, re-evaluate the route without reloading
-  const route = parseRoute(getRoute());
-  const user   = auth.currentUser;
-  if (!user) {
+  } else if (route.type === 'site') {
     showView('login');
     setupLoginUI(route);
-    return;
   }
-  const email = user.email.toLowerCase();
-  if (route.type === 'super' && email === OWNER) {
-    showView('super');
-  } else if (route.type === 'client' && route.username) {
-    // Just show login for client routes - onAuthStateChanged will verify
-    showView('login');
-    setupLoginUI(route);
-  } else if (route.type === 'site' && route.username) {
-    // FIX: '#/username' site route — redirect to admin panel for that client
-    // (or show a "not found" if not a known client)
-    showView('login');
-    setupLoginUI({ type: 'site', username: route.username });
-  }
-});
+}
+
+onAuthStateChanged(auth, user => handleRoute(user));
+window.addEventListener('hashchange', () => handleRoute(auth.currentUser));
 
 function showView(name) {
   ['login','super','client'].forEach(v => {
@@ -302,7 +306,6 @@ function showView(name) {
       el.style.display = 'none';
     }
   });
-  // Login is centered
   if (name === 'login') {
     const lw = document.getElementById('view-login');
     lw.style.alignItems     = 'center';
@@ -319,18 +322,17 @@ function setupLoginUI(route) {
     badge.className = 'lbadge client';
     badge.textContent = 'CLIENT ACCESS';
     sub.textContent   = 'Client Admin Panel';
-    info.innerHTML    = `Sign in with your authorized Google account<br>to access panel for <strong>${route.username}</strong>`;
+    info.innerHTML    = `Sign in with your authorized Google account<br>to access panel for <strong>${escapeHTML(route.username)}</strong>`;
   } else if (route.type === 'super') {
     badge.className   = 'lbadge owner';
     badge.textContent = 'SUPER ADMIN';
     sub.textContent   = 'Owner Control Panel';
     info.innerHTML    = `Only <strong>${OWNER}</strong> can access this panel`;
   } else if (route.type === 'site' && route.username) {
-    // FIX: site route (#/username) — show client login prompt
     badge.className   = 'lbadge client';
     badge.textContent = 'CLIENT ACCESS';
     sub.textContent   = 'Client Panel';
-    info.innerHTML    = `Sign in with your authorized Google account<br>to access <strong>${route.username}</strong>'s admin panel`;
+    info.innerHTML    = `Sign in with your authorized Google account<br>to access <strong>${escapeHTML(route.username)}</strong>'s admin panel`;
   } else {
     badge.className   = 'lbadge owner';
     badge.textContent = 'ADMIN';
@@ -352,17 +354,14 @@ document.getElementById('g-btn').addEventListener('click', async () => {
   btn.disabled  = true;
   document.getElementById('l-err').style.display = 'none';
   try {
-    // Attempt popup login first
     await signInWithPopup(auth, gp);
   } catch(e) {
     console.warn('Popup sign-in failed/blocked:', e.code, e.message);
     if (e.code === 'auth/popup-closed-by-user') {
-      // User manually closed the popup, do not redirect
       resetGBtn();
       return;
     }
 
-    // Automatic fallback to redirect method
     try {
       btn.innerHTML = '⏳ Redirecting to Google...';
       await signInWithRedirect(auth, gp);
@@ -420,7 +419,7 @@ function saLogHTML(e) {
   const colors = { add:'var(--grn)', edit:'var(--blu)', del:'var(--red)', login:'var(--ylw)' };
   return `<div style="display:flex;gap:11px;padding:11px 18px;border-bottom:1px solid var(--br)">
     <div style="width:7px;height:7px;border-radius:50%;background:${colors[e.type]||'#888'};margin-top:5px;flex-shrink:0"></div>
-    <div><div style="font-size:12px;font-weight:600">${e.msg}</div>
+    <div><div style="font-size:12px;font-weight:600">${escapeHTML(e.msg)}</div>
     <div style="font-size:10px;color:var(--mu);font-family:monospace;margin-top:2px">${d.toLocaleDateString()} ${d.toLocaleTimeString()}</div></div>
   </div>`;
 }
@@ -440,13 +439,16 @@ function saRenderDashLog() {
 // DB
 function saInitDB() {
   onValue(ref(db, 'superAdmin/clients'), snap => {
-    saClients = snap.exists() ? Object.values(snap.val()) : [];
+    saClients = snapToArray(snap);
     document.getElementById('sa-db-st').textContent   = 'Live';
     document.getElementById('sa-nb-clients').textContent = saClients.length;
     saUpdateDash();
     saRenderClients();
     saPopulateEarnSelect();
-  }, () => { document.getElementById('sa-db-st').textContent = 'Error'; });
+  }, err => {
+    console.error('saInitDB error:', err);
+    document.getElementById('sa-db-st').textContent = 'Error';
+  });
 }
 
 const COLORS = ['#E02424','#3b82f6','#22c55e','#f59e0b','#a855f7','#06b6d4','#ec4899','#f97316'];
@@ -471,7 +473,7 @@ function saUpdateDash() {
         <div class="bwrp">
           <div class="bval">₹${(c.totalEarning||0).toFixed(0)}</div>
           <div class="bbar" style="height:${Math.max(((c.totalEarning||0)/max)*80,3)}px;background:${COLORS[i%COLORS.length]}"></div>
-          <div class="blbl">${(c.name||'').slice(0,8)}</div>
+          <div class="blbl">${escapeHTML((c.name||'').slice(0,8))}</div>
         </div>`).join('')
     : '<div style="color:var(--mu);font-size:12px;margin:auto">No clients yet</div>';
 
@@ -481,15 +483,15 @@ function saUpdateDash() {
     const siteUrl  = c.siteUrl || `${base}/#/${c.username}`;
     return `
     <tr>
-      <td style="font-weight:700">${c.name||'—'}</td>
+      <td style="font-weight:700">${escapeHTML(c.name||'—')}</td>
       <td>
-        <div style="font-family:monospace;font-size:11px;color:var(--mu)">${c.username||'—'}</div>
+        <div style="font-family:monospace;font-size:11px;color:var(--mu)">${escapeHTML(c.username||'—')}</div>
         <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
           <a href="${adminUrl}" target="_blank" class="tag grn" style="text-decoration:none">⚙️ Admin</a>
           <a href="${siteUrl}" target="_blank" class="tag blu" style="text-decoration:none">🌐 Site</a>
         </div>
       </td>
-      <td><span class="tag ${c.status==='active'?'grn':'mu'}">${c.status||'inactive'}</span></td>
+      <td><span class="tag ${c.status==='active'?'grn':'mu'}">${escapeHTML(c.status||'inactive')}</span></td>
       <td style="font-size:11px">${(c.totalVisits||0).toLocaleString()}</td>
       <td style="color:var(--grn);font-weight:700">₹${(c.totalEarning||0).toFixed(0)}</td>
       <td>${c.earningPercent||40}%</td>
@@ -509,22 +511,22 @@ function saRenderClients() {
     const adminUrl = `${base}/#/admin/${c.username}`;
     const siteUrl  = c.siteUrl || `${base}/#/${c.username}`;
     return `<tr>
-      <td><div style="font-weight:700">${c.name||'—'}</div><div style="font-size:10px;color:var(--mu);font-family:monospace">${c.id}</div></td>
+      <td><div style="font-weight:700">${escapeHTML(c.name||'—')}</div><div style="font-size:10px;color:var(--mu);font-family:monospace">${escapeHTML(c.id)}</div></td>
       <td>
-        <div style="font-size:11px;font-family:monospace;color:var(--mu);font-weight:700">${c.username||'—'}</div>
+        <div style="font-size:11px;font-family:monospace;color:var(--mu);font-weight:700">${escapeHTML(c.username||'—')}</div>
         <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
           <a href="${adminUrl}" target="_blank" class="tag grn" style="text-decoration:none">⚙️ Admin Panel</a>
           <a href="${siteUrl}" target="_blank" class="tag blu" style="text-decoration:none">🌐 Real Site</a>
         </div>
       </td>
-      <td style="font-size:11px">${c.googleEmail||'—'}</td>
-      <td><span class="tag ${c.status==='active'?'grn':'mu'}">${c.status||'inactive'}</span></td>
+      <td style="font-size:11px">${escapeHTML(c.googleEmail||'—')}</td>
+      <td><span class="tag ${c.status==='active'?'grn':'mu'}">${escapeHTML(c.status||'inactive')}</span></td>
       <td style="color:var(--red);font-weight:700">${c.earningPercent||40}%</td>
       <td style="color:var(--grn);font-weight:700">₹${(c.totalEarning||0).toFixed(0)}</td>
       <td><div class="arow">
-        <button class="btn btn-grn btn-xs" data-share="${c.id}">📤 Share</button>
-        <button class="btn btn-g btn-xs" data-edit="${c.id}">✏️</button>
-        <button class="btn btn-d btn-xs" data-del="${c.id}" data-dname="${c.name||''}">🗑</button>
+        <button class="btn btn-grn btn-xs" data-share="${escapeHTML(c.id)}">📤 Share</button>
+        <button class="btn btn-g btn-xs" data-edit="${escapeHTML(c.id)}">✏️</button>
+        <button class="btn btn-d btn-xs" data-del="${escapeHTML(c.id)}" data-dname="${escapeHTML(c.name||'')}">🗑</button>
       </div></td>
     </tr>`;
   }).join('')
@@ -534,7 +536,7 @@ function saRenderClients() {
   document.querySelectorAll('[data-edit]').forEach(btn  => btn.addEventListener('click', () => saOpenEdit(btn.dataset.edit)));
   document.querySelectorAll('[data-del]').forEach(btn   => btn.addEventListener('click', () => saDeleteClient(btn.dataset.del, btn.dataset.dname)));
 }
-document.getElementById('sa-q-client').addEventListener('input', saRenderClients);
+document.getElementById('sa-q-client')?.addEventListener('input', saRenderClients);
 
 // SHARE MODAL
 function saShowShareModal(clientId) {
@@ -566,10 +568,10 @@ function saShowShareModal(clientId) {
     setTimeout(() => document.getElementById('sm-copy-both').textContent = '📋 Copy Both Links', 2000);
   };
 
-  // Save URLs to Firebase with robust try/catch and toast error messages
   (async () => {
     try {
       await update(ref(db, `superAdmin/clients/${clientId}`), { adminUrl, generatedAt: new Date().toISOString() });
+      try { await update(ref(db, `clients/${clientId}/info`), { adminUrl, generatedAt: new Date().toISOString() }); } catch(e){}
       saAddLog('add', `Generated URLs for "${c.name}" — admin: ${adminUrl}`);
     } catch (err) {
       console.error('Error saving URLs to Firebase:', err);
@@ -623,7 +625,6 @@ function saOpenEdit(id) {
   document.getElementById('sa-cm-pct').value           = pct;
   document.getElementById('sa-pct-val').textContent    = pct;
   document.getElementById('sa-keep-val').textContent   = 100 - pct;
-  // trigger preview
   document.getElementById('sa-cm-username').dispatchEvent(new Event('input'));
   document.getElementById('sa-client-modal').style.display = 'flex';
 }
@@ -641,13 +642,11 @@ document.getElementById('sa-cm-save').addEventListener('click', async () => {
   if(!email)    { toast('❌ Email required!','err'); return; }
   if(!username) { toast('❌ Username required (only a-z, 0-9, - allowed)!','err'); return; }
 
-  // Check username unique (for new clients only)
   if(!saEditId) {
     const exists = saClients.find(c => c.username === username);
     if(exists) { toast('❌ Username "'+username+'" already taken! Choose another.','err'); return; }
   }
 
-  // 1. Verify User Authentication and Authorization first
   try {
     checkAuth();
   } catch (authError) {
@@ -685,22 +684,23 @@ document.getElementById('sa-cm-save').addEventListener('click', async () => {
 
   try {
     console.log('Saving client to Firebase path: superAdmin/clients/' + id);
-    console.log('Data:', JSON.stringify(data));
-
-    // 2. Perform write using the timeout wrapper saveClient(data)
     await saveClient(data);
+
+    try {
+      await update(ref(db, `clients/${id}/info`), data);
+    } catch(syncErr) {
+      console.warn("Syncing to clients/info failed:", syncErr);
+    }
 
     console.log('✅ Client saved successfully');
     toast('✅ Client "' + name + '" ' + (saEditId ? 'updated' : 'created') + '!');
     document.getElementById('sa-client-modal').style.display = 'none';
 
-    // Log action
     try {
       saAddLog(saEditId ? 'edit' : 'add',
         (saEditId ? 'Updated' : 'Created') + ' client: "' + name + '" (@' + username + ')');
     } catch(logErr) { console.warn('Log failed:', logErr); }
 
-    // Auto show share modal for new clients
     if(!saEditId) {
       setTimeout(() => saShowShareModal(id), 500);
     }
@@ -709,7 +709,7 @@ document.getElementById('sa-cm-save').addEventListener('click', async () => {
     console.error('Client save error:', e);
     let msg = e.message || 'Unknown error';
     if(e.code === 'PERMISSION_DENIED' || msg.includes('permission') || msg.includes('Permission') || msg.includes('PERMISSION_DENIED')) {
-      msg = 'Firebase permission denied! Database Rules mein superAdmin path allow karo.';
+      msg = 'Firebase permission denied! Database Rules check karo.';
     } else if(msg.includes('network') || msg.includes('Network')) {
       msg = 'Network error! Internet connection check karo.';
     }
@@ -724,6 +724,7 @@ async function saDeleteClient(id, name) {
   if(!confirm(`Delete client "${name}"?`)) return;
   try {
     await remove(ref(db, `superAdmin/clients/${id}`));
+    try { await remove(ref(db, `clients/${id}/info`)); } catch(e){}
     saAddLog('del', `Deleted client: "${name}"`);
     toast('🗑️ Client deleted');
   } catch(e) { toast('❌ '+e.message,'err'); }
@@ -739,15 +740,15 @@ function saRenderRevenue() {
   document.getElementById('sa-rev-tbody').innerHTML  = saClients.map(c => {
     const t=c.totalEarning||0, p=c.earningPercent||40;
     return `<tr>
-      <td style="font-weight:700">${c.name}</td>
+      <td style="font-weight:700">${escapeHTML(c.name)}</td>
       <td style="color:var(--grn)">₹${t.toFixed(0)}</td>
       <td>
-        <input type="range" min="0" max="100" value="${p}" data-cid="${c.id}" data-tot="${t}" class="pct-sl" style="width:80px;accent-color:var(--red)"/>
-        <span id="psl-${c.id}" style="font-size:11px;font-weight:700;color:var(--red);margin-left:4px">${p}%</span>
+        <input type="range" min="0" max="100" value="${p}" data-cid="${escapeHTML(c.id)}" data-tot="${t}" class="pct-sl" style="width:80px;accent-color:var(--red)"/>
+        <span id="psl-${escapeHTML(c.id)}" style="font-size:11px;font-weight:700;color:var(--red);margin-left:4px">${p}%</span>
       </td>
-      <td style="color:var(--ylw)" id="cget-${c.id}">₹${(t*p/100).toFixed(0)}</td>
-      <td style="color:var(--blu)" id="ykeep-${c.id}">₹${(t*(100-p)/100).toFixed(0)}</td>
-      <td><button class="btn btn-grn btn-xs" data-sp="${c.id}">💾</button></td>
+      <td style="color:var(--ylw)" id="cget-${escapeHTML(c.id)}">₹${(t*p/100).toFixed(0)}</td>
+      <td style="color:var(--blu)" id="ykeep-${escapeHTML(c.id)}">₹${(t*(100-p)/100).toFixed(0)}</td>
+      <td><button class="btn btn-grn btn-xs" data-sp="${escapeHTML(c.id)}">💾</button></td>
     </tr>`;
   }).join('') || '<tr><td colspan="6"><div class="empty"><div class="eic">💰</div>No clients</div></td></tr>';
 
@@ -760,8 +761,14 @@ function saRenderRevenue() {
     document.getElementById('ykeep-'+cid).textContent = '₹' + (tot * (100 - val) / 100).toFixed(0);
   }));
   document.querySelectorAll('[data-sp]').forEach(btn => btn.addEventListener('click', async () => {
-    const sl = document.querySelector(`.pct-sl[data-cid="${btn.dataset.sp}"]`);
-    try { await update(ref(db,`superAdmin/clients/${btn.dataset.sp}`),{earningPercent:parseInt(sl.value)}); toast('✅ % updated'); } catch(e){ toast('❌ '+e.message,'err'); }
+    const cid = btn.dataset.sp;
+    const sl = document.querySelector(`.pct-sl[data-cid="${cid}"]`);
+    const val = parseInt(sl.value) || 0;
+    try {
+      await update(ref(db,`superAdmin/clients/${cid}`),{earningPercent:val});
+      try { await update(ref(db,`clients/${cid}/info`),{earningPercent:val}); } catch(e){}
+      toast('✅ % updated');
+    } catch(e){ toast('❌ '+e.message,'err'); }
   }));
 }
 
@@ -780,7 +787,6 @@ function saRenderTraffic() {
   document.getElementById('sa-t-today').textContent = saClients.reduce((a,c)=>a+(c.todayVisits||0),0).toLocaleString();
   document.getElementById('sa-t-views').textContent = saClients.reduce((a,c)=>a+(c.totalViews||0),0).toLocaleString();
 
-  // Sort clients
   const sortedClients = [...saClients].sort((a, b) => {
     let valA = a[trafficSortField];
     let valB = b[trafficSortField];
@@ -811,12 +817,12 @@ function saRenderTraffic() {
 
   const tbodyHTML = sortedClients.map(c=>`
     <tr>
-      <td style="font-weight:700">${c.name}</td>
-      <td><a href="${c.siteUrl||'#'}" target="_blank" style="color:var(--blu);font-size:11px">${c.siteUrl||'—'}</a></td>
+      <td style="font-weight:700">${escapeHTML(c.name)}</td>
+      <td><a href="${c.siteUrl||'#'}" target="_blank" style="color:var(--blu);font-size:11px">${escapeHTML(c.siteUrl||'—')}</a></td>
       <td style="color:var(--ylw);font-weight:700">${(c.todayVisits||0).toLocaleString()}</td>
       <td style="color:var(--grn);font-weight:700">${(c.totalVisits||0).toLocaleString()}</td>
       <td>${(c.totalViews||0).toLocaleString()}</td>
-      <td><span class="tag ${c.status==='active'?'grn':'mu'}">${c.status}</span></td>
+      <td><span class="tag ${c.status==='active'?'grn':'mu'}">${escapeHTML(c.status)}</span></td>
     </tr>`).join('') || '<tr><td colspan="6"><div class="empty"><div class="eic">📈</div>No data</div></td></tr>';
 
   const tableContainer = document.getElementById('sa-traffic-tbody').parentElement;
@@ -824,13 +830,14 @@ function saRenderTraffic() {
   document.getElementById('sa-traffic-tbody').innerHTML = tbodyHTML;
 
   headers.forEach(h => {
-    document.getElementById(`th-traffic-${h.field}`).addEventListener('click', () => setTrafficSort(h.field));
+    document.getElementById(`th-traffic-${h.field}`)?.addEventListener('click', () => setTrafficSort(h.field));
   });
 }
 
 // EARN ADD
 function saPopulateEarnSelect() {
   const sel = document.getElementById('sa-earn-client');
+  if(!sel) return;
   sel.innerHTML = '<option value="">Choose client...</option>';
   saClients.forEach(c => { const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; sel.appendChild(o); });
 }
@@ -840,9 +847,16 @@ document.getElementById('sa-btn-earn').addEventListener('click', async () => {
   const note   = document.getElementById('sa-earn-note').value.trim();
   if(!cid||!amount) { toast('Select client and amount','inf'); return; }
   const c = saClients.find(x=>x.id===cid);
+  const newEarn = (c?.totalEarning||0)+amount;
+  const earnItem = {amount,note,t:new Date().toISOString()};
+  const earnKey = `earn_${Date.now()}`;
   try {
-    await update(ref(db,`superAdmin/clients/${cid}`),{totalEarning:(c?.totalEarning||0)+amount});
-    await set(ref(db,`superAdmin/clients/${cid}/earningHistory/earn_${Date.now()}`),{amount,note,t:new Date().toISOString()});
+    await update(ref(db,`superAdmin/clients/${cid}`),{totalEarning:newEarn});
+    await set(ref(db,`superAdmin/clients/${cid}/earningHistory/${earnKey}`),earnItem);
+    try {
+      await update(ref(db,`clients/${cid}/info`),{totalEarning:newEarn});
+      await set(ref(db,`clients/${cid}/earningHistory/${earnKey}`),earnItem);
+    } catch(e){}
     saAddLog('add',`Added ₹${amount} to "${c?.name}"`);
     toast(`✅ ₹${amount} added`);
     document.getElementById('sa-earn-amount').value='';
@@ -894,21 +908,30 @@ document.querySelectorAll('[data-cl-page]').forEach(el => el.addEventListener('c
 document.querySelectorAll('[data-cl-goto]').forEach(el  => el.addEventListener('click', () => clShowPage(el.dataset.clGoto)));
 
 function clInitDB(clientId) {
+  if (!clientId) return;
+
   onValue(ref(db,`clients/${clientId}/images`), snap => {
-    clImages = snap.exists() ? Object.values(snap.val()) : [];
+    clImages = snapToArray(snap);
     document.getElementById('cl-db-st').textContent  = 'Live';
     document.getElementById('cl-nb-img').textContent = clImages.length;
     document.getElementById('cl-d-images').textContent = clImages.length;
     clRenderTable(); clRenderDashImgs(); clPopulateCatFilter();
+  }, err => {
+    console.error('clInitDB images error:', err);
+    document.getElementById('cl-db-st').textContent = 'Error';
   });
+
   onValue(ref(db,`clients/${clientId}/categories`), snap => {
-    clCats = snap.exists() ? Object.values(snap.val()) : [];
+    clCats = snapToArray(snap);
     document.getElementById('cl-nb-cat').textContent = clCats.length;
     clRenderCatTable(); clPopulateCatDropdowns();
+  }, err => {
+    console.error('clInitDB categories error:', err);
   });
-  onValue(ref(db,`superAdmin/clients/${clientId}`), snap => {
+
+  const handleClientDataSnap = snap => {
     if(!snap.exists()) return;
-    clClientData = snap.val();
+    clClientData = { ...clClientData, ...snap.val() };
     const d=clClientData, pct=d.earningPercent||40, earn=(d.totalEarning||0)*pct/100;
     document.getElementById('cl-d-visits').textContent = (d.totalVisits||0).toLocaleString();
     document.getElementById('cl-d-today').textContent  = (d.todayVisits||0).toLocaleString();
@@ -921,20 +944,30 @@ function clInitDB(clientId) {
     const pctBar = Math.min((earn/1000)*100,100);
     document.getElementById('cl-earn-fill').style.width   = pctBar+'%';
     document.getElementById('cl-earn-pct-lbl').textContent= pctBar.toFixed(0)+'%';
+  };
+
+  onValue(ref(db,`superAdmin/clients/${clientId}`), handleClientDataSnap, err => {
+    console.warn('clInitDB superAdmin client listener warning:', err);
+  });
+
+  onValue(ref(db,`clients/${clientId}/info`), handleClientDataSnap, err => {
+    console.warn('clInitDB clients info listener warning:', err);
   });
 }
 
 function clRenderDashImgs() {
   document.getElementById('cl-dash-imgs').innerHTML = clImages.slice(0,12).map(img=>`
-    <div style="cursor:pointer" data-edit-img="${img.id}" title="${img.title||''}">
-      <img src="${img.thumbnailUrl||''}" onerror="this.src=''" alt=""
+    <div style="cursor:pointer" data-edit-img="${escapeHTML(img.id)}" title="${escapeHTML(img.title||'')}">
+      <img src="${escapeHTML(img.thumbnailUrl||'')}" onerror="this.src=''" alt=""
         style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:7px;border:1px solid var(--br)"/>
     </div>`).join('') || '<div style="color:var(--mu);font-size:12px">No images yet</div>';
   document.querySelectorAll('[data-edit-img]').forEach(el => el.addEventListener('click', () => clOpenEditImg(el.dataset.editImg)));
 }
 
 function clPopulateCatFilter() {
-  const sel = document.getElementById('cl-f-cat'), cur = sel.value;
+  const sel = document.getElementById('cl-f-cat');
+  if(!sel) return;
+  const cur = sel.value;
   sel.innerHTML = '<option value="">All Categories</option>';
   [...new Set(clImages.map(i=>i.category).filter(Boolean))].sort().forEach(c => {
     const o=document.createElement('option'); o.value=c; o.textContent=c; if(c===cur) o.selected=true; sel.appendChild(o);
@@ -951,10 +984,10 @@ function clRenderTable() {
   document.getElementById('cl-img-foot').textContent = `${list.length} of ${clImages.length} images`;
   document.getElementById('cl-img-tbody').innerHTML = list.length ? list.map(img=>`
     <tr>
-      <td><img class="thumb" src="${img.thumbnailUrl||''}" onerror="this.src=''" alt=""/></td>
-      <td><div style="font-weight:700;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${img.title||'—'}</div>
-          <div style="font-size:10px;color:var(--mu);font-family:monospace">${img.id}</div></td>
-      <td><span class="tag cat">${img.category||'—'}</span></td>
+      <td><img class="thumb" src="${escapeHTML(img.thumbnailUrl||'')}" onerror="this.src=''" alt=""/></td>
+      <td><div style="font-weight:700;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHTML(img.title||'—')}</div>
+          <div style="font-size:10px;color:var(--mu);font-family:monospace">${escapeHTML(img.id)}</div></td>
+      <td><span class="tag cat">${escapeHTML(img.category||'—')}</span></td>
       <td>
         ${img.isFeatured?'<span class="tag ft">⭐</span>':''}
         ${img.isTrending?'<span class="tag grn">🔥</span>':''}
@@ -963,8 +996,8 @@ function clRenderTable() {
       <td><div style="font-size:10px;color:var(--mu)">👁 ${(img.views||0).toLocaleString()}</div>
           <div style="font-size:10px;color:var(--mu)">❤️ ${(img.likes||0).toLocaleString()}</div></td>
       <td><div class="arow">
-        <button class="btn btn-g btn-xs" data-edit-img="${img.id}">✏️</button>
-        <button class="btn btn-d btn-xs" data-del-img="${img.id}" data-dtitle="${(img.title||'').replace(/"/g,'&quot;')}">🗑</button>
+        <button class="btn btn-g btn-xs" data-edit-img="${escapeHTML(img.id)}">✏️</button>
+        <button class="btn btn-d btn-xs" data-del-img="${escapeHTML(img.id)}" data-dtitle="${escapeHTML(img.title||'')}">🗑</button>
       </div></td>
     </tr>`).join('')
   : '<tr><td colspan="6"><div class="empty"><div class="eic">🖼️</div>No images found</div></td></tr>';
@@ -978,7 +1011,9 @@ function clRenderTable() {
 
 // IMAGE MODAL
 function clPopulateCatDropdowns() {
-  const sel=document.getElementById('cl-m-cat'), cur=sel.value;
+  const sel=document.getElementById('cl-m-cat');
+  if(!sel) return;
+  const cur=sel.value;
   sel.innerHTML='<option value="general">General</option>';
   clCats.forEach(c => { const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; if(c.id===cur) o.selected=true; sel.appendChild(o); });
 }
@@ -1085,12 +1120,12 @@ function clRenderCatTable(){
   document.getElementById('cl-cat-tbody').innerHTML = clCats.length ? clCats.map(cat=>{
     const cnt=clImages.filter(i=>i.category===cat.id).length;
     return `<tr>
-      <td><code style="font-size:11px;background:var(--s2);padding:2px 6px;border-radius:4px">${cat.id}</code></td>
-      <td style="font-weight:700">${cat.name}</td>
+      <td><code style="font-size:11px;background:var(--s2);padding:2px 6px;border-radius:4px">${escapeHTML(cat.id)}</code></td>
+      <td style="font-weight:700">${escapeHTML(cat.name)}</td>
       <td><span class="tag cat">${cnt}</span></td>
       <td><div class="arow">
-        <button class="btn btn-g btn-xs" data-ecat="${cat.id}">✏️</button>
-        <button class="btn btn-d btn-xs" data-dcat="${cat.id}" data-dcname="${cat.name}">🗑</button>
+        <button class="btn btn-g btn-xs" data-ecat="${escapeHTML(cat.id)}">✏️</button>
+        <button class="btn btn-d btn-xs" data-dcat="${escapeHTML(cat.id)}" data-dcname="${escapeHTML(cat.name)}">🗑</button>
       </div></td>
     </tr>`;
   }).join('')
@@ -1149,7 +1184,7 @@ function clRenderEarning(){
       <td style="font-size:11px;font-family:monospace">${new Date(r.t).toLocaleDateString()}</td>
       <td style="color:var(--grn)">₹${(r.amount||0).toFixed(0)}</td>
       <td style="color:var(--blu);font-weight:700">₹${((r.amount||0)*pct/100).toFixed(0)}</td>
-      <td style="font-size:11px;color:var(--mu)">${r.note||'—'}</td>
+      <td style="font-size:11px;color:var(--mu)">${escapeHTML(r.note||'—')}</td>
     </tr>`).join('')
   || '<tr><td colspan="4"><div class="empty"><div class="eic">💰</div>No earning history yet</div></td></tr>';
 }
@@ -1158,7 +1193,6 @@ function clRenderEarning(){
 document.getElementById('sa-nb-log').textContent = saActLog.length;
 saRenderLog();
 
-// Set base URL default
 if (!localStorage.getItem('mnx_base_url')) {
   localStorage.setItem('mnx_base_url', window.location.origin + window.location.pathname);
 }

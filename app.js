@@ -586,7 +586,11 @@ function saShowShareModal(clientId) {
   };
   document.getElementById('sm-open-site').onclick  = () => window.open(siteUrl, '_blank');
   document.getElementById('sm-copy-both').onclick  = () => {
-    const msg = `Hi! Ye rahe aapke 2 links:\n\n⚙️ Admin Panel:\n${adminUrl}\n\n🌐 Real Site:\n${siteUrl}\n\nAdmin panel pe apni Gmail se login karo.`;
+    const msg = `🌙 Moon Light X — Aapke Links:
+
+📌 Ye links sirf aapke liye hain.
+
+Hi! Ye rahe aapke Moon Light X ke 2 links:\n\n⚙️ Admin Panel (images manage karo):\n${adminUrl}\n\n🌐 Public Gallery (visitors dekhenge):\n${siteUrl}\n\nAdmin panel pe apni Gmail (${c.googleEmail}) se login karo.`;
     navigator.clipboard.writeText(msg);
     document.getElementById('sm-copy-both').textContent = '✅ Copied!';
     setTimeout(() => document.getElementById('sm-copy-both').textContent = '📋 Copy Both Links', 2000);
@@ -626,7 +630,7 @@ function saOpenAdd() {
   saEditId = null;
   document.getElementById('sa-cm-title').textContent = '👥 Add New Client';
   document.getElementById('sa-cm-save').textContent  = '💾 Save & Generate URLs';
-  ['sa-cm-name','sa-cm-email','sa-cm-username','sa-cm-adsterra','sa-cm-notes'].forEach(id => document.getElementById(id).value = '');
+  ['sa-cm-name','sa-cm-email','sa-cm-username','sa-cm-adsterra','sa-cm-notes','sa-cm-ad-banner','sa-cm-ad-native'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('sa-cm-pct').value = 40;
   document.getElementById('sa-pct-val').textContent  = '40';
   document.getElementById('sa-keep-val').textContent = '60';
@@ -644,6 +648,8 @@ function saOpenEdit(id) {
   document.getElementById('sa-cm-username').value      = c.username||'';
   document.getElementById('sa-cm-adsterra').value      = c.adsterraSiteId||'';
   document.getElementById('sa-cm-notes').value         = c.notes||'';
+  document.getElementById('sa-cm-ad-banner').value    = c.adBannerCode||'';
+  document.getElementById('sa-cm-ad-native').value    = c.adNativeCode||'';
   document.getElementById('sa-cm-status').value        = c.status||'active';
   const pct = c.earningPercent||40;
   document.getElementById('sa-cm-pct').value           = pct;
@@ -692,6 +698,8 @@ document.getElementById('sa-cm-save').addEventListener('click', async () => {
     status:         document.getElementById('sa-cm-status').value || 'active',
     adsterraSiteId: document.getElementById('sa-cm-adsterra').value.trim(),
     notes:          document.getElementById('sa-cm-notes').value.trim(),
+    adBannerCode:   document.getElementById('sa-cm-ad-banner')?.value.trim()||'',
+    adNativeCode:   document.getElementById('sa-cm-ad-native')?.value.trim()||'',
     createdAt:      existing ? (existing.createdAt || new Date().toISOString()) : new Date().toISOString(),
     updatedAt:      new Date().toISOString(),
     totalEarning:   existing ? (existing.totalEarning  || 0) : 0,
@@ -930,9 +938,12 @@ function clShowPage(name) {
   document.getElementById('cl-page-'+name)?.classList.add('on');
   document.querySelector(`[data-cl-page="${name}"]`)?.classList.add('on');
   if(name==='earning') clRenderEarning();
+  if(name==='profile')  clLoadProfile();
 }
 document.querySelectorAll('[data-cl-page]').forEach(el => el.addEventListener('click', () => clShowPage(el.dataset.clPage)));
 document.querySelectorAll('[data-cl-goto]').forEach(el  => el.addEventListener('click', () => clShowPage(el.dataset.clGoto)));
+document.getElementById('cl-p-save')?.addEventListener('click', clSaveProfile);
+document.getElementById('cl-p-reset')?.addEventListener('click', clResetProfile);
 
 function clInitDB(clientId) {
   if (!clientId) return;
@@ -971,6 +982,8 @@ function clInitDB(clientId) {
     const pctBar = Math.min((earn/1000)*100,100);
     document.getElementById('cl-earn-fill').style.width   = pctBar+'%';
     document.getElementById('cl-earn-pct-lbl').textContent= pctBar.toFixed(0)+'%';
+    clLoadProfile();
+    clLoadProfile();
   };
 
   onValue(ref(db,`superAdmin/clients/${clientId}`), handleClientDataSnap, err => {
@@ -981,6 +994,62 @@ function clInitDB(clientId) {
     console.warn('clInitDB clients info listener warning:', err);
   });
 }
+
+// ── PROFILE / SOCIAL LINKS ─────────────────────────────────────────────
+
+function clLoadProfile() {
+  if (!clClientData) return;
+  const p = clClientData.profile || {};
+  document.getElementById('cl-p-name').value      = clClientData.name  || p.name      || '';
+  document.getElementById('cl-p-bio').value       = p.bio       || '';
+  document.getElementById('cl-p-avatar').value    = p.avatar    || '';
+  document.getElementById('cl-p-instagram').value = p.instagram || '';
+  document.getElementById('cl-p-twitter').value   = p.twitter   || '';
+  document.getElementById('cl-p-telegram').value  = p.telegram  || '';
+  document.getElementById('cl-p-whatsapp').value  = p.whatsapp  || '';
+  document.getElementById('cl-p-youtube').value   = p.youtube   || '';
+  document.getElementById('cl-p-other').value     = p.other     || '';
+}
+
+async function clSaveProfile() {
+  const btn = document.getElementById('cl-p-save');
+  const msg = document.getElementById('cl-p-msg');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  try {
+    const profile = {
+      bio:       document.getElementById('cl-p-bio').value.trim(),
+      avatar:    document.getElementById('cl-p-avatar').value.trim(),
+      instagram: document.getElementById('cl-p-instagram').value.trim(),
+      twitter:   document.getElementById('cl-p-twitter').value.trim(),
+      telegram:  document.getElementById('cl-p-telegram').value.trim(),
+      whatsapp:  document.getElementById('cl-p-whatsapp').value.trim(),
+      youtube:   document.getElementById('cl-p-youtube').value.trim(),
+      other:     document.getElementById('cl-p-other').value.trim(),
+    };
+    await set(ref(db, `clients/${clClientId}/info/profile`), profile);
+    msg.style.display = 'block';
+    msg.style.color   = 'var(--grn)';
+    msg.textContent   = '✅ Profile saved! Visitors ko abhi dikhega.';
+    setTimeout(() => { msg.style.display = 'none'; }, 4000);
+  } catch(e) {
+    msg.style.display = 'block';
+    msg.style.color   = 'var(--red)';
+    msg.textContent   = '❌ Save failed: ' + e.message;
+  }
+  btn.disabled = false;
+  btn.textContent = '💾 Save Profile';
+}
+
+function clResetProfile() {
+  clLoadProfile();
+  const msg = document.getElementById('cl-p-msg');
+  msg.style.display = 'block';
+  msg.style.color   = 'var(--mu)';
+  msg.textContent   = 'Reset ho gaya.';
+  setTimeout(() => { msg.style.display = 'none'; }, 2000);
+}
+
 
 function clRenderDashImgs() {
   document.getElementById('cl-dash-imgs').innerHTML = clImages.slice(0,12).map(img=>`

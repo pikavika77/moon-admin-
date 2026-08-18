@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>MoonNight X</title>
+<title>Moon Light X — Admin Panel</title>
 <link rel="stylesheet" href="app.css"/>
 </head>
 <body>
@@ -11,7 +11,7 @@
 <!-- ══ LOGIN VIEW ════════════════════════════════════════════════════════ -->
 <div id="view-login" style="display:flex">
   <div class="lbox" id="login-box">
-    <div class="llogo" id="l-logo">Moon <span>Night X</span></div>
+    <div class="llogo" id="l-logo">Moon <span>Light X</span></div>
     <p class="lsub" id="l-sub">Loading...</p>
     <div class="lbadge owner" id="l-badge">ADMIN</div>
     <div class="linfo" id="l-info">Sign in with Google to continue</div>
@@ -31,7 +31,7 @@
 <!-- ══ SUPER ADMIN VIEW ══════════════════════════════════════════════════ -->
 <div id="view-super" style="display:none">
   <div class="topbar">
-    <div class="tlogo">Moon <span>Night X</span><span class="tbadge owner">SUPER ADMIN</span></div>
+    <div class="tlogo">Moon <span>Light X</span><span class="tbadge owner">SUPER ADMIN</span></div>
     <div class="tright">
       <span class="sdot live" id="sa-db-st">Connecting</span>
       <button class="btn btn-r btn-sm" id="sa-btn-add">+ Add Client</button>
@@ -216,6 +216,7 @@
       <div class="sb-item" data-cl-page="images"><span class="ic">🖼️</span>Images<span class="sbn" id="cl-nb-img">0</span></div>
       <div class="sb-item" data-cl-page="categories"><span class="ic">📂</span>Categories<span class="sbn" id="cl-nb-cat">0</span></div>
       <div class="sb-item" data-cl-page="earning"><span class="ic">💰</span>My Earning</div>
+      <div class="sb-item" data-cl-page="profile"><span class="ic">✏️</span>My Profile</div>
       <div class="sb-foot">
         <div class="sb-user"><strong id="cl-email">—</strong>Client Admin</div>
         <button class="btn btn-g btn-sm" id="cl-btn-logout2" style="width:100%;justify-content:center">Sign Out</button>
@@ -281,7 +282,68 @@
         </div>
       </div>
 
-      <!-- EARNING -->
+      <!-- PROFILE / SITE SETTINGS -->
+      <div class="page" id="cl-page-profile">
+        <div class="phdr"><div class="ptitle">✏️ My Profile &amp; Social Links</div></div>
+        <div class="card">
+          <div class="chdr"><div class="ctitle">👤 Profile Info</div></div>
+          <div class="cbody" style="display:grid;gap:14px">
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Display Name (visitors ko dikhega)</label>
+              <input id="cl-p-name" placeholder="Ravi Gallery" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:13px;outline:none;box-sizing:border-box"/>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Bio / Description (gallery ke baare mein)</label>
+              <textarea id="cl-p-bio" placeholder="Premium 18+ content gallery..." style="width:100%;min-height:70px;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:13px;outline:none;resize:vertical;box-sizing:border-box"></textarea>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Profile / Banner Image URL</label>
+              <input id="cl-p-avatar" type="url" placeholder="https://i.imgur.com/yourphoto.jpg" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:13px;outline:none;box-sizing:border-box"/>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <div class="chdr"><div class="ctitle">🔗 Social Media Links</div></div>
+          <div class="cbody" style="display:grid;gap:12px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:5px">📸 Instagram URL</label>
+                <input id="cl-p-instagram" type="url" placeholder="https://instagram.com/username" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:5px">🐦 Twitter / X URL</label>
+                <input id="cl-p-twitter" type="url" placeholder="https://x.com/username" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:5px">📱 Telegram URL</label>
+                <input id="cl-p-telegram" type="url" placeholder="https://t.me/username" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:5px">💬 WhatsApp Link</label>
+                <input id="cl-p-whatsapp" type="url" placeholder="https://wa.me/91XXXXXXXXXX" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:5px">▶️ YouTube URL</label>
+                <input id="cl-p-youtube" type="url" placeholder="https://youtube.com/@username" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:5px">🔗 Other Link</label>
+                <input id="cl-p-other" type="url" placeholder="https://linktr.ee/username" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--mu);background:var(--s2);padding:10px 14px;border-radius:8px">
+              ⚠️ <strong>Note:</strong> Sirf social links daal sakte ho — legal policies (Terms, Privacy, DMCA) change nahi hongi.
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn btn-g btn-sm" id="cl-p-reset">↩ Reset</button>
+          <button class="btn btn-r" id="cl-p-save">💾 Save Profile</button>
+        </div>
+        <div id="cl-p-msg" style="margin-top:12px;font-size:12px;text-align:right;display:none"></div>
+      </div>
+
+            <!-- EARNING -->
       <div class="page" id="cl-page-earning">
         <div class="phdr"><div class="ptitle">💰 My Earning</div></div>
         <div class="sgrid">
@@ -324,6 +386,19 @@
       </div>
       <div class="fg"><label>Adsterra Site ID</label><input id="sa-cm-adsterra" placeholder="123456"/></div>
       <div class="fg full"><label>Notes</label><textarea id="sa-cm-notes" style="min-height:55px"></textarea></div>
+      <div class="fg full" style="grid-column:1/-1;border-top:1px solid var(--br);padding-top:14px;margin-top:4px">
+        <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">📺 Adsterra Ad Codes (Client ki site pe lagenge)</div>
+        <div class="fg full" style="margin-bottom:10px">
+          <label>Banner Ad Code (Top Banner — Adsterra se copy karo)</label>
+          <textarea id="sa-cm-ad-banner" style="min-height:80px;font-family:monospace;font-size:11px" placeholder="&lt;script type=&quot;text/javascript&quot;&gt;...&lt;/script&gt;"></textarea>
+          <div style="font-size:10px;color:var(--mu);margin-top:4px">Adsterra → My Sites → Banner ad → Copy Code → yahan paste karo</div>
+        </div>
+        <div class="fg full">
+          <label>Native / In-Content Ad Code (Gallery ke beech)</label>
+          <textarea id="sa-cm-ad-native" style="min-height:80px;font-family:monospace;font-size:11px" placeholder="&lt;script type=&quot;text/javascript&quot;&gt;...&lt;/script&gt;"></textarea>
+          <div style="font-size:10px;color:var(--mu);margin-top:4px">Adsterra → My Sites → Native ad → Copy Code → yahan paste karo</div>
+        </div>
+      </div>
     </div>
     <div class="mfoot">
       <button class="btn btn-g" id="sa-cm-cancel">Cancel</button>

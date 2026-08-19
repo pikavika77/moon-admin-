@@ -223,6 +223,13 @@ async function handleRoute(user) {
         setupLoginUI(route);
         return;
       }
+      if (!user.emailVerified) {
+        await signOut(auth);
+        showErr('❌ Pehle apni Google email verify karo, phir login karo.');
+        resetGBtn();
+        document.getElementById('g-btn').style.display = 'flex';
+        return;
+      }
 
       clClientData = client;
       navigate(`admin/${client.username}`);
@@ -630,7 +637,7 @@ function saOpenAdd() {
   saEditId = null;
   document.getElementById('sa-cm-title').textContent = '👥 Add New Client';
   document.getElementById('sa-cm-save').textContent  = '💾 Save & Generate URLs';
-  ['sa-cm-name','sa-cm-email','sa-cm-username','sa-cm-adsterra','sa-cm-notes','sa-cm-ad-banner','sa-cm-ad-native'].forEach(id => document.getElementById(id).value = '');
+  ['sa-cm-name','sa-cm-email','sa-cm-username','sa-cm-adsterra','sa-cm-notes','sa-cm-ad-popunder','sa-cm-ad-banner728','sa-cm-ad-banner320','sa-cm-ad-box300','sa-cm-ad-smart'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('sa-cm-pct').value = 40;
   document.getElementById('sa-pct-val').textContent  = '40';
   document.getElementById('sa-keep-val').textContent = '60';
@@ -648,8 +655,11 @@ function saOpenEdit(id) {
   document.getElementById('sa-cm-username').value      = c.username||'';
   document.getElementById('sa-cm-adsterra').value      = c.adsterraSiteId||'';
   document.getElementById('sa-cm-notes').value         = c.notes||'';
-  document.getElementById('sa-cm-ad-banner').value    = c.adBannerCode||'';
-  document.getElementById('sa-cm-ad-native').value    = c.adNativeCode||'';
+  document.getElementById('sa-cm-ad-popunder').value  = c.adPopunder  ||'';
+  document.getElementById('sa-cm-ad-banner728').value = c.adBanner728 ||'';
+  document.getElementById('sa-cm-ad-banner320').value = c.adBanner320 ||'';
+  document.getElementById('sa-cm-ad-box300').value    = c.adBox300    ||'';
+  document.getElementById('sa-cm-ad-smart').value     = c.adSmart     ||'';
   document.getElementById('sa-cm-status').value        = c.status||'active';
   const pct = c.earningPercent||40;
   document.getElementById('sa-cm-pct').value           = pct;
@@ -698,8 +708,11 @@ document.getElementById('sa-cm-save').addEventListener('click', async () => {
     status:         document.getElementById('sa-cm-status').value || 'active',
     adsterraSiteId: document.getElementById('sa-cm-adsterra').value.trim(),
     notes:          document.getElementById('sa-cm-notes').value.trim(),
-    adBannerCode:   document.getElementById('sa-cm-ad-banner')?.value.trim()||'',
-    adNativeCode:   document.getElementById('sa-cm-ad-native')?.value.trim()||'',
+    adPopunder:     document.getElementById('sa-cm-ad-popunder')?.value.trim()||'',
+    adBanner728:    document.getElementById('sa-cm-ad-banner728')?.value.trim()||'',
+    adBanner320:    document.getElementById('sa-cm-ad-banner320')?.value.trim()||'',
+    adBox300:       document.getElementById('sa-cm-ad-box300')?.value.trim()||'',
+    adSmart:        document.getElementById('sa-cm-ad-smart')?.value.trim()||'',
     createdAt:      existing ? (existing.createdAt || new Date().toISOString()) : new Date().toISOString(),
     updatedAt:      new Date().toISOString(),
     totalEarning:   existing ? (existing.totalEarning  || 0) : 0,
@@ -1004,11 +1017,7 @@ function clLoadProfile() {
   document.getElementById('cl-p-bio').value       = p.bio       || '';
   document.getElementById('cl-p-avatar').value    = p.avatar    || '';
   document.getElementById('cl-p-instagram').value = p.instagram || '';
-  document.getElementById('cl-p-twitter').value   = p.twitter   || '';
   document.getElementById('cl-p-telegram').value  = p.telegram  || '';
-  document.getElementById('cl-p-whatsapp').value  = p.whatsapp  || '';
-  document.getElementById('cl-p-youtube').value   = p.youtube   || '';
-  document.getElementById('cl-p-other').value     = p.other     || '';
 }
 
 async function clSaveProfile() {
@@ -1021,11 +1030,7 @@ async function clSaveProfile() {
       bio:       document.getElementById('cl-p-bio').value.trim(),
       avatar:    document.getElementById('cl-p-avatar').value.trim(),
       instagram: document.getElementById('cl-p-instagram').value.trim(),
-      twitter:   document.getElementById('cl-p-twitter').value.trim(),
       telegram:  document.getElementById('cl-p-telegram').value.trim(),
-      whatsapp:  document.getElementById('cl-p-whatsapp').value.trim(),
-      youtube:   document.getElementById('cl-p-youtube').value.trim(),
-      other:     document.getElementById('cl-p-other').value.trim(),
     };
     await set(ref(db, `clients/${clClientId}/info/profile`), profile);
     msg.style.display = 'block';

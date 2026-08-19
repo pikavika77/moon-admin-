@@ -311,24 +311,8 @@
                 <input id="cl-p-instagram" type="url" placeholder="https://instagram.com/username" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
               </div>
               <div>
-                <label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:5px">🐦 Twitter / X URL</label>
-                <input id="cl-p-twitter" type="url" placeholder="https://x.com/username" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
-              </div>
-              <div>
                 <label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:5px">📱 Telegram URL</label>
                 <input id="cl-p-telegram" type="url" placeholder="https://t.me/username" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
-              </div>
-              <div>
-                <label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:5px">💬 WhatsApp Link</label>
-                <input id="cl-p-whatsapp" type="url" placeholder="https://wa.me/91XXXXXXXXXX" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
-              </div>
-              <div>
-                <label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:5px">▶️ YouTube URL</label>
-                <input id="cl-p-youtube" type="url" placeholder="https://youtube.com/@username" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
-              </div>
-              <div>
-                <label style="font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:5px">🔗 Other Link</label>
-                <input id="cl-p-other" type="url" placeholder="https://linktr.ee/username" style="width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:12px;outline:none;box-sizing:border-box"/>
               </div>
             </div>
             <div style="font-size:11px;color:var(--mu);background:var(--s2);padding:10px 14px;border-radius:8px">
@@ -387,16 +371,37 @@
       <div class="fg"><label>Adsterra Site ID</label><input id="sa-cm-adsterra" placeholder="123456"/></div>
       <div class="fg full"><label>Notes</label><textarea id="sa-cm-notes" style="min-height:55px"></textarea></div>
       <div class="fg full" style="grid-column:1/-1;border-top:1px solid var(--br);padding-top:14px;margin-top:4px">
-        <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">📺 Adsterra Ad Codes (Client ki site pe lagenge)</div>
-        <div class="fg full" style="margin-bottom:10px">
-          <label>Banner Ad Code (Top Banner — Adsterra se copy karo)</label>
-          <textarea id="sa-cm-ad-banner" style="min-height:80px;font-family:monospace;font-size:11px" placeholder="&lt;script type=&quot;text/javascript&quot;&gt;...&lt;/script&gt;"></textarea>
-          <div style="font-size:10px;color:var(--mu);margin-top:4px">Adsterra → My Sites → Banner ad → Copy Code → yahan paste karo</div>
+        <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">📺 Adsterra Ad Codes — Client ki public site pe automatically lagenge</div>
+        <div style="display:grid;gap:12px">
+
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--tx);display:block;margin-bottom:4px">🔴 Popunder Ad Code <span style="color:var(--mu);font-weight:400">(site open hote hi — sabse zyada earning)</span></label>
+            <textarea id="sa-cm-ad-popunder" style="width:100%;min-height:60px;padding:8px 10px;background:var(--bg);border:1px solid var(--br);border-radius:8px;color:var(--tx);font-family:monospace;font-size:10px;outline:none;resize:vertical;box-sizing:border-box" placeholder="&lt;script&gt;...popunder script...&lt;/script&gt;"></textarea>
+            <div style="font-size:10px;color:var(--mu);margin-top:3px">Adsterra → Popunder → Copy Code</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--tx);display:block;margin-bottom:4px">📐 Banner 728×90 <span style="color:var(--mu);font-weight:400">(desktop top)</span></label>
+              <textarea id="sa-cm-ad-banner728" style="width:100%;min-height:55px;padding:8px 10px;background:var(--bg);border:1px solid var(--br);border-radius:8px;color:var(--tx);font-family:monospace;font-size:10px;outline:none;resize:vertical;box-sizing:border-box" placeholder="&lt;script&gt;...728x90...&lt;/script&gt;"></textarea>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--tx);display:block;margin-bottom:4px">📱 Banner 320×50 <span style="color:var(--mu);font-weight:400">(mobile top)</span></label>
+              <textarea id="sa-cm-ad-banner320" style="width:100%;min-height:55px;padding:8px 10px;background:var(--bg);border:1px solid var(--br);border-radius:8px;color:var(--tx);font-family:monospace;font-size:10px;outline:none;resize:vertical;box-sizing:border-box" placeholder="&lt;script&gt;...320x50...&lt;/script&gt;"></textarea>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--tx);display:block;margin-bottom:4px">📦 Box 300×250 <span style="color:var(--mu);font-weight:400">(in-content)</span></label>
+              <textarea id="sa-cm-ad-box300" style="width:100%;min-height:55px;padding:8px 10px;background:var(--bg);border:1px solid var(--br);border-radius:8px;color:var(--tx);font-family:monospace;font-size:10px;outline:none;resize:vertical;box-sizing:border-box" placeholder="&lt;script&gt;...300x250...&lt;/script&gt;"></textarea>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--tx);display:block;margin-bottom:4px">🔗 Smart Link <span style="color:var(--mu);font-weight:400">(direct link)</span></label>
+              <textarea id="sa-cm-ad-smart" style="width:100%;min-height:55px;padding:8px 10px;background:var(--bg);border:1px solid var(--br);border-radius:8px;color:var(--tx);font-family:monospace;font-size:10px;outline:none;resize:vertical;box-sizing:border-box" placeholder="&lt;script&gt;...smart link...&lt;/script&gt;"></textarea>
+            </div>
+          </div>
+
         </div>
-        <div class="fg full">
-          <label>Native / In-Content Ad Code (Gallery ke beech)</label>
-          <textarea id="sa-cm-ad-native" style="min-height:80px;font-family:monospace;font-size:11px" placeholder="&lt;script type=&quot;text/javascript&quot;&gt;...&lt;/script&gt;"></textarea>
-          <div style="font-size:10px;color:var(--mu);margin-top:4px">Adsterra → My Sites → Native ad → Copy Code → yahan paste karo</div>
+        <div style="font-size:10px;color:var(--mu);background:var(--s2);padding:8px 12px;border-radius:7px;margin-top:10px">
+          ℹ️ Adsterra se codes copy karo → yahan paste karo → Save karo. Client ki public gallery pe automatically activate ho jaayenge.
         </div>
       </div>
     </div>

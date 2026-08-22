@@ -146,12 +146,25 @@ function getBase() {
   return defaultBase;
 }
 
+function getPublicBase() {
+  const stored = localStorage.getItem('mnx_public_url');
+  if (stored && stored.trim()) {
+    return stored.trim().replace(/\/+$/, '');
+  }
+  return getBase();
+}
+
 function getClientSiteUrl(c, base) {
   if (!c) return '';
+  const publicBase = getPublicBase();
   if (!c.siteUrl || c.siteUrl.includes('/#/' + c.username) || c.siteUrl.startsWith(window.location.origin + '/#/')) {
-    return `${base}/#/${c.username}`;
+    return `${publicBase}/#/${c.username}`;
   }
-  return c.siteUrl;
+  // Update stale siteUrl if it's pointing to admin domain
+  if (c.siteUrl && c.siteUrl.includes(window.location.hostname) && !c.siteUrl.includes('/#/admin/')) {
+    return `${publicBase}/#/${c.username}`;
+  }
+  return `${publicBase}/#/${c.username}`;
 }
 
 // ── AUTH STATE & ROUTE HANDLING ────────────────────────────────────────
@@ -921,10 +934,14 @@ document.getElementById('sa-btn-earn').addEventListener('click', async () => {
 
 // SETTINGS
 function saLoadSettings() {
-  const base = getBase();
-  document.getElementById('sa-base-url').value = base;
+  const base       = getBase();
+  const publicBase = getPublicBase();
+  document.getElementById('sa-base-url').value   = base;
+  if (document.getElementById('sa-public-url')) {
+    document.getElementById('sa-public-url').value = publicBase !== base ? publicBase : '';
+  }
   document.getElementById('sa-url-preview').textContent  = base + '/#/admin/username';
-  document.getElementById('sa-site-preview').textContent = base + '/#/username';
+  document.getElementById('sa-site-preview').textContent = publicBase + '/#/username';
 }
 document.getElementById('sa-base-url').addEventListener('input', () => {
   let v = document.getElementById('sa-base-url').value.trim().replace(/\/index\.(html?|php)$/i, '').replace(/\/+$/, '');

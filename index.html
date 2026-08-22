@@ -161,17 +161,28 @@
               Ye woh domain hai jahan ye file host hai. Client URLs isi se banenge.<br>
               <strong style="color:var(--tx)">Jaise:</strong> <code style="background:var(--s2);padding:2px 6px;border-radius:4px;font-size:11px">https://moonlightx.qd.je</code>
             </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
-              <div style="flex:1;min-width:200px">
-                <div style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Base URL</div>
-                <input id="sa-base-url" type="url" placeholder="https://moonlightx.qd.je"
-                  style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:13px;outline:none"/>
+            <div style="display:grid;gap:12px">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+                <div style="flex:1;min-width:200px">
+                  <div style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">⚙️ Admin Panel Base URL</div>
+                  <div style="font-size:10px;color:var(--mu);margin-bottom:5px">Jahan admin panel host hai (ye URL)</div>
+                  <input id="sa-base-url" type="url" placeholder="https://pikavika77.github.io/moon-admin-"
+                    style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:13px;outline:none;box-sizing:border-box"/>
+                </div>
               </div>
-              <button class="btn btn-r" id="sa-save-base">💾 Save</button>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+                <div style="flex:1;min-width:200px">
+                  <div style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">🌐 Public Site Base URL</div>
+                  <div style="font-size:10px;color:var(--mu);margin-bottom:5px">Jahan public gallery host hai (alag repo/domain)</div>
+                  <input id="sa-public-url" type="url" placeholder="https://pikavika77.github.io/moonlightx"
+                    style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:13px;outline:none;box-sizing:border-box"/>
+                </div>
+              </div>
+              <button class="btn btn-r" id="sa-save-base" style="align-self:flex-start">💾 Save Both URLs</button>
             </div>
             <div style="margin-top:12px;padding:12px 14px;background:var(--bg);border:1px solid var(--br);border-radius:10px;font-size:11px;font-family:monospace;color:var(--mu)">
               Preview Admin URL: <span id="sa-url-preview" style="color:var(--grn)">—</span><br>
-              Preview Site URL: <span id="sa-site-preview" style="color:var(--blu)">—</span>
+              Preview Site URL&nbsp;: <span id="sa-site-preview" style="color:var(--blu)">—</span>
             </div>
           </div>
         </div>

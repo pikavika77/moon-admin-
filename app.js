@@ -937,8 +937,14 @@ document.getElementById('sa-save-base').addEventListener('click', () => {
   if (!url) url = getDefaultBase();
   localStorage.setItem('mnx_base_url', url);
   document.getElementById('sa-base-url').value = url;
-  toast('✅ Base URL saved!');
-  saAddLog('edit','Updated base URL: '+url);
+  // Also save public site URL
+  let pubUrl = document.getElementById('sa-public-url')?.value.trim().replace(/\/index\.(html?|php)$/i, '').replace(/\/+$/, '') || '';
+  if (pubUrl) {
+    localStorage.setItem('mnx_public_url', pubUrl);
+    document.getElementById('sa-public-url').value = pubUrl;
+  }
+  toast('✅ URLs saved! Ab share karo — sahi links generate honge.');
+  saAddLog('edit','Updated URLs — Admin: '+url+' | Public: '+(pubUrl||'same as admin'));
 });
 
 // ACTIVITY CONTROLS

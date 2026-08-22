@@ -147,10 +147,27 @@ function getBase() {
 }
 
 function getPublicBase() {
+  // Try localStorage first
   const stored = localStorage.getItem('mnx_public_url');
   if (stored && stored.trim()) {
     return stored.trim().replace(/\/+$/, '');
   }
+  // If not set - prompt user to enter public site URL right now
+  const entered = prompt(
+    '⚠️ Public Site URL set nahi hai!\n\n' +
+    'Apni public gallery ka URL daalo:\n' +
+    '(jahan tumhare visitors jaate hain - login wali site NAHI)\n\n' +
+    'Example: https://pikavika77.github.io/moonlightx'
+  );
+  if (entered && entered.trim().startsWith('http')) {
+    const clean = entered.trim().replace(/\/+$/, '');
+    localStorage.setItem('mnx_public_url', clean);
+    // Also save to settings field if visible
+    const field = document.getElementById('sa-public-url');
+    if (field) field.value = clean;
+    return clean;
+  }
+  // Last resort - return admin base (wrong but better than crash)
   return getBase();
 }
 
@@ -492,6 +509,16 @@ function saRenderDashLog() {
 
 // DB
 function saInitDB() {
+  // Auto-load public site URL from Firebase settings
+  get(ref(db, 'superAdmin/settings/publicUrl')).then(snap => {
+    if (snap.exists() && snap.val()) {
+      const pubUrl = snap.val().trim().replace(/\/+$/, '');
+      localStorage.setItem('mnx_public_url', pubUrl);
+      const field = document.getElementById('sa-public-url');
+      if (field) field.value = pubUrl;
+    }
+  }).catch(() => {});
+
   onValue(ref(db, 'superAdmin/clients'), snap => {
     saClients = snapToArray(snap);
     document.getElementById('sa-db-st').textContent   = 'Live';
@@ -595,9 +622,10 @@ document.getElementById('sa-q-client')?.addEventListener('input', saRenderClient
 // SHARE MODAL
 function saShowShareModal(clientId) {
   const c    = saClients.find(x => x.id === clientId); if(!c) return;
-  const base = getBase();
-  const adminUrl = `${base}/#/admin/${c.username}`;
-  const siteUrl  = getClientSiteUrl(c, base);
+  const base       = getBase();
+  const publicBase = getPublicBase();
+  const adminUrl   = `${base}/#/admin/${c.username}`;
+  const siteUrl    = `${publicBase}/#/${c.username}`;
 
   document.getElementById('sm-name').textContent       = c.name;
   document.getElementById('sm-admin-url').textContent  = adminUrl;
@@ -743,7 +771,7 @@ document.getElementById('sa-cm-save').addEventListener('click', async () => {
     todayVisits:    existing ? (existing.todayVisits   || 0) : 0,
     totalViews:     existing ? (existing.totalViews    || 0) : 0,
     adminUrl:       base + '/#/admin/' + username,
-    siteUrl:        existing ? getClientSiteUrl(existing, base) : base+'/#/'+username,
+    siteUrl:        getPublicBase()+'/#/'+username,
   };
 
   const btn = document.getElementById('sa-cm-save');
@@ -954,14 +982,17 @@ document.getElementById('sa-save-base').addEventListener('click', () => {
   if (!url) url = getDefaultBase();
   localStorage.setItem('mnx_base_url', url);
   document.getElementById('sa-base-url').value = url;
-  // Also save public site URL
-  let pubUrl = document.getElementById('sa-public-url')?.value.trim().replace(/\/index\.(html?|php)$/i, '').replace(/\/+$/, '') || '';
+  // Save public site URL to localStorage AND Firebase
+  const pubUrl = (document.getElementById('sa-public-url')?.value||'').trim().replace(/\/index\.(html?|php)$/i,'').replace(/\/+$/,'');
   if (pubUrl) {
     localStorage.setItem('mnx_public_url', pubUrl);
-    document.getElementById('sa-public-url').value = pubUrl;
+    set(ref(db,'superAdmin/settings/publicUrl'), pubUrl).catch(console.warn);
+    set(ref(db,'superAdmin/settings/adminUrl'), url).catch(console.warn);
+    toast('✅ URLs saved! Ab sahi public link generate hoga.');
+  } else {
+    toast('⚠️ Public Site URL zaroori hai — Settings mein daalo!','warn');
   }
-  toast('✅ URLs saved! Ab share karo — sahi links generate honge.');
-  saAddLog('edit','Updated URLs — Admin: '+url+' | Public: '+(pubUrl||'same as admin'));
+  saAddLog('edit','URLs — Admin: '+url+' | Public: '+(pubUrl||'NOT SET'));
 });
 
 // ACTIVITY CONTROLS
